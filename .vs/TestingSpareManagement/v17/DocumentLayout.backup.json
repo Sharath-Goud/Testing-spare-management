@@ -1,0 +1,153 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{F4D9F457-BC97-4AA3-AEE7-939375F6840B}|TestingSpareManagement\\TestingSpareManagement.csproj|c:\\users\\2063907\\source\\repos\\testingsparemanagement\\testingsparemanagement\\views\\masterconnector\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F4D9F457-BC97-4AA3-AEE7-939375F6840B}|TestingSpareManagement\\TestingSpareManagement.csproj|solutionrelative:testingsparemanagement\\views\\masterconnector\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4D9F457-BC97-4AA3-AEE7-939375F6840B}|TestingSpareManagement\\TestingSpareManagement.csproj|c:\\users\\2063907\\source\\repos\\testingsparemanagement\\testingsparemanagement\\wwwroot\\css\\master-connector.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{F4D9F457-BC97-4AA3-AEE7-939375F6840B}|TestingSpareManagement\\TestingSpareManagement.csproj|solutionrelative:testingsparemanagement\\wwwroot\\css\\master-connector.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4D9F457-BC97-4AA3-AEE7-939375F6840B}|TestingSpareManagement\\TestingSpareManagement.csproj|c:\\users\\2063907\\source\\repos\\testingsparemanagement\\testingsparemanagement\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F4D9F457-BC97-4AA3-AEE7-939375F6840B}|TestingSpareManagement\\TestingSpareManagement.csproj|solutionrelative:testingsparemanagement\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4D9F457-BC97-4AA3-AEE7-939375F6840B}|TestingSpareManagement\\TestingSpareManagement.csproj|c:\\users\\2063907\\source\\repos\\testingsparemanagement\\testingsparemanagement\\models\\masterconnector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F4D9F457-BC97-4AA3-AEE7-939375F6840B}|TestingSpareManagement\\TestingSpareManagement.csproj|solutionrelative:testingsparemanagement\\models\\masterconnector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4D9F457-BC97-4AA3-AEE7-939375F6840B}|TestingSpareManagement\\TestingSpareManagement.csproj|c:\\users\\2063907\\source\\repos\\testingsparemanagement\\testingsparemanagement\\controllers\\masterconnectorcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F4D9F457-BC97-4AA3-AEE7-939375F6840B}|TestingSpareManagement\\TestingSpareManagement.csproj|solutionrelative:testingsparemanagement\\controllers\\masterconnectorcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4D9F457-BC97-4AA3-AEE7-939375F6840B}|TestingSpareManagement\\TestingSpareManagement.csproj|c:\\users\\2063907\\source\\repos\\testingsparemanagement\\testingsparemanagement\\models\\masterconnectorviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F4D9F457-BC97-4AA3-AEE7-939375F6840B}|TestingSpareManagement\\TestingSpareManagement.csproj|solutionrelative:testingsparemanagement\\models\\masterconnectorviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4D9F457-BC97-4AA3-AEE7-939375F6840B}|TestingSpareManagement\\TestingSpareManagement.csproj|c:\\users\\2063907\\source\\repos\\testingsparemanagement\\testingsparemanagement\\wwwroot\\css\\dashboard.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{F4D9F457-BC97-4AA3-AEE7-939375F6840B}|TestingSpareManagement\\TestingSpareManagement.csproj|solutionrelative:testingsparemanagement\\wwwroot\\css\\dashboard.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4D9F457-BC97-4AA3-AEE7-939375F6840B}|TestingSpareManagement\\TestingSpareManagement.csproj|c:\\users\\2063907\\source\\repos\\testingsparemanagement\\testingsparemanagement\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{F4D9F457-BC97-4AA3-AEE7-939375F6840B}|TestingSpareManagement\\TestingSpareManagement.csproj|solutionrelative:testingsparemanagement\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "dashboard.css",
+              "DocumentMoniker": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\wwwroot\\css\\dashboard.css",
+              "RelativeDocumentMoniker": "TestingSpareManagement\\wwwroot\\css\\dashboard.css",
+              "ToolTip": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\wwwroot\\css\\dashboard.css",
+              "RelativeToolTip": "TestingSpareManagement\\wwwroot\\css\\dashboard.css",
+              "ViewState": "AgIAAKwDAAAAAAAAAAAAwKwDAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-09-21T02:56:26.103Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "site.css",
+              "DocumentMoniker": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\wwwroot\\css\\site.css",
+              "RelativeDocumentMoniker": "TestingSpareManagement\\wwwroot\\css\\site.css",
+              "ToolTip": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\wwwroot\\css\\site.css",
+              "RelativeToolTip": "TestingSpareManagement\\wwwroot\\css\\site.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-09-21T02:56:22.254Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "master-connector.css",
+              "DocumentMoniker": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\wwwroot\\css\\master-connector.css",
+              "RelativeDocumentMoniker": "TestingSpareManagement\\wwwroot\\css\\master-connector.css",
+              "ToolTip": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\wwwroot\\css\\master-connector.css",
+              "RelativeToolTip": "TestingSpareManagement\\wwwroot\\css\\master-connector.css",
+              "ViewState": "AgIAAIwBAAAAAAAAAAAAAKEBAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-09-20T13:50:13.609Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\Views\\MasterConnector\\Index.cshtml",
+              "RelativeDocumentMoniker": "TestingSpareManagement\\Views\\MasterConnector\\Index.cshtml",
+              "ToolTip": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\Views\\MasterConnector\\Index.cshtml",
+              "RelativeToolTip": "TestingSpareManagement\\Views\\MasterConnector\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-20T13:49:26.078Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "MasterConnectorViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\Models\\MasterConnectorViewModel.cs",
+              "RelativeDocumentMoniker": "TestingSpareManagement\\Models\\MasterConnectorViewModel.cs",
+              "ToolTip": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\Models\\MasterConnectorViewModel.cs",
+              "RelativeToolTip": "TestingSpareManagement\\Models\\MasterConnectorViewModel.cs",
+              "ViewState": "AgIAADsAAAAAAAAAAAAUwEcAAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-20T13:48:50.465Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "MasterConnector.cs",
+              "DocumentMoniker": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\Models\\MasterConnector.cs",
+              "RelativeDocumentMoniker": "TestingSpareManagement\\Models\\MasterConnector.cs",
+              "ToolTip": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\Models\\MasterConnector.cs",
+              "RelativeToolTip": "TestingSpareManagement\\Models\\MasterConnector.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-20T13:48:35.94Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MasterConnectorController.cs",
+              "DocumentMoniker": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\Controllers\\MasterConnectorController.cs",
+              "RelativeDocumentMoniker": "TestingSpareManagement\\Controllers\\MasterConnectorController.cs",
+              "ToolTip": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\Controllers\\MasterConnectorController.cs",
+              "RelativeToolTip": "TestingSpareManagement\\Controllers\\MasterConnectorController.cs",
+              "ViewState": "AgIAAD8DAAAAAAAAAAAcwFADAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-20T13:48:14.439Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "TestingSpareManagement\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "TestingSpareManagement\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAAJ8AAAAAAAAAAADwv7EAAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-20T13:22:34.971Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

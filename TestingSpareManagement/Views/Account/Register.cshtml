@@ -1,0 +1,376 @@
+﻿@model TestingSpareManagement.ViewModels.RegisterViewModel
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Employee Registration";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        Employee Registration - Testing Spare Management System
+    </title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            overflow: hidden;
+        }
+
+        .register-page {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient( 135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.20) ), url('https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=1920&auto=format&fit=crop') center / cover no-repeat;
+        }
+
+        .register-card {
+            width: 100%;
+            max-width: 400px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            color: #1e293b;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+            .logo-container img {
+                height: 80px;
+                width: auto;
+                max-width: 230px;
+                object-fit: contain;
+            }
+
+        .title {
+            text-align: center;
+            font-size: 15px;
+            font-weight: 800;
+            color: #7c3aed;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            margin-bottom: 22px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                font-size: 11px;
+                color: #64748b;
+                font-weight: 600;
+            }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #0f172a;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+            .form-control:focus {
+                border-color: #8b5cf6;
+                background: #ffffff;
+                box-shadow: 0 0 0 3px rgba(139,92,246,0.12);
+            }
+
+        .validation-message {
+            display: block;
+            color: #dc2626;
+            font-size: 10.5px;
+            margin-top: 4px;
+        }
+
+        .validation-summary {
+            color: #dc2626;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 12px;
+            font-size: 11px;
+        }
+
+            .validation-summary:empty {
+                display: none;
+            }
+
+            .validation-summary ul {
+                margin: 0;
+                padding-left: 18px;
+            }
+
+        .register-button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(139,92,246,0.25);
+            transition: all 0.2s ease;
+        }
+
+            .register-button:hover {
+                background: #7c3aed;
+                transform: translateY(-1px);
+            }
+
+        .login-section {
+            text-align: center;
+            margin-top: 18px;
+            padding-top: 15px;
+            border-top: 1px solid #f1f5f9;
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .login-link {
+            color: #7c3aed;
+            font-weight: 700;
+            text-decoration: none;
+            margin-left: 4px;
+        }
+
+            .login-link:hover {
+                color: #6d28d9;
+                text-decoration: underline;
+            }
+
+        @@media (max-width: 480px) {
+
+            .register-page {
+                padding: 15px;
+            }
+
+            .register-card {
+                padding: 25px 20px;
+            }
+
+            .logo-container img {
+                height: 70px;
+            }
+
+            .title {
+                font-size: 14px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="register-page">
+
+        <div class="register-card">
+
+            <!-- Foxlink Logo -->
+
+            <div class="logo-container">
+
+                <img src="~/images/Foxlink-logo.png"
+                     alt="Foxlink Logo" />
+
+            </div>
+
+
+            <!-- System Title -->
+
+            <div class="title">
+
+                TESTING SPARE MANAGEMENT SYSTEM
+
+            </div>
+
+
+            <div class="subtitle">
+
+                Employee Registration
+
+            </div>
+
+
+            <!-- Registration Form -->
+
+            <form asp-controller="Account"
+                  asp-action="Register"
+                  method="post"
+                  autocomplete="off">
+
+                @Html.AntiForgeryToken()
+
+
+                <!-- Validation Summary -->
+
+                <div class="validation-summary"
+                     asp-validation-summary="ModelOnly">
+                </div>
+
+
+                <!-- Employee ID -->
+
+                <div class="form-group">
+
+                    <label asp-for="EmployeeId">
+                        Employee ID
+                    </label>
+
+                    <input asp-for="EmployeeId"
+                           class="form-control"
+                           placeholder="Enter Employee ID"
+                           autocomplete="off" />
+
+                    <span asp-validation-for="EmployeeId"
+                          class="validation-message">
+                    </span>
+
+                </div>
+
+
+                <!-- Employee Name -->
+
+                <div class="form-group">
+
+                    <label asp-for="EmployeeName">
+                        Employee Name
+                    </label>
+
+                    <input asp-for="EmployeeName"
+                           class="form-control"
+                           placeholder="Enter Employee Name"
+                           autocomplete="off" />
+
+                    <span asp-validation-for="EmployeeName"
+                          class="validation-message">
+                    </span>
+
+                </div>
+
+
+                <!-- Password -->
+
+                <div class="form-group">
+
+                    <label asp-for="Password">
+                        Password
+                    </label>
+
+                    <input asp-for="Password"
+                           class="form-control"
+                           placeholder="Enter Password"
+                           autocomplete="new-password" />
+
+                    <span asp-validation-for="Password"
+                          class="validation-message">
+                    </span>
+
+                </div>
+
+
+                <!-- Confirm Password -->
+
+                <div class="form-group">
+
+                    <label asp-for="ConfirmPassword">
+                        Confirm Password
+                    </label>
+
+                    <input asp-for="ConfirmPassword"
+                           class="form-control"
+                           placeholder="Confirm Password"
+                           autocomplete="new-password" />
+
+                    <span asp-validation-for="ConfirmPassword"
+                          class="validation-message">
+                    </span>
+
+                </div>
+
+
+                <!-- Register -->
+
+                <button type="submit"
+                        class="register-button">
+
+                    Create Account
+
+                </button>
+
+            </form>
+
+
+            <!-- Login Link -->
+
+            <div class="login-section">
+
+                Already registered?
+
+                <a asp-controller="Account"
+                   asp-action="Login"
+                   class="login-link">
+
+                    Login
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

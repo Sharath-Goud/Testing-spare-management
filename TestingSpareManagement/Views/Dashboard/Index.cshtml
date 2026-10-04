@@ -1,0 +1,428 @@
+﻿@model TestingSpareManagement.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Testing Spare Management System";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="mainApp">
+
+    <div id="globalAlarmBannerTop"
+         class="alarm-banner-top">
+
+        <h3>
+            🚨 SYSTEM ALARM:
+            CRITICAL LOW MATERIAL QUANTITY DETECTED
+        </h3>
+
+        <ul id="globalAlarmListTop"
+            class="alarm-list">
+        </ul>
+
+    </div>
+
+
+    <div id="realTimeView"
+         class="dashboard-view active">
+
+
+        <div class="card">
+
+
+            <h2>
+
+                ⚡ Real-Time Factory Command Center &
+                Live Telemetry
+
+
+                <span class="live-status">
+
+                    🟢 LIVE SYSTEM ONLINE
+
+                </span>
+
+
+            </h2>
+
+
+            <div class="rt-metric-grid">
+
+
+                <div class="rt-metric-card purple-card">
+
+
+                    <div class="rt-card-title">
+
+                        Master Connectors Consolidated
+
+                    </div>
+
+
+                    <div class="rt-card-value">
+
+                        @Model.TotalConnectors
+
+                    </div>
+
+
+                    <div class="rt-card-sub">
+
+                        Matrix Mapped Spares
+
+                    </div>
+
+
+                </div>
+
+
+
+                <div class="rt-metric-card red-card">
+
+
+                    <div class="rt-card-title">
+
+                        Stock-Out Alerts ⚠️
+
+                    </div>
+
+
+                    <div class="rt-card-value">
+
+                        @Model.StockOutAlerts
+
+                    </div>
+
+
+                    <div class="rt-card-sub">
+
+                        Requires Immediate PO
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="rt-metric-card yellow-card">
+
+
+                    <div class="rt-card-title">
+
+                        Pending Requisitions
+
+                    </div>
+
+
+                    <div class="rt-card-value">
+
+                        @Model.PendingRequests
+
+                    </div>
+
+
+                    <div class="rt-card-sub">
+
+                        Awaiting Admin Sign-off
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="rt-metric-card blue-card">
+
+
+                    <div class="rt-card-title">
+
+                        YTD Spares Burn (INR)
+
+                    </div>
+
+
+                    <div class="rt-card-value">
+
+                        ₹ @Model.YtdSpend
+
+                    </div>
+
+
+                    <div class="rt-card-sub">
+
+                        Within Allocated Cap
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= PROJECTS + CLOCK SECTION ================= -->
+
+
+    <div class="projects-clock-container">
+
+
+        <!-- ACTIVE PROJECTS -->
+
+        <div class="card project-card">
+
+
+            <h3>
+
+                📁 Active Projects Status Grid
+
+            </h3>
+
+
+            <div id="activeProjectsGridContainer"
+                 class="projects-status-grid">
+
+                <div class="project-status-card">
+                    <div>
+                        <strong>🔌 A246f</strong>
+                        <span>C-C Cable</span>
+                    </div>
+
+                    <span class="green-badge">
+                        🟢 ONLINE
+                    </span>
+                </div>
+
+                <div class="project-status-card">
+                    <div>
+                        <strong>🔌 A246f</strong>
+                        <span>C-C Cable</span>
+                    </div>
+
+                    <span class="green-badge">
+                        🟢 ONLINE
+                    </span>
+                </div>
+
+                <div class="project-status-card">
+                    <div>
+                        <strong>⚡ A191m</strong>
+                        <span>Lightning Cable</span>
+                    </div>
+
+                    <span class="green-badge">
+                        🟢 ONLINE
+                    </span>
+                </div>
+
+                <div class="project-status-card">
+                    <div>
+                        <strong>🔗 Vivo_zv6</strong>
+                        <span>USB-C Cable</span>
+                    </div>
+
+                    <span class="green-badge">
+                        🟢 ONLINE
+                    </span>
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
+
+        <!-- FACTORY CLOCK -->
+
+
+        <div class="card clock-container">
+
+
+            <h3>
+
+                🌐 Factory Time Zone Clocks
+
+            </h3>
+
+
+
+            <div class="dual-clock-box">
+
+
+
+                <!-- INDIA -->
+
+
+                <div class="clock-card-india">
+
+
+                    <div class="clock-symbol-title">
+
+                        🏛️ INDIA (IST)
+
+                    </div>
+
+
+                    <div id="indiaClockTime"
+                         class="clock-time">
+
+                        00:00:00
+
+                    </div>
+
+
+                    <div id="indiaClockDate"
+                         class="clock-date">
+
+                        --
+
+                    </div>
+
+
+                </div>
+
+
+
+
+                <!-- CHINA -->
+
+
+                <div class="clock-card-china">
+
+
+                    <div class="clock-symbol-title">
+
+                        🐉 CHINA (CST)
+
+                    </div>
+
+
+                    <div id="chinaClockTime"
+                         class="clock-time">
+
+                        00:00:00
+
+                    </div>
+
+
+                    <div id="chinaClockDate"
+                         class="clock-date">
+
+                        --
+
+                    </div>
+
+
+                </div>
+
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+    </div>
+
+
+
+
+
+    <!-- ================= CHART SECTION ================= -->
+
+
+    <div class="chart-grid">
+
+
+        <div class="card">
+
+
+            <div class="card-header">
+
+
+                <h3>
+
+                    📊 Current Month Budget & Expense Analysis
+
+                </h3>
+
+
+
+                <span id="currentMonthDisplay">
+
+                    September 2026
+
+                </span>
+
+
+            </div>
+
+
+
+            <div class="chart-box">
+
+
+                <canvas id="compactTrendCanvas"></canvas>
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+
+
+
+        <div class="card">
+
+
+            <div class="card-header">
+
+
+                <h3>
+
+                    📈 Yearly Trend:
+                    Budget Utilized vs Cost Saved
+
+                </h3>
+
+
+                <span>
+
+                    Multi-Year Master View
+
+                </span>
+
+
+            </div>
+
+
+
+            <div class="chart-box">
+
+
+                <canvas id="yearlyTrendCanvas"></canvas>
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+
+    </div>
+
+
+
+</div>

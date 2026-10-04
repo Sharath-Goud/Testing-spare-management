@@ -1,0 +1,564 @@
+
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f4f6f9;
+}
+
+
+/* ============================================================
+   TOP HEADER
+   ============================================================ */
+
+.app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 72px;
+    background: #ffffff;
+    border-bottom: 1px solid #dfe3e8;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    z-index: 2000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+
+/* ============================================================
+   HEADER BRAND
+   ============================================================ */
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+
+.brand-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: linear-gradient( 135deg, #5b21b6, #7c3aed );
+    color: white;
+    font-size: 22px;
+    box-shadow: 0 4px 10px rgba(91, 33, 182, 0.25);
+}
+
+
+.brand-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #202938;
+}
+
+
+.brand-subtitle {
+    margin-top: 2px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #7b8494;
+}
+
+
+/* ============================================================
+   HEADER RIGHT
+   ============================================================ */
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+
+/* ============================================================
+   SEARCH
+   ============================================================ */
+
+.header-search {
+    height: 38px;
+    width: 220px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    border: 1px solid #dfe3e8;
+    border-radius: 8px;
+    background: #fafbfc;
+}
+
+
+    .header-search i {
+        color: #8b95a5;
+    }
+
+
+    .header-search input {
+        border: none;
+        outline: none;
+        width: 100%;
+        background: transparent;
+        font-size: 13px;
+    }
+
+
+/* ============================================================
+   USER
+   ============================================================ */
+
+.header-user {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+
+.user-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eee9ff;
+    color: #673ab7;
+}
+
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.user-label {
+    font-size: 10px;
+    color: #8b95a5;
+}
+
+
+.user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #252b36;
+}
+
+
+/* ============================================================
+   LOGOUT
+   ============================================================ */
+
+.logout-form {
+    margin: 0;
+}
+
+
+.logout-button {
+    border: 1px solid #ef4444;
+    background: #fff;
+    color: #dc2626;
+    padding: 8px 13px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+
+    .logout-button:hover {
+        background: #dc2626;
+        color: #ffffff;
+    }
+
+
+/* ============================================================
+   APPLICATION WRAPPER
+   ============================================================ */
+
+.app-wrapper {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    padding-top: 72px;
+}
+
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+
+.app-sidebar {
+    position: fixed;
+    top: 72px;
+    left: 0;
+    bottom: 0;
+    width: 260px;
+    background: #ffffff;
+    border-right: 1px solid #e1e5ea;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    z-index: 1500;
+}
+
+
+/* ============================================================
+   SIDEBAR HEADER
+   ============================================================ */
+
+.sidebar-header {
+    height: 58px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 18px;
+    border-bottom: 1px solid #edf0f3;
+    color: #4b5563;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+}
+
+
+.sidebar-menu-icon {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+
+/* ============================================================
+   SIDEBAR SECTION
+   ============================================================ */
+
+.sidebar-section {
+    padding: 14px 10px 4px;
+}
+
+
+.sidebar-section-title {
+    padding: 0 10px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #9ca3af;
+}
+
+
+/* ============================================================
+   SIDEBAR ITEM
+   ============================================================ */
+
+.sidebar-item {
+    position: relative;
+    width: 100%;
+    min-height: 46px;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    margin-bottom: 3px;
+    border-radius: 8px;
+    color: #4b5563;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+
+    .sidebar-item:hover {
+        background: #f5f7fa;
+        color: #1f2937;
+        transform: translateX(2px);
+    }
+
+
+    /* ============================================================
+   ACTIVE ITEM
+   ============================================================ */
+
+    .sidebar-item.active {
+        background: #f0edff;
+        color: #5b21b6;
+        font-weight: 600;
+    }
+
+
+        .sidebar-item.active::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 8px;
+            bottom: 8px;
+            width: 3px;
+            border-radius: 0 4px 4px 0;
+            background: #6d28d9;
+        }
+
+
+/* ============================================================
+   SIDEBAR ICON
+   ============================================================ */
+
+.sidebar-icon {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+
+.sidebar-red {
+    background: #fff1f2;
+    color: #ef4444;
+}
+
+
+.sidebar-purple {
+    background: #f3e8ff;
+    color: #7c3aed;
+}
+
+
+.sidebar-orange {
+    background: #fff7ed;
+    color: #f97316;
+}
+
+
+.sidebar-green {
+    background: #ecfdf5;
+    color: #10b981;
+}
+
+
+.sidebar-blue {
+    background: #eff6ff;
+    color: #3b82f6;
+}
+
+
+/* ============================================================
+   SIDEBAR TEXT
+   ============================================================ */
+
+.sidebar-text {
+    flex: 1;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* ============================================================
+   BADGE
+   ============================================================ */
+
+.sidebar-badge {
+    min-width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+
+/* ============================================================
+   SIDEBAR FOOTER
+   ============================================================ */
+
+.sidebar-footer {
+    margin-top: auto;
+    padding: 15px;
+    border-top: 1px solid #edf0f3;
+}
+
+
+.system-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+
+.status-dot {
+    width: 9px;
+    height: 9px;
+    background: #22c55e;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px #dcfce7;
+}
+
+
+.system-status strong {
+    display: block;
+    font-size: 12px;
+    color: #374151;
+}
+
+
+.system-status small {
+    display: block;
+    margin-top: 2px;
+    font-size: 9px;
+    color: #9ca3af;
+}
+
+
+.sidebar-version {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 9px;
+    color: #9ca3af;
+}
+
+
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
+
+.app-main {
+    width: calc(100% - 260px);
+    margin-left: 260px;
+    min-height: calc(100vh - 72px);
+    padding: 20px 24px;
+    box-sizing: border-box;
+}
+
+
+    /* ============================================================
+   EXISTING DASHBOARD
+   ============================================================ */
+
+    .app-main #mainApp {
+        width: 100%;
+    }
+
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+
+.app-sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+
+
+.app-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+.app-sidebar::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1100px) {
+
+    .header-search {
+        width: 160px;
+    }
+
+    .brand-subtitle {
+        display: none;
+    }
+}
+
+
+@media (max-width: 800px) {
+
+    .app-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+    }
+
+
+        .app-sidebar.mobile-open {
+            transform: translateX(0);
+        }
+
+
+    .app-main {
+        width: 100%;
+        margin-left: 0;
+        padding: 15px;
+    }
+
+
+    .header-search {
+        display: none;
+    }
+
+
+    .user-details {
+        display: none;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .brand-title {
+        font-size: 15px;
+    }
+
+
+    .logout-button {
+        padding: 7px 9px;
+    }
+
+
+        .logout-button i {
+            margin-right: 0;
+        }
+
+
+    .logout-button {
+        font-size: 0;
+    }
+
+
+        .logout-button i {
+            font-size: 13px;
+        }
+}

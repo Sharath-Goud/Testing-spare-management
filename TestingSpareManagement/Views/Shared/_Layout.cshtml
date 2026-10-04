@@ -1,0 +1,732 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - Testing Spare Management</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Main CSS -->
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+    <!-- Dashboard CSS -->
+    <link rel="stylesheet"
+          href="~/css/dashboard.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/TestingSpareManagement.styles.css"
+          asp-append-version="true" />
+
+    <!-- Icons -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+</head>
+
+<body>
+
+    <!-- ========================================================= -->
+    <!-- TOP HEADER -->
+    <!-- ========================================================= -->
+
+    <header class="app-header">
+
+        <!-- Logo / Application Name -->
+        <div class="header-brand">
+
+            <!-- Company Logo -->
+            <div class="company-logo">
+                <img src="~/images/Foxlink-logo.png"
+                     alt="Company Logo" />
+            </div>
+
+            <!-- Animated Gear -->
+            <div class="brand-icon">
+                <i class="fa-solid fa-gear"></i>
+            </div>
+
+            <div class="brand-text">
+
+                <div class="brand-title">
+                    Testing Spare Management
+                </div>
+
+                <div class="brand-subtitle">
+                    INDUSTRY 4.0 SMART FACTORY AUTOMATION PLATFORM
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Header Right Side -->
+        <div class="header-right">
+
+            <div class="header-search">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input type="text"
+                       placeholder="Search..." />
+
+            </div>
+
+
+            <div class="header-user">
+
+                <div class="user-icon">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div class="user-details">
+
+                    <span class="user-label">
+                        
+                    </span>
+
+                    <span class="user-name">
+                        @Context.Session.GetString("EmployeeName")
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <form asp-controller="Account"
+                  asp-action="Logout"
+                  method="post"
+                  class="logout-form">
+
+                @Html.AntiForgeryToken()
+
+                <button type="submit"
+                        class="logout-button">
+
+                    <i class="fa-solid fa-right-from-bracket"></i>
+
+                    Logout
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </header>
+
+
+    <!-- ========================================================= -->
+    <!-- APPLICATION BODY -->
+    <!-- ========================================================= -->
+
+    <div class="app-wrapper">
+
+
+        <!-- ===================================================== -->
+        <!-- SIDEBAR -->
+        <!-- ===================================================== -->
+
+        <aside id="appSidebar"
+               class="app-sidebar">
+
+
+            <!-- Sidebar Header -->
+
+            <div class="sidebar-header">
+
+                <div class="sidebar-menu-icon"
+                     onclick="toggleSidebarCollapse()">
+
+                    <i class="fa-solid fa-bars"></i>
+
+                </div>
+
+                <span>
+                    MAIN MENU
+                </span>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- DASHBOARD -->
+            <!-- ================================================= -->
+
+            <div class="sidebar-section">
+
+                <div class="sidebar-section-title">
+                    OPERATIONS
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- REAL-TIME COMMAND CENTER -->
+                <!-- ================================================= -->
+
+                <button class="sidebar-item
+           @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard"
+                                       ? "active"
+                                       : "")"
+                        type="button"
+                        data-title="Real-Time Command Center"
+                        onclick="openDashboardSection('realTimeView', this)">
+
+                    <span class="sidebar-icon sidebar-red">
+                        <i class="fa-solid fa-bolt"></i>
+                    </span>
+
+                    <span class="sidebar-text">
+                        Real-Time Command Center
+                    </span>
+
+                </button>
+
+
+                <!-- ================================================= -->
+                <!-- MASTER CONNECTOR -->
+                <!-- ================================================= -->
+
+                <button class="sidebar-item
+           @(ViewContext.RouteData.Values["controller"]?.ToString() == "MasterConnector"
+                                       ? "active"
+                                       : "")"
+                        type="button"
+                        onclick="openDashboardSection('sparesView', this)">
+
+                    <span class="sidebar-icon sidebar-purple">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                    </span>
+
+                    <span class="sidebar-text">
+                        Master Connector List
+                    </span>
+
+                </button>
+
+
+                <!-- ================================================= -->
+                <!-- DAILY CONSUMPTION -->
+                <!-- ================================================= -->
+
+                <button class="sidebar-item"
+                        type="button"
+                        onclick="openDashboardSection('consumptionView', this)">
+
+                    <span class="sidebar-icon sidebar-orange">
+                        <i class="fa-solid fa-clock"></i>
+                    </span>
+
+                    <span class="sidebar-text">
+                        Daily Consumption
+                    </span>
+
+                </button>
+
+
+                <!-- ================================================= -->
+                <!-- MATERIAL REQUEST -->
+                <!-- ================================================= -->
+
+                <button class="sidebar-item"
+                        type="button"
+                        onclick="openDashboardSection('reqView', this)">
+
+                    <span class="sidebar-icon sidebar-green">
+                        <i class="fa-solid fa-file-pen"></i>
+                    </span>
+
+                    <span class="sidebar-text">
+                        Material Request
+                    </span>
+
+                    <span id="layoutReqBadge"
+                          class="sidebar-badge">
+
+                        0
+
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- MANAGEMENT -->
+            <!-- ================================================= -->
+
+            <div class="sidebar-section">
+
+                <div class="sidebar-section-title">
+                    MANAGEMENT
+                </div>
+
+
+                <button class="sidebar-item admin-only"
+                        type="button"
+                        onclick="openDashboardSection('budgetAnalyticsView', this)">
+
+                    <span class="sidebar-icon sidebar-purple">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </span>
+
+                    <span class="sidebar-text">
+                        Budget & Expenditure
+                    </span>
+
+                </button>
+
+
+                <button class="sidebar-item"
+                        type="button"
+                        onclick="openDashboardSection('equipmentView', this)">
+
+                    <span class="sidebar-icon sidebar-blue">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                    </span>
+
+                    <span class="sidebar-text">
+                        Equipment Consumables
+                    </span>
+
+                </button>
+
+
+                <button class="sidebar-item admin-only"
+                        type="button"
+                        onclick="openDashboardSection('prpoView', this)">
+
+                    <span class="sidebar-icon sidebar-red">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                    </span>
+
+                    <span class="sidebar-text">
+                        PR & PO Tracker
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- USER -->
+            <!-- ================================================= -->
+
+            <div class="sidebar-section">
+
+                <div class="sidebar-section-title">
+                    USER
+                </div>
+
+
+                <button class="sidebar-item admin-only"
+                        type="button"
+                        onclick="openDashboardSection('profileView', this)">
+
+                    <span class="sidebar-icon sidebar-purple">
+                        <i class="fa-solid fa-user-gear"></i>
+                    </span>
+
+                    <span class="sidebar-text">
+                        Profile & User Settings
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- SIDEBAR FOOTER -->
+            <!-- ================================================= -->
+
+            <div class="sidebar-footer">
+
+                <div class="system-status">
+
+                    <span class="status-dot"></span>
+
+                    <div>
+
+                        <strong>
+                            System Online
+                        </strong>
+
+                        <small>
+                            All services operational
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <div class="sidebar-version">
+                    v1.0.0
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ===================================================== -->
+        <!-- MAIN CONTENT -->
+        <!-- ===================================================== -->
+
+        <main id="mainContent"
+              class="app-main">
+
+            @RenderBody()
+
+        </main>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- SCRIPTS -->
+    <!-- ========================================================= -->
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="~/js/site.js"
+            asp-append-version="true"></script>
+
+    <script src="~/js/dashboard.js"
+            asp-append-version="true"></script>
+
+
+    <script>
+
+        function openDashboardSection(sectionId, element) {
+
+            if (sectionId === "sparesView") {
+
+                window.location.href =
+                    '@Url.Action("Index", "MasterConnector")';
+
+                return;
+            }
+
+
+            const currentController =
+                '@ViewContext.RouteData.Values["controller"]';
+
+
+            if (
+                currentController === "Dashboard" &&
+                typeof switchDashboard === "function"
+            ) {
+
+                switchDashboard(
+                    sectionId,
+                    element
+                );
+
+                updateActiveSidebarItem(element);
+
+                return;
+            }
+
+
+            const dashboardUrl =
+                '@Url.Action("Index", "Dashboard")';
+
+            window.location.href =
+                dashboardUrl +
+                "?section=" +
+                encodeURIComponent(sectionId);
+
+        }
+
+
+        function updateActiveSidebarItem(element) {
+
+            document
+                .querySelectorAll(".sidebar-item")
+                .forEach(function (item) {
+
+                    item.classList.remove("active");
+
+                });
+
+
+            if (element) {
+
+                element.classList.add("active");
+
+            }
+
+        }
+
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const currentController =
+                    '@ViewContext.RouteData.Values["controller"]';
+
+
+                // Only process the section when we are on Dashboard.
+
+                if (currentController !== "Dashboard") {
+
+                    return;
+
+                }
+
+
+                // Read ?section= from URL.
+
+                const urlParams =
+                    new URLSearchParams(
+                        window.location.search
+                    );
+
+
+                const requestedSection =
+                    urlParams.get("section");
+
+
+                // No requested section.
+                // Leave the normal Dashboard page as it is.
+
+                if (!requestedSection) {
+
+                    return;
+
+                }
+
+
+                // Wait until dashboard.js has loaded.
+
+                if (
+                    typeof switchDashboard === "function"
+                ) {
+
+                    openRequestedDashboardSection(
+                        requestedSection
+                    );
+
+                    return;
+
+                }
+
+
+                // In case dashboard.js takes a moment to load,
+                // try again shortly.
+
+                setTimeout(
+                    function () {
+
+                        if (
+                            typeof switchDashboard ===
+                            "function"
+                        ) {
+
+                            openRequestedDashboardSection(
+                                requestedSection
+                            );
+
+                        }
+
+                    },
+                    100
+                );
+
+            }
+        );
+
+
+        function openRequestedDashboardSection(
+            sectionId
+        ) {
+
+            const sidebarItems =
+                document.querySelectorAll(
+                    ".sidebar-item"
+                );
+
+
+            let matchingElement = null;
+
+
+            sidebarItems.forEach(
+                function (item) {
+
+                    const onclickValue =
+                        item.getAttribute("onclick");
+
+
+                    if (
+                        onclickValue &&
+                        onclickValue.indexOf(
+                            "'" + sectionId + "'"
+                        ) !== -1
+                    ) {
+
+                        matchingElement = item;
+
+                    }
+
+                }
+            );
+
+
+            switchDashboard(
+                sectionId,
+                matchingElement
+            );
+
+            updateActiveSidebarItem(
+                matchingElement
+            );
+
+            const cleanUrl =
+                window.location.pathname;
+
+
+            window.history.replaceState(
+                {},
+                document.title,
+                cleanUrl
+            );
+
+        }
+
+
+        function toggleSidebar() {
+
+            const sidebar =
+                document.getElementById(
+                    "appSidebar"
+                );
+
+
+            if (!sidebar) {
+
+                return;
+
+            }
+
+
+            sidebar.classList.toggle(
+                "mobile-open"
+            );
+
+        }
+
+                // =====================================================
+        // COLLAPSE / EXPAND SIDEBAR
+        // =====================================================
+
+        function toggleSidebarCollapse() {
+
+
+            document.body.classList.toggle(
+                "sidebar-collapsed"
+            );
+
+
+            // Save user preference
+
+            const isCollapsed =
+                document.body.classList.contains(
+                    "sidebar-collapsed"
+                );
+
+
+            localStorage.setItem(
+                "sidebarCollapsed",
+                isCollapsed
+            );
+
+        }
+
+
+
+        // =====================================================
+        // LOAD SIDEBAR STATE
+        // =====================================================
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+
+                const collapsed =
+                    localStorage.getItem(
+                        "sidebarCollapsed"
+                    );
+
+
+                if (collapsed === "true") {
+
+
+                    document.body.classList.add(
+                        "sidebar-collapsed"
+                    );
+
+
+                }
+
+
+            }
+        );
+
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Escape"
+                ) {
+
+                    const sidebar =
+                        document.getElementById(
+                            "appSidebar"
+                        );
+
+
+                    if (
+                        sidebar &&
+                        sidebar.classList.contains(
+                            "mobile-open"
+                        )
+                    ) {
+
+                        sidebar.classList.remove(
+                            "mobile-open"
+                        );
+
+                    }
+
+                }
+
+            }
+        );
+
+    </script>
+
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

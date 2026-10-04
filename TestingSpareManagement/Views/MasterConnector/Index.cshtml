@@ -1,0 +1,742 @@
+﻿@model TestingSpareManagement.ViewModels.MasterConnectorViewModel
+
+@{
+    ViewData["Title"] = "Master Connector List";
+}
+
+<link rel="stylesheet"
+      href="~/css/master-connector.css"
+      asp-append-version="true" />
+
+
+<div class="master-connector-page">
+
+
+    <!-- ===================================================== -->
+    <!-- PAGE HEADER -->
+    <!-- ===================================================== -->
+
+    <div class="page-title-bar">
+
+        <div>
+
+            <h2>
+                📋 Master Connector List
+            </h2>
+
+            <span>
+                Connector master data and inventory management
+            </span>
+
+        </div>
+
+
+        <div class="record-count">
+
+            <strong>
+                @Model.Connectors.Count
+            </strong>
+
+            Connectors
+
+        </div>
+
+    </div>
+
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="success-message">
+
+            ✅ @TempData["SuccessMessage"]
+
+        </div>
+    }
+
+
+    <div class="master-layout">
+
+
+        <!-- ================================================= -->
+        <!-- LEFT SIDE - ADD / MODIFY -->
+        <!-- ================================================= -->
+
+        <div class="connector-form-card">
+
+            <div class="section-title">
+
+                <span>
+                    ✚
+                </span>
+
+                <div>
+
+                    <strong>
+                        Add / Modify Master Connector
+                    </strong>
+
+                    <small>
+                        Enter connector information
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <form asp-controller="MasterConnector"
+                  asp-action="@(Model.Connector.Id > 0 ? "Update" : "Save")"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       asp-for="Connector.Id" />
+
+
+                <!-- Station -->
+
+                <div class="form-group">
+
+                    <label>
+                        Testing Station Profile
+                    </label>
+
+                    <select asp-for="Connector.StationProfile"
+                            class="form-control">
+
+                        <option value="">
+                            Select Station
+                        </option>
+
+                        <option value="OS">
+                            OS
+                        </option>
+
+                        <option value="ATE">
+                            ATE
+                        </option>
+
+                        <option value="APP">
+                            APP
+                        </option>
+
+                        <option value="EUT">
+                            EUT
+                        </option>
+
+                        <option value="FCT">
+                            FCT
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="Connector.StationProfile"
+                          class="validation-message">
+                    </span>
+
+                </div>
+
+
+                <!-- Connector Code -->
+
+                <div class="form-group">
+
+                    <label>
+                        Connector Code Type
+                    </label>
+
+                    <input asp-for="Connector.ConnectorCodeType"
+                           class="form-control"
+                           placeholder="e.g. C70, QT1, QT3" />
+
+                    <span asp-validation-for="Connector.ConnectorCodeType"
+                          class="validation-message">
+                    </span>
+
+                </div>
+
+
+                <!-- Description -->
+
+                <div class="form-group">
+
+                    <label>
+                        Description / Part No
+                    </label>
+
+                    <input asp-for="Connector.DescriptionPartNo"
+                           class="form-control"
+                           placeholder="e.g. Snoopy Board / 103PP-09940IA" />
+
+                    <span asp-validation-for="Connector.DescriptionPartNo"
+                          class="validation-message">
+                    </span>
+
+                </div>
+
+
+                <!-- Photo -->
+
+                <div class="form-group">
+
+                    <label>
+                        📷 Upload Connector Photo / Image
+                    </label>
+
+                    <input asp-for="PhotoFile"
+                           type="file"
+                           class="form-control"
+                           accept="image/*"
+                           onchange="previewConnectorImage(this)" />
+
+                </div>
+
+
+                <!-- Preview -->
+
+                <div class="image-preview">
+
+                    <img id="connectorImagePreview"
+                         src=""
+                         alt="Image Preview"
+                         style="display:none;" />
+
+                    <span id="previewText">
+                        🖼 Image Preview Box
+                    </span>
+
+                </div>
+
+
+                <!-- Life Cycle -->
+
+                <div class="form-group">
+
+                    <label>
+                        Life Cycles Limit
+                    </label>
+
+                    <input asp-for="Connector.LifeCycleLimit"
+                           class="form-control"
+                           placeholder="e.g. 4K, 2K, 5000" />
+
+                </div>
+
+
+                <!-- Base Stock -->
+
+                <div class="form-group">
+
+                    <label>
+                        Total Base Stock (Pcs)
+                    </label>
+
+                    <input asp-for="Connector.BaseStock"
+                           type="number"
+                           min="0"
+                           class="form-control"
+                           placeholder="Initial stock count" />
+
+                </div>
+
+
+                <!-- Alert -->
+
+                <div class="form-group">
+
+                    <label>
+                        Alert Threshold Minimum
+                    </label>
+
+                    <input asp-for="Connector.AlertThreshold"
+                           type="number"
+                           min="0"
+                           class="form-control"
+                           placeholder="Minimum stock" />
+
+                </div>
+
+
+                <!-- INR -->
+
+                <div class="form-group">
+
+                    <label>
+                        Unit Cost Price (INR ₹)
+                    </label>
+
+                    <input asp-for="Connector.UnitCostINR"
+                           type="number"
+                           step="0.01"
+                           min="0"
+                           class="form-control"
+                           placeholder="Value in Indian Rupees" />
+
+                </div>
+
+
+                <!-- CNY -->
+
+                <div class="form-group">
+
+                    <label>
+                        Unit Cost Price (CNY ¥)
+                    </label>
+
+                    <input asp-for="Connector.UnitCostCNY"
+                           type="number"
+                           step="0.01"
+                           min="0"
+                           class="form-control"
+                           placeholder="Value in Chinese Yuan" />
+
+                </div>
+
+
+                <button type="submit"
+                        class="save-button">
+
+                    @(Model.Connector.Id > 0
+                                        ? "✏ Update Connector"
+                                        : "💾 Save Connector Row")
+
+                </button>
+
+
+                <button type="reset"
+                        class="cancel-button">
+
+                    ↩ Clear Form
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- RIGHT SIDE - REPORT -->
+        <!-- ================================================= -->
+
+        <div class="connector-report-card">
+
+
+            <div class="section-title report-title">
+
+                <span>
+                    📋
+                </span>
+
+                <div>
+
+                    <strong>
+                        Master Connector Inventory Matrix
+                    </strong>
+
+                    <small>
+                        Live connector inventory report
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="report-wrapper">
+
+                <table class="connector-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                PHOTO
+                            </th>
+
+                            <th>
+                                ASSET KEY
+                            </th>
+
+                            <th>
+                                STATION
+                            </th>
+
+                            <th>
+                                DESCRIPTION / PART NO
+                            </th>
+
+                            <th>
+                                LIFE CYCLE
+                            </th>
+
+                            <th>
+                                AVAILABLE STOCK
+                            </th>
+
+                            <th>
+                                ALERT MIN
+                            </th>
+
+                            <th>
+                                UNIT COST
+                            </th>
+
+                            <th>
+                                STATUS
+                            </th>
+
+                            <th>
+                                ACTIONS
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @if (Model.Connectors.Any())
+                        {
+                            foreach (var item in Model.Connectors)
+                            {
+                                <tr>
+
+                                    <!-- PHOTO -->
+
+                                    <td>
+
+                                        @if (!string.IsNullOrEmpty(
+                                                                        item.PhotoPath))
+                                        {
+                                            <img src="@item.PhotoPath"
+                                                 class="connector-photo"
+                                                 alt="Connector" />
+                                        }
+                                        else
+                                        {
+                                            <div class="photo-placeholder">
+                                                Photo
+                                            </div>
+                                        }
+
+                            </td>
+
+
+                            <!-- ASSET KEY -->
+
+                            <td>
+
+                                <strong class="asset-key">
+
+                                    @item.StationProfile-@item.ConnectorCodeType
+
+                                </strong>
+
+                            </td>
+
+
+                            <!-- STATION -->
+
+                            <td>
+                                @item.StationProfile
+                            </td>
+
+
+                            <!-- DESCRIPTION -->
+
+                            <td>
+
+                                <strong>
+                                    @item.DescriptionPartNo
+                                </strong>
+
+                            </td>
+
+
+                            <!-- LIFE CYCLE -->
+
+                            <td>
+                                @item.LifeCycleLimit
+                            </td>
+
+
+                            <!-- STOCK -->
+
+                            <td>
+
+                                <strong class="stock-value
+                                            @(item.StockStatus == "LOW STOCK"
+                                                                                        ? "stock-low"
+                                                                                        : "stock-safe")">
+
+                                    @item.BaseStock
+
+                                        </strong>
+
+                                    </td>
+
+
+                                    <!-- ALERT -->
+
+                                    <td>
+                                        @item.AlertThreshold
+                                    </td>
+
+
+                                    <!-- COST -->
+
+                                    <td>
+
+                                        <div class="cost-inr">
+
+                                            ₹@item.UnitCostINR.ToString("N2")
+
+                                        </div>
+
+
+                                @if (item.UnitCostCNY.HasValue)
+                                        {
+                                            <div class="cost-cny">
+
+                                                ¥@item.UnitCostCNY.Value.ToString("N2")
+
+                                            </div>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- STATUS -->
+
+                                    <td>
+
+                                        @if (item.StockStatus == "LOW STOCK")
+                                        {
+                                            <span class="status-danger">
+
+                                                ⚠ LOW
+
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-safe">
+
+                                                ✓ SAFE
+
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- ACTIONS -->
+
+                                    <td>
+
+                                        <div class="action-buttons">
+
+                                            <button type="button"
+                                                    class="edit-button"
+                                                    onclick="editConnector(@item.Id)">
+
+                                                ✏ Edit
+
+                                            </button>
+
+
+                                            <button type="button"
+                                                    class="delete-button"
+                                                    onclick="deleteConnector(@item.Id)">
+
+                                                🗑 Del
+
+                                            </button>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+
+                                <td colspan="10"
+                                    class="empty-report">
+
+                                    📋 No Master Connector records found.
+
+                                    <br />
+
+                                    Add your first connector using
+                                    the form on the left.
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        function previewConnectorImage(input) {
+
+            const preview =
+                document.getElementById(
+                    "connectorImagePreview");
+
+            const text =
+                document.getElementById(
+                    "previewText");
+
+
+            if (input.files &&
+                input.files[0]) {
+
+                const reader =
+                    new FileReader();
+
+
+                reader.onload =
+                    function (e) {
+
+                        preview.src =
+                            e.target.result;
+
+                        preview.style.display =
+                            "block";
+
+                        text.style.display =
+                            "none";
+                    };
+
+
+                reader.readAsDataURL(
+                    input.files[0]);
+            }
+        }
+
+
+        // =====================================================
+        // EDIT
+        // =====================================================
+
+        function editConnector(id) {
+
+            if (!id || id <= 0) {
+
+                return;
+            }
+
+
+            window.location.href =
+                '@Url.Action("Edit", "MasterConnector")/' + id;
+        }
+
+
+        // =====================================================
+        // DELETE
+        // =====================================================
+
+        function deleteConnector(id) {
+
+            if (!id || id <= 0) {
+
+                return;
+            }
+
+
+            const confirmed =
+                confirm(
+                    "Are you sure you want to delete this connector?"
+                );
+
+
+            if (!confirmed) {
+
+                return;
+            }
+
+
+            const form =
+                document.createElement("form");
+
+            form.method = "POST";
+
+            form.action =
+                '@Url.Action("Delete", "MasterConnector")';
+
+
+            const token =
+                document.querySelector(
+                    'input[name="__RequestVerificationToken"]'
+                );
+
+
+            if (token) {
+
+                const hiddenToken =
+                    document.createElement("input");
+
+                hiddenToken.type =
+                    "hidden";
+
+                hiddenToken.name =
+                    "__RequestVerificationToken";
+
+                hiddenToken.value =
+                    token.value;
+
+                form.appendChild(
+                    hiddenToken);
+            }
+
+
+            const idInput =
+                document.createElement("input");
+
+            idInput.type =
+                "hidden";
+
+            idInput.name =
+                "id";
+
+            idInput.value =
+                id;
+
+            form.appendChild(
+                idInput);
+
+
+            document.body.appendChild(
+                form);
+
+            form.submit();
+        }
+
+    </script>
+}

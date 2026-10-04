@@ -1,0 +1,430 @@
+﻿@model TestingSpareManagement.ViewModels.LoginViewModel
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Login";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        Testing Spare Management System - Login
+    </title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            overflow: hidden;
+        }
+
+        /* =====================================================
+                   LOGIN PAGE
+                   ===================================================== */
+
+        .login-page {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient( 135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.20) ), url('https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=1920&auto=format&fit=crop') center / cover no-repeat;
+        }
+
+        /* =====================================================
+                   LOGIN CARD
+                   ===================================================== */
+
+        .login-card {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 380px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            color: #1e293b;
+            animation: loginCardAppear 0.5s ease-out;
+        }
+
+        @@keyframes loginCardAppear {
+
+            from {
+                opacity: 0;
+                transform: translateY(15px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* =====================================================
+                   LOGO
+                   ===================================================== */
+
+        .logo-container {
+            margin: 0 auto 16px auto;
+            text-align: center;
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .logo-container img {
+                height: 90px;
+                width: auto;
+                max-width: 230px;
+                object-fit: contain;
+            }
+
+        /* =====================================================
+                   SYSTEM TITLE
+                   ===================================================== */
+
+        .system-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #7c3aed;
+            letter-spacing: 1px;
+            line-height: 1.4;
+            margin-bottom: 5px;
+        }
+
+        .system-subtitle {
+            color: #64748b;
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            margin-bottom: 20px;
+        }
+
+        /* =====================================================
+                   FORM
+                   ===================================================== */
+
+        .form-group {
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                font-size: 11px;
+                color: #64748b;
+                font-weight: 600;
+            }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            color: #0f172a;
+            font-size: 12px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+            .form-control::placeholder {
+                color: #94a3b8;
+            }
+
+            .form-control:focus {
+                border-color: #8b5cf6;
+                background-color: #ffffff;
+                box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+            }
+
+        /* =====================================================
+                   VALIDATION
+                   ===================================================== */
+
+        .validation-message {
+            display: block;
+            color: #dc2626;
+            font-size: 10.5px;
+            margin-top: 4px;
+        }
+
+        .validation-summary {
+            color: #dc2626;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 12px;
+            font-size: 11px;
+            text-align: left;
+        }
+
+            .validation-summary:empty {
+                display: none;
+            }
+
+            .validation-summary ul {
+                margin: 0;
+                padding-left: 18px;
+            }
+
+        /* =====================================================
+                   LOGIN BUTTON
+                   ===================================================== */
+
+        .login-button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            background: #8b5cf6;
+            border: none;
+            border-radius: 6px;
+            color: #ffffff;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 8px rgba(139, 92, 246, 0.25);
+        }
+
+            .login-button:hover {
+                background: #7c3aed;
+                transform: translateY(-1px);
+                box-shadow: 0 5px 12px rgba(139, 92, 246, 0.30);
+            }
+
+            .login-button:active {
+                transform: translateY(0);
+            }
+
+        /* =====================================================
+                   REGISTER SECTION
+                   ===================================================== */
+
+        .register-section {
+            margin-top: 18px;
+            padding-top: 15px;
+            border-top: 1px solid #f1f5f9;
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .register-link {
+            color: #7c3aed;
+            font-weight: 700;
+            text-decoration: none;
+            margin-left: 4px;
+        }
+
+            .register-link:hover {
+                color: #6d28d9;
+                text-decoration: underline;
+            }
+
+        /* =====================================================
+                   SUCCESS MESSAGE
+                   ===================================================== */
+
+        .success-message {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            color: #15803d;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 12px;
+            font-size: 11px;
+            text-align: left;
+        }
+
+        /* =====================================================
+                   MOBILE
+                   ===================================================== */
+
+        @@media (max-width: 480px) {
+
+            .login-page {
+                padding: 15px;
+            }
+
+            .login-card {
+                max-width: 100%;
+                padding: 25px 20px;
+            }
+
+            .logo-container img {
+                height: 75px;
+            }
+
+            .system-title {
+                font-size: 14px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="login-page">
+
+        <div class="login-card">
+
+            <!-- Foxlink Logo -->
+
+            <div class="logo-container">
+
+                <img src="~/images/Foxlink-logo.png"
+                     alt="Foxlink Logo" />
+
+            </div>
+
+
+            <!-- System Title -->
+
+            <div class="system-title">
+
+                TESTING SPARE MANAGEMENT SYSTEM
+
+            </div>
+
+
+            <div class="system-subtitle">
+
+                Secure Access Portal
+
+            </div>
+
+
+            <!-- Registration Success -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="success-message">
+
+                    @TempData["SuccessMessage"]
+
+                </div>
+            }
+
+
+            <!-- Login Form -->
+
+            <form asp-controller="Account"
+                  asp-action="Login"
+                  method="post"
+                  autocomplete="off">
+
+                @Html.AntiForgeryToken()
+
+
+                <!-- Validation Summary -->
+
+                <div class="validation-summary"
+                     asp-validation-summary="ModelOnly">
+                </div>
+
+
+                <!-- Employee ID -->
+
+                <div class="form-group">
+
+                    <label asp-for="EmployeeId">
+                        Employee ID
+                    </label>
+
+                    <input asp-for="EmployeeId"
+                           class="form-control"
+                           placeholder="Enter Employee Id"
+                           autocomplete="username"
+                           autofocus />
+
+                    <span asp-validation-for="EmployeeId"
+                          class="validation-message">
+                    </span>
+
+                </div>
+
+
+                <!-- Password -->
+
+                <div class="form-group">
+
+                    <label asp-for="Password">
+                        Password
+                    </label>
+
+                    <input asp-for="Password"
+                           class="form-control"
+                           placeholder="Enter the Password"
+                           autocomplete="current-password" />
+
+                    <span asp-validation-for="Password"
+                          class="validation-message">
+                    </span>
+
+                </div>
+
+
+                <!-- Login Button -->
+
+                <button type="submit"
+                        class="login-button">
+
+                    Login
+
+                </button>
+
+            </form>
+
+
+            <!-- Registration -->
+
+            <div class="register-section">
+
+                New employee?
+
+                <a asp-controller="Account"
+                   asp-action="Register"
+                   class="register-link">
+
+                    Create an account
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
