@@ -34,7 +34,7 @@
         <div class="record-count">
 
             <strong>
-                @Model.Connectors.Count
+                @Model.TotalRecords
             </strong>
 
             Connectors
@@ -72,7 +72,9 @@
                 <div>
 
                     <strong>
-                        Add / Modify Master Connector
+                        @(Model.Connector.Id > 0
+                                                ? "Modify Master Connector"
+                                                : "Add Master Connector")
                     </strong>
 
                     <small>
@@ -94,6 +96,12 @@
                 <input type="hidden"
                        asp-for="Connector.Id" />
 
+                <input type="hidden"
+                       asp-for="CurrentPage" />
+
+                <input type="hidden"
+                       asp-for="PageSize" />
+
 
                 <!-- Station -->
 
@@ -110,25 +118,11 @@
                             Select Station
                         </option>
 
-                        <option value="OS">
-                            OS
-                        </option>
-
-                        <option value="ATE">
-                            ATE
-                        </option>
-
-                        <option value="APP">
-                            APP
-                        </option>
-
-                        <option value="EUT">
-                            EUT
-                        </option>
-
-                        <option value="FCT">
-                            FCT
-                        </option>
+                        <option value="OS">OS</option>
+                        <option value="ATE">ATE</option>
+                        <option value="APP">APP</option>
+                        <option value="EUT">EUT</option>
+                        <option value="FCT">FCT</option>
 
                     </select>
 
@@ -198,14 +192,28 @@
 
                 <div class="image-preview">
 
-                    <img id="connectorImagePreview"
-                         src=""
-                         alt="Image Preview"
-                         style="display:none;" />
+                    @if (!string.IsNullOrEmpty(Model.Connector.PhotoPath))
+                    {
+                        <img id="connectorImagePreview"
+                             src="@Model.Connector.PhotoPath"
+                             alt="Image Preview"
+                             style="display:block;" />
 
-                    <span id="previewText">
-                        🖼 Image Preview Box
-                    </span>
+                        <span id="previewText" style="display:none;">
+                            🖼 Image Preview Box
+                        </span>
+                    }
+                    else
+                    {
+                        <img id="connectorImagePreview"
+                             src=""
+                             alt="Image Preview"
+                             style="display:none;" />
+
+                        <span id="previewText">
+                            🖼 Image Preview Box
+                        </span>
+                    }
 
                 </div>
 
@@ -305,12 +313,21 @@
                 </button>
 
 
-                <button type="reset"
-                        class="cancel-button">
-
-                    ↩ Clear Form
-
-                </button>
+                @if (Model.Connector.Id > 0)
+                {
+                    <a href="@Url.Action("Index", "MasterConnector", new { pageNumber = Model.CurrentPage, pageSize = Model.PageSize })"
+                       class="cancel-button"
+                       style="text-decoration: none; display: block; text-align: center;">
+                        ↩ Cancel Edit
+                    </a>
+                }
+                else
+                {
+                    <button type="reset"
+                            class="cancel-button">
+                        ↩ Clear Form
+                    </button>
+                }
 
             </form>
 
@@ -353,45 +370,16 @@
 
                         <tr>
 
-                            <th>
-                                PHOTO
-                            </th>
-
-                            <th>
-                                ASSET KEY
-                            </th>
-
-                            <th>
-                                STATION
-                            </th>
-
-                            <th>
-                                DESCRIPTION / PART NO
-                            </th>
-
-                            <th>
-                                LIFE CYCLE
-                            </th>
-
-                            <th>
-                                AVAILABLE STOCK
-                            </th>
-
-                            <th>
-                                ALERT MIN
-                            </th>
-
-                            <th>
-                                UNIT COST
-                            </th>
-
-                            <th>
-                                STATUS
-                            </th>
-
-                            <th>
-                                ACTIONS
-                            </th>
+                            <th>PHOTO</th>
+                            <th>ASSET KEY</th>
+                            <th>STATION</th>
+                            <th>DESCRIPTION / PART NO</th>
+                            <th>LIFE CYCLE</th>
+                            <th>AVAILABLE STOCK</th>
+                            <th>ALERT MIN</th>
+                            <th>UNIT COST</th>
+                            <th>STATUS</th>
+                            <th>ACTIONS</th>
 
                         </tr>
 
@@ -400,7 +388,7 @@
 
                     <tbody>
 
-                        @if (Model.Connectors.Any())
+                        @if (Model.Connectors != null && Model.Connectors.Any())
                         {
                             foreach (var item in Model.Connectors)
                             {
@@ -410,8 +398,7 @@
 
                                     <td>
 
-                                        @if (!string.IsNullOrEmpty(
-                                                                        item.PhotoPath))
+                                        @if (!string.IsNullOrEmpty(item.PhotoPath))
                                         {
                                             <img src="@item.PhotoPath"
                                                  class="connector-photo"
@@ -432,9 +419,7 @@
                             <td>
 
                                 <strong class="asset-key">
-
                                     @item.StationProfile-@item.ConnectorCodeType
-
                                 </strong>
 
                             </td>
@@ -470,9 +455,9 @@
                             <td>
 
                                 <strong class="stock-value
-                                            @(item.StockStatus == "LOW STOCK"
-                                                                                        ? "stock-low"
-                                                                                        : "stock-safe")">
+                                                    @(item.StockStatus == "LOW STOCK"
+                                                                                                ? "stock-low"
+                                                                                                : "stock-safe")">
 
                                     @item.BaseStock
 
@@ -493,18 +478,13 @@
                                     <td>
 
                                         <div class="cost-inr">
-
                                             ₹@item.UnitCostINR.ToString("N2")
-
                                         </div>
-
 
                                 @if (item.UnitCostCNY.HasValue)
                                         {
                                             <div class="cost-cny">
-
                                                 ¥@item.UnitCostCNY.Value.ToString("N2")
-
                                             </div>
                                         }
 
@@ -518,17 +498,13 @@
                                         @if (item.StockStatus == "LOW STOCK")
                                         {
                                             <span class="status-danger">
-
                                                 ⚠ LOW
-
                                             </span>
                                         }
                                         else
                                         {
                                             <span class="status-safe">
-
                                                 ✓ SAFE
-
                                             </span>
                                         }
 
@@ -541,21 +517,15 @@
 
                                         <div class="action-buttons">
 
-                                            <button type="button"
-                                                    class="edit-button"
-                                                    onclick="editConnector(@item.Id)">
-
+                                            <a href="@Url.Action("Edit", "MasterConnector", new { id = item.Id, pageNumber = Model.CurrentPage, pageSize = Model.PageSize })"
+                                               class="edit-button">
                                                 ✏ Edit
-
-                                            </button>
-
+                                            </a>
 
                                             <button type="button"
                                                     class="delete-button"
                                                     onclick="deleteConnector(@item.Id)">
-
                                                 🗑 Del
-
                                             </button>
 
                                         </div>
@@ -590,6 +560,38 @@
 
             </div>
 
+
+            <!-- ================================================= -->
+            <!-- PAGINATION -->
+            <!-- ================================================= -->
+            @if (Model.TotalPages > 1)
+            {
+                <div class="pagination-wrapper">
+
+                    @if (Model.CurrentPage > 1)
+                    {
+                        <a href="@Url.Action("Index", "MasterConnector", new { pageNumber = Model.CurrentPage - 1, pageSize = Model.PageSize })"
+                           class="page-btn">
+                            ← Prev
+                        </a>
+                    }
+
+                    <span class="page-info">
+                        Page @Model.CurrentPage of @Model.TotalPages
+                        (Total: @Model.TotalRecords records)
+                    </span>
+
+                    @if (Model.CurrentPage < Model.TotalPages)
+                    {
+                        <a href="@Url.Action("Index", "MasterConnector", new { pageNumber = Model.CurrentPage + 1, pageSize = Model.PageSize })"
+                           class="page-btn">
+                            Next →
+                        </a>
+                    }
+
+                </div>
+            }
+
         </div>
 
     </div>
@@ -603,138 +605,64 @@
 
     <script>
 
+        // =====================================================
+        // IMAGE PREVIEW
+        // =====================================================
         function previewConnectorImage(input) {
 
-            const preview =
-                document.getElementById(
-                    "connectorImagePreview");
+            const preview = document.getElementById("connectorImagePreview");
+            const text = document.getElementById("previewText");
 
-            const text =
-                document.getElementById(
-                    "previewText");
+            if (input.files && input.files[0]) {
 
+                const reader = new FileReader();
 
-            if (input.files &&
-                input.files[0]) {
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = "block";
+                    if (text) text.style.display = "none";
+                };
 
-                const reader =
-                    new FileReader();
-
-
-                reader.onload =
-                    function (e) {
-
-                        preview.src =
-                            e.target.result;
-
-                        preview.style.display =
-                            "block";
-
-                        text.style.display =
-                            "none";
-                    };
-
-
-                reader.readAsDataURL(
-                    input.files[0]);
+                reader.readAsDataURL(input.files[0]);
             }
-        }
-
-
-        // =====================================================
-        // EDIT
-        // =====================================================
-
-        function editConnector(id) {
-
-            if (!id || id <= 0) {
-
-                return;
-            }
-
-
-            window.location.href =
-                '@Url.Action("Edit", "MasterConnector")/' + id;
         }
 
 
         // =====================================================
         // DELETE
         // =====================================================
-
         function deleteConnector(id) {
 
             if (!id || id <= 0) {
-
+                alert('Invalid connector ID');
                 return;
             }
 
-
-            const confirmed =
-                confirm(
-                    "Are you sure you want to delete this connector?"
-                );
-
-
-            if (!confirmed) {
-
+            if (!confirm("Are you sure you want to delete this connector?")) {
                 return;
             }
 
-
-            const form =
-                document.createElement("form");
-
+            const form = document.createElement("form");
             form.method = "POST";
+            form.action = '@Url.Action("Delete", "MasterConnector")';
 
-            form.action =
-                '@Url.Action("Delete", "MasterConnector")';
-
-
-            const token =
-                document.querySelector(
-                    'input[name="__RequestVerificationToken"]'
-                );
-
+            const token = document.querySelector('input[name="__RequestVerificationToken"]');
 
             if (token) {
-
-                const hiddenToken =
-                    document.createElement("input");
-
-                hiddenToken.type =
-                    "hidden";
-
-                hiddenToken.name =
-                    "__RequestVerificationToken";
-
-                hiddenToken.value =
-                    token.value;
-
-                form.appendChild(
-                    hiddenToken);
+                const hiddenToken = document.createElement("input");
+                hiddenToken.type = "hidden";
+                hiddenToken.name = "__RequestVerificationToken";
+                hiddenToken.value = token.value;
+                form.appendChild(hiddenToken);
             }
 
+            const idInput = document.createElement("input");
+            idInput.type = "hidden";
+            idInput.name = "id";
+            idInput.value = id;
+            form.appendChild(idInput);
 
-            const idInput =
-                document.createElement("input");
-
-            idInput.type =
-                "hidden";
-
-            idInput.name =
-                "id";
-
-            idInput.value =
-                id;
-
-            form.appendChild(
-                idInput);
-
-
-            document.body.appendChild(
-                form);
-
+            document.body.appendChild(form);
             form.submit();
         }
 

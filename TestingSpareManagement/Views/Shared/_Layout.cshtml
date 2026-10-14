@@ -90,7 +90,7 @@
                 <div class="user-details">
 
                     <span class="user-label">
-                        
+
                     </span>
 
                     <span class="user-name">
@@ -170,16 +170,16 @@
 
 
                 <!-- ================================================= -->
-                <!-- REAL-TIME COMMAND CENTER -->
+                <!-- REAL-TIME COMMAND CENTER  (UPDATED)                -->
                 <!-- ================================================= -->
 
                 <button class="sidebar-item
            @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard"
-                                       ? "active"
-                                       : "")"
+                                                                                                                                               ? "active"
+                                                                                                                                               : "")"
                         type="button"
                         data-title="Real-Time Command Center"
-                        onclick="openDashboardSection('realTimeView', this)">
+                        onclick="window.location.href='@Url.Action("Index", "Dashboard")'">
 
                     <span class="sidebar-icon sidebar-red">
                         <i class="fa-solid fa-bolt"></i>
@@ -193,15 +193,15 @@
 
 
                 <!-- ================================================= -->
-                <!-- MASTER CONNECTOR -->
+                <!-- MASTER CONNECTOR                                   -->
                 <!-- ================================================= -->
 
                 <button class="sidebar-item
            @(ViewContext.RouteData.Values["controller"]?.ToString() == "MasterConnector"
-                                       ? "active"
-                                       : "")"
+                                                                                                                                               ? "active"
+                                                                                                                                               : "")"
                         type="button"
-                        onclick="openDashboardSection('sparesView', this)">
+                        onclick="window.location.href='@Url.Action("Index", "MasterConnector")'">
 
                     <span class="sidebar-icon sidebar-purple">
                         <i class="fa-solid fa-clipboard-list"></i>
@@ -215,12 +215,15 @@
 
 
                 <!-- ================================================= -->
-                <!-- DAILY CONSUMPTION -->
+                <!-- DAILY CONSUMPTION                                  -->
                 <!-- ================================================= -->
 
-                <button class="sidebar-item"
+                <button class="sidebar-item
+           @(ViewContext.RouteData.Values["controller"]?.ToString() == "Consumption"
+                                                                                                                                               ? "active"
+                                                                                                                                               : "")"
                         type="button"
-                        onclick="openDashboardSection('consumptionView', this)">
+                        onclick="window.location.href='@Url.Action("DailyConsumption", "Consumption")'">
 
                     <span class="sidebar-icon sidebar-orange">
                         <i class="fa-solid fa-clock"></i>
@@ -234,12 +237,15 @@
 
 
                 <!-- ================================================= -->
-                <!-- MATERIAL REQUEST -->
+                <!-- MATERIAL REQUEST                                   -->
                 <!-- ================================================= -->
 
-                <button class="sidebar-item"
+                <button class="sidebar-item
+           @(ViewContext.RouteData.Values["controller"]?.ToString() == "MaterialRequest"
+                                                                                                                                               ? "active"
+                                                                                                                                               : "")"
                         type="button"
-                        onclick="openDashboardSection('reqView', this)">
+                        onclick="window.location.href='@Url.Action("Index", "MaterialRequest")'">
 
                     <span class="sidebar-icon sidebar-green">
                         <i class="fa-solid fa-file-pen"></i>
@@ -252,7 +258,7 @@
                     <span id="layoutReqBadge"
                           class="sidebar-badge">
 
-                        0
+                        1
 
                     </span>
 
@@ -272,9 +278,16 @@
                 </div>
 
 
-                <button class="sidebar-item admin-only"
+                <!-- ================================================= -->
+                <!-- BUDGET & EXPENDITURE                               -->
+                <!-- ================================================= -->
+
+                <button class="sidebar-item admin-only
+           @(ViewContext.RouteData.Values["controller"]?.ToString() == "Budget"
+                                                                                                                                               ? "active"
+                                                                                                                                               : "")"
                         type="button"
-                        onclick="openDashboardSection('budgetAnalyticsView', this)">
+                        onclick="window.location.href='@Url.Action("Index", "Budget")'">
 
                     <span class="sidebar-icon sidebar-purple">
                         <i class="fa-solid fa-chart-line"></i>
@@ -287,9 +300,16 @@
                 </button>
 
 
-                <button class="sidebar-item"
+                <!-- ================================================= -->
+                <!-- EQUIPMENT CONSUMABLES                              -->
+                <!-- ================================================= -->
+
+                <button class="sidebar-item
+           @(ViewContext.RouteData.Values["controller"]?.ToString() == "Equipment"
+                                                                                                                                               ? "active"
+                                                                                                                                               : "")"
                         type="button"
-                        onclick="openDashboardSection('equipmentView', this)">
+                        onclick="window.location.href='@Url.Action("Index", "Equipment")'">
 
                     <span class="sidebar-icon sidebar-blue">
                         <i class="fa-solid fa-screwdriver-wrench"></i>
@@ -302,9 +322,16 @@
                 </button>
 
 
-                <button class="sidebar-item admin-only"
+                <!-- ================================================= -->
+                <!-- PR & PO TRACKER                                    -->
+                <!-- ================================================= -->
+
+                <button class="sidebar-item admin-only
+           @(ViewContext.RouteData.Values["controller"]?.ToString() == "PrPoTracker"
+                                                                                                                                               ? "active"
+                                                                                                                                               : "")"
                         type="button"
-                        onclick="openDashboardSection('prpoView', this)">
+                        onclick="window.location.href='@Url.Action("Index", "PrPoTracker")'">
 
                     <span class="sidebar-icon sidebar-red">
                         <i class="fa-solid fa-cart-shopping"></i>
@@ -330,9 +357,16 @@
                 </div>
 
 
-                <button class="sidebar-item admin-only"
+                <!-- ================================================= -->
+                <!-- PROFILE & USER SETTINGS                            -->
+                <!-- ================================================= -->
+
+                <button class="sidebar-item admin-only
+           @(ViewContext.RouteData.Values["controller"]?.ToString() == "Profile"
+                                                                                                                                               ? "active"
+                                                                                                                                               : "")"
                         type="button"
-                        onclick="openDashboardSection('profileView', this)">
+                        onclick="window.location.href='@Url.Action("Index", "Profile")'">
 
                     <span class="sidebar-icon sidebar-purple">
                         <i class="fa-solid fa-user-gear"></i>

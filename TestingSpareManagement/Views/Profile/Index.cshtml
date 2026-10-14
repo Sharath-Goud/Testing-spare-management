@@ -1,0 +1,837 @@
+﻿@model TestingSpareManagement.Models.ProfileSettingsViewModel
+
+@{
+    ViewData["Title"] = "Profile & User Settings";
+}
+
+<div class="profile-page-wrapper">
+
+    <!-- Success / Error Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success" style="font-size: 0.85rem; padding: 10px; grid-column: 1 / -1;">
+            ✅ @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger" style="font-size: 0.85rem; padding: 10px; grid-column: 1 / -1;">
+            ⚠ @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- ========================================================= -->
+    <!-- LEFT COLUMN                                               -->
+    <!-- ========================================================= -->
+    <div class="profile-col-left">
+
+        <!-- 1. TERMINAL OPERATOR IDENTITY & ADMIN MAIL -->
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <h5><i class="fa-solid fa-id-card"></i> Terminal Operator Identity & Admin Mail</h5>
+                <button type="button" class="btn-edit-identity" onclick="openEditInfoModal()">
+                    <i class="fa-solid fa-pen"></i> Edit Info
+                </button>
+            </div>
+            <div class="profile-card-body">
+                <div class="identity-row">
+                    <div>
+                        <div class="avatar-circle" style="overflow: hidden; padding: 0;">
+                            @if (!string.IsNullOrEmpty(Model.UserProfile.AvatarPath))
+                            {
+                                <img src="@Model.UserProfile.AvatarPath" alt="Avatar"
+                                     style="width: 100%; height: 100%; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <i class="fa-solid fa-user-tie"></i>
+                            }
+                        </div>
+                        <button type="button" class="btn-upload-avatar" onclick="openAvatarModal()">
+                            <i class="fa-solid fa-upload"></i> Upload Avatar
+                        </button>
+                    </div>
+
+                    <div class="identity-info">
+                        <div class="identity-field">
+                            <span class="label">User Login ID:</span>
+                            <span class="value">@Model.UserProfile.LoginId</span>
+                        </div>
+                        <div class="identity-field">
+                            <span class="label">Designation / Role:</span>
+                            <span class="value">@Model.UserProfile.Designation</span>
+                        </div>
+                        <div class="identity-field">
+                            <span class="label">Admin Alert Email:</span>
+                            <span class="value email">@Model.UserProfile.AdminEmail</span>
+                        </div>
+                        <div class="identity-field">
+                            <span class="label">Clearance Tier:</span>
+                            <span class="value" style="color: #28a745;">@Model.UserProfile.ClearanceTier</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 2. PORTABLE DATA BACKUP & RESTORE HUB -->
+        <div class="profile-card">
+            <div class="profile-card-body">
+                <h5 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 6px;">
+                    <i class="fa-solid fa-cloud-arrow-down" style="color: #007bff;"></i>
+                    Portable Data Backup & Restore Hub
+                </h5>
+                <p style="font-size: 0.78rem; color: #666; margin-bottom: 12px;">
+                    Download a local backup file (.json) to prevent data loss if browser cache clears.
+                </p>
+
+                <div class="backup-btn-row">
+                    <button type="button" class="btn-backup download" onclick="downloadBackup()">
+                        <i class="fa-solid fa-download"></i> Download Backup
+                    </button>
+                    <button type="button" class="btn-backup restore" onclick="restoreBackup()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Restore Backup
+                    </button>
+                </div>
+
+                <input type="file" id="restoreFileInput" accept=".json" style="display: none;" onchange="handleRestoreFile(this)" />
+            </div>
+        </div>
+
+
+        <!-- 3. EXTENDED DASHBOARD THEME COLORS -->
+        <div class="profile-card">
+            <div class="profile-card-body">
+                <h5 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 12px;">
+                    <i class="fa-solid fa-palette" style="color: #c82333;"></i>
+                    Extended Dashboard Theme Colors
+                </h5>
+
+                <select class="theme-selector" id="themeSelector" onchange="changeTheme(this.value)">
+                    <option value="Dark Charcoal" selected="@(Model.SelectedTheme == "Dark Charcoal")">Dark Charcoal (Default Standard)</option>
+                    <option value="Ocean Blue" selected="@(Model.SelectedTheme == "Ocean Blue")">Ocean Blue</option>
+                    <option value="Forest Green" selected="@(Model.SelectedTheme == "Forest Green")">Forest Green</option>
+                    <option value="Ruby Red" selected="@(Model.SelectedTheme == "Ruby Red")">Ruby Red</option>
+                    <option value="Light Modern" selected="@(Model.SelectedTheme == "Light Modern")">Light Modern</option>
+                </select>
+            </div>
+        </div>
+
+
+        <!-- 4. TESTING STATION ROSTER MANAGEMENT -->
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <h5><i class="fa-solid fa-tools"></i> Testing Station Roster Management</h5>
+            </div>
+            <div class="profile-card-body">
+
+                <div class="roster-form">
+                    <div class="roster-form-title">
+                        <i class="fa-solid fa-plus-circle"></i> Add / Edit Testing Station
+                    </div>
+
+                    <form asp-controller="Profile" asp-action="SaveStation" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="roster-form-group">
+                            <label>Station Code Name</label>
+                            <input type="text" id="stationCodeInput" name="stationCode" placeholder="e.g. OS, ATE, AOI, APP, RFID, FCT" required />
+                        </div>
+                        <button type="submit" class="btn-roster-save">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Testing Station
+                        </button>
+                        <button type="reset" class="btn-roster-cancel">Cancel Modification</button>
+                    </form>
+                </div>
+
+                <div style="font-size: 0.85rem; font-weight: 700; color: #333; margin-bottom: 8px;">
+                    <i class="fa-solid fa-list"></i> Registered Testing Stations Roster
+                </div>
+
+                <table class="roster-table">
+                    <thead>
+                        <tr>
+                            <th>STATION CODE</th>
+                            <th>STATUS</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var station in Model.TestingStations)
+                        {
+                            <tr>
+                                <td><span class="col-station">@station.StationCode</span></td>
+                                <td><span class="status-badge-active">Active Station</span></td>
+                                <td>
+                                    <button type="button" class="btn-row-edit"
+                                            onclick="editStation(@station.Id, '@station.StationCode')">
+                                        <i class="fa-solid fa-pen"></i> Edit
+                                    </button>
+                                    <button type="button" class="btn-row-del" onclick="deleteItem('DeleteStation', @station.Id)">
+                                        <i class="fa-solid fa-trash"></i> Del
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <!-- 5. PROJECT MASTER ROSTER MANAGEMENT -->
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <h5><i class="fa-solid fa-folder-open"></i> Project Master Roster Management</h5>
+            </div>
+            <div class="profile-card-body">
+
+                <div class="roster-form">
+                    <div class="roster-form-title">
+                        <i class="fa-solid fa-plus-circle"></i> Register / Edit Project Code
+                    </div>
+
+                    <form asp-controller="Profile" asp-action="SaveProject" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="roster-form-group">
+                            <label>Project Code Name</label>
+                            <input type="text" id="projectCodeInput" name="projectCode" placeholder="e.g. A246f, A246c, A191m, Vivo_zv6" required />
+                        </div>
+                        <button type="submit" class="btn-roster-save">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Project Code
+                        </button>
+                        <button type="reset" class="btn-roster-cancel">Cancel Modification</button>
+                    </form>
+                </div>
+
+                <div style="font-size: 0.85rem; font-weight: 700; color: #333; margin-bottom: 8px;">
+                    <i class="fa-solid fa-list"></i> Registered Active Projects List
+                </div>
+
+                <table class="roster-table">
+                    <thead>
+                        <tr>
+                            <th>PROJECT CODE</th>
+                            <th>STATUS</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var project in Model.Projects)
+                        {
+                            <tr>
+                                <td><span class="col-project">@project.ProjectCode</span></td>
+                                <td><span class="status-badge-active">Active Project</span></td>
+                                <td>
+                                    <button type="button" class="btn-row-edit"
+                                            onclick="editProject(@project.Id, '@project.ProjectCode')">
+                                        <i class="fa-solid fa-pen"></i> Edit
+                                    </button>
+                                    <button type="button" class="btn-row-del" onclick="deleteItem('DeleteProject', @project.Id)">
+                                        <i class="fa-solid fa-trash"></i> Del
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- RIGHT COLUMN                                              -->
+    <!-- ========================================================= -->
+    <div class="profile-col-right">
+
+        <!-- 6. UNIFIED SYSTEM USERS & DRI ROSTER MANAGEMENT -->
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <h5><i class="fa-solid fa-users"></i> Unified System Users & DRI Roster Management</h5>
+            </div>
+            <div class="profile-card-body">
+
+                <div class="roster-form">
+                    <div class="roster-form-title">
+                        <i class="fa-solid fa-plus-circle"></i> Register / Edit User Account & DRI Engineer
+                    </div>
+
+                    <form asp-controller="Profile" asp-action="SaveUser" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="roster-form-group">
+                            <label>User / Employee ID Number</label>
+                            <input type="text" name="EmployeeId" placeholder="e.g. 2062927, user1" required />
+                        </div>
+
+                        <div class="roster-form-group">
+                            <label>Engineer / User Full Name</label>
+                            <input type="text" name="FullName" placeholder="e.g. M.SaiBalaji" required />
+                        </div>
+
+                        <div class="roster-form-group">
+                            <label>Password Credentials</label>
+                            <input type="password" name="Password" placeholder="••••••••" />
+                        </div>
+
+                        <div class="roster-form-group">
+                            <label>Official Email Address</label>
+                            <input type="email" name="OfficialEmail" placeholder="e.g. saibalaji_m@foxlink.com" required />
+                        </div>
+
+                        <div class="roster-form-group">
+                            <label>Assigned Role / Dept / Shift</label>
+                            <input type="text" name="AssignedRole" placeholder="e.g. Line-01 Lead / Shift-A" required />
+                        </div>
+
+                        <button type="submit" class="btn-roster-save">
+                            <i class="fa-solid fa-floppy-disk"></i> Save User Profile Credentials
+                        </button>
+                        <button type="reset" class="btn-roster-cancel">Cancel Modification</button>
+                    </form>
+                </div>
+
+                <div style="font-size: 0.85rem; font-weight: 700; color: #333; margin-bottom: 8px;">
+                    <i class="fa-solid fa-list"></i> Registered Users & DRI Roster
+                </div>
+
+                <table class="roster-table">
+                    <thead>
+                        <tr>
+                            <th>EMPLOYEE / USER ID</th>
+                            <th>FULL NAME</th>
+                            <th>ASSIGNED ROLE / SHIFT</th>
+                            <th>OFFICIAL EMAIL ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model.SystemUsers)
+                        {
+                            <tr>
+                                <td><span class="col-id">@user.EmployeeId</span></td>
+                                <td><strong>@user.FullName</strong></td>
+                                <td>@user.AssignedRole</td>
+                                <td><span class="col-email">@user.OfficialEmail</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <!-- 7. BUYER ROSTER MANAGEMENT -->
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <h5><i class="fa-solid fa-handshake"></i> Buyer Roster Management</h5>
+            </div>
+            <div class="profile-card-body">
+
+                <div class="roster-form">
+                    <div class="roster-form-title">
+                        <i class="fa-solid fa-plus-circle"></i> Add / Edit Buyer Name
+                    </div>
+
+                    <form asp-controller="Profile" asp-action="SaveBuyer" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="roster-form-group">
+                            <label>Buyer Full Name</label>
+                            <input type="text" id="buyerNameInput" name="buyerName" placeholder="e.g. A.S Dhanush, Jayaprathap..." required />
+                        </div>
+                        <button type="submit" class="btn-roster-save danger">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Buyer Name
+                        </button>
+                        <button type="reset" class="btn-roster-cancel">Cancel Modification</button>
+                    </form>
+                </div>
+
+                <div style="font-size: 0.85rem; font-weight: 700; color: #333; margin-bottom: 8px;">
+                    <i class="fa-solid fa-list"></i> Registered Buyers List
+                </div>
+
+                <table class="roster-table">
+                    <thead>
+                        <tr>
+                            <th>BUYER NAME</th>
+                            <th>STATUS</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var buyer in Model.Buyers)
+                        {
+                            <tr>
+                                <td><span class="col-buyer">@buyer.BuyerName</span></td>
+                                <td><span class="status-badge-active">Active Buyer</span></td>
+                                <td>
+                                    <button type="button" class="btn-row-edit"
+                                            onclick="editBuyer(@buyer.Id, '@buyer.BuyerName')">
+                                        <i class="fa-solid fa-pen"></i> Edit
+                                    </button>
+                                    <button type="button" class="btn-row-del" onclick="deleteItem('DeleteBuyer', @buyer.Id)">
+                                        <i class="fa-solid fa-trash"></i> Del
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <!-- 8. YEARLY BUDGET & SAVINGS MASTER CONTROL -->
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <h5><i class="fa-solid fa-coins"></i> Yearly Budget & Savings Master Control</h5>
+            </div>
+            <div class="profile-card-body">
+
+                <p style="font-size: 0.78rem; color: #666; margin-bottom: 12px;">
+                    Modify yearly totals or add upcoming years (e.g., 2027) to update the dashboard trend chart instantly.
+                </p>
+
+                <table class="budget-master-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 12%;">YEAR</th>
+                            <th style="width: 30%;">ALLOCATED BUDGET (₹)</th>
+                            <th style="width: 30%;">BUDGET UTILIZED (₹)</th>
+                            <th style="width: 28%;">COST SAVED (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var budget in Model.YearlyBudgets)
+                        {
+                            <tr>
+                                <td><strong>@budget.Year</strong></td>
+                                <td>
+                                    <input type="number" class="budget-alloc" value="@budget.AllocatedBudget" data-year="@budget.Year" />
+                                </td>
+                                <td>
+                                    <input type="number" class="budget-util" value="@budget.BudgetUtilized" data-year="@budget.Year" />
+                                </td>
+                                <td>
+                                    <input type="number" class="budget-saved" value="@budget.CostSaved" data-year="@budget.Year" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="budget-btn-row">
+                    <button type="button" class="btn-roster-save blue" onclick="addNewYear()">
+                        <i class="fa-solid fa-plus"></i> Add New Year
+                    </button>
+                    <button type="button" class="btn-roster-save success" onclick="saveYearlyBudgets()">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                    </button>
+                </div>
+
+                <div id="newYearForm" style="display: none; margin-top: 12px; padding: 12px; background: #f8f9fa; border-radius: 6px;">
+                    <div class="roster-form-group">
+                        <label>New Year</label>
+                        <input type="number" id="newYearInput" placeholder="e.g. 2027" min="2020" max="2100" />
+                    </div>
+                    <div class="budget-btn-row">
+                        <button type="button" class="btn-roster-cancel" onclick="cancelNewYear()">Cancel</button>
+                        <button type="button" class="btn-roster-save success" onclick="confirmNewYear()">Add Year</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- EDIT INFO MODAL                                           -->
+<!-- ========================================================= -->
+<div class="modal fade" id="editInfoModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-controller="Profile" asp-action="UpdateProfile" method="post">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="id" value="@Model.UserProfile.Id" />
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Operator Identity</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="roster-form-group">
+                        <label>Designation / Role</label>
+                        <input type="text" name="designation" value="@Model.UserProfile.Designation" required />
+                    </div>
+
+                    <div class="roster-form-group">
+                        <label>Admin Alert Email</label>
+                        <input type="email" name="adminEmail" value="@Model.UserProfile.AdminEmail" required />
+                    </div>
+
+                    <div class="roster-form-group">
+                        <label>Clearance Tier</label>
+                        <input type="text" name="clearanceTier" value="@Model.UserProfile.ClearanceTier" required />
+                    </div>
+
+                    <input type="hidden" name="themeColor" value="@Model.UserProfile.ThemeColor" />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================================= -->
+<!-- UPLOAD AVATAR MODAL                                       -->
+<!-- ========================================================= -->
+<div class="modal fade" id="avatarModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-controller="Profile" asp-action="UpdateAvatar" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="id" value="@Model.UserProfile.Id" />
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Upload Profile Avatar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="roster-form-group">
+                        <label>Select Image (JPG, PNG, WEBP, max 5 MB)</label>
+                        <input type="file" name="avatarFile" accept="image/*" required onchange="previewAvatar(this)" />
+                    </div>
+
+                    <div style="text-align: center; margin-top: 15px;">
+                        <img id="avatarPreview" src="" alt="Preview"
+                             style="display: none; max-width: 150px; max-height: 150px; border-radius: 50%; border: 3px solid #6f42c1;" />
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        // =====================================================
+        // BACKUP / RESTORE
+        // =====================================================
+        function downloadBackup() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                note: 'Backup generated from Testing Spare Management System'
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'TSM_Backup_' + new Date().toISOString().slice(0, 10) + '.json';
+            link.click();
+        }
+
+        function restoreBackup() {
+            document.getElementById('restoreFileInput').click();
+        }
+
+        function handleRestoreFile(input) {
+            if (input.files && input.files[0]) {
+                alert('Backup file selected: ' + input.files[0].name + '\n(Restore logic pending server implementation)');
+            }
+        }
+
+        // =====================================================
+        // THEME CHANGE
+        // =====================================================
+        function changeTheme(theme) {
+            localStorage.setItem('dashboardTheme', theme);
+            document.body.setAttribute('data-theme', theme);
+            alert('Theme changed to: ' + theme);
+        }
+
+        // =====================================================
+        // DELETE ITEM (Generic)
+        // =====================================================
+        function deleteItem(action, id) {
+            if (!confirm('Are you sure you want to delete this item?')) return;
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '@Url.Action("__ACTION__", "Profile")'.replace('__ACTION__', action);
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (token) {
+                const t = document.createElement('input');
+                t.type = 'hidden';
+                t.name = '__RequestVerificationToken';
+                t.value = token.value;
+                form.appendChild(t);
+            }
+
+            const idInput = document.createElement('input');
+            idInput.type = 'hidden';
+            idInput.name = 'id';
+            idInput.value = id;
+            form.appendChild(idInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // =====================================================
+        // EDIT PROJECT
+        // =====================================================
+        function editProject(id, projectCode) {
+            const newCode = prompt('Edit Project Code:', projectCode);
+            if (newCode && newCode.trim() !== '' && newCode.trim() !== projectCode) {
+                submitUpdate('UpdateProject', { id: id, projectCode: newCode.trim() });
+            }
+        }
+
+        // =====================================================
+        // EDIT STATION
+        // =====================================================
+        function editStation(id, stationCode) {
+            const newCode = prompt('Edit Station Code:', stationCode);
+            if (newCode && newCode.trim() !== '' && newCode.trim() !== stationCode) {
+                submitUpdate('UpdateStation', { id: id, stationCode: newCode.trim() });
+            }
+        }
+
+        // =====================================================
+        // EDIT BUYER
+        // =====================================================
+        function editBuyer(id, buyerName) {
+            const newName = prompt('Edit Buyer Name:', buyerName);
+            if (newName && newName.trim() !== '' && newName.trim() !== buyerName) {
+                submitUpdate('UpdateBuyer', { id: id, buyerName: newName.trim() });
+            }
+        }
+
+        // =====================================================
+        // GENERIC UPDATE SUBMITTER
+        // =====================================================
+        function submitUpdate(action, fields) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '@Url.Action("__ACTION__", "Profile")'.replace('__ACTION__', action);
+            form.style.display = 'none';
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (token) {
+                const t = document.createElement('input');
+                t.type = 'hidden';
+                t.name = '__RequestVerificationToken';
+                t.value = token.value;
+                form.appendChild(t);
+            }
+
+            for (const key in fields) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = fields[key];
+                form.appendChild(input);
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // =====================================================
+        // YEARLY BUDGET - BULK SAVE
+        // =====================================================
+        // function saveYearlyBudgets() {
+        //     const rows = document.querySelectorAll('.budget-master-table tbody tr');
+
+        //     if (rows.length === 0) {
+        //         alert('No budget rows to save.');
+        //         return;
+        //     }
+
+        //     const budgets = [];
+        //     rows.forEach(row => {
+        //         const year = row.querySelector('.budget-alloc').getAttribute('data-year');
+        //         const alloc = row.querySelector('.budget-alloc').value || 0;
+        //         const util = row.querySelector('.budget-util').value || 0;
+        //         const saved = row.querySelector('.budget-saved').value || 0;
+
+        //         budgets.push({
+        //             Year: parseInt(year),
+        //             AllocatedBudget: parseFloat(alloc),
+        //             BudgetUtilized: parseFloat(util),
+        //             CostSaved: parseFloat(saved)
+        //         });
+        //     });
+
+        //     const form = document.createElement('form');
+        //     form.method = 'POST';
+        //     form.action = '@Url.Action("SaveYearlyBudgetsBulk", "Profile")';
+        //     form.style.display = 'none';
+
+        //     const token = document.querySelector('input[name="__RequestVerificationToken"]');
+        //     if (token) {
+        //         const t = document.createElement('input');
+        //         t.type = 'hidden';
+        //         t.name = '__RequestVerificationToken';
+        //         t.value = token.value;
+        //         form.appendChild(t);
+        //     }
+
+        //     budgets.forEach((b, i) => {
+        //         form.innerHTML += `<input type="hidden" name="budgets[${i}].Year" value="${b.Year}" />`;
+        //         form.innerHTML += `<input type="hidden" name="budgets[${i}].AllocatedBudget" value="${b.AllocatedBudget}" />`;
+        //         form.innerHTML += `<input type="hidden" name="budgets[${i}].BudgetUtilized" value="${b.BudgetUtilized}" />`;
+        //         form.innerHTML += `<input type="hidden" name="budgets[${i}].CostSaved" value="${b.CostSaved}" />`;
+        //     });
+
+        //     document.body.appendChild(form);
+        //     form.submit();
+        // }
+                // =====================================================
+        // YEARLY BUDGET - BULK SAVE (ALL ROWS AT ONCE)
+        // =====================================================
+        function saveYearlyBudgets() {
+            const rows = document.querySelectorAll('.budget-master-table tbody tr');
+
+            if (rows.length === 0) {
+                alert('No budget rows to save.');
+                return;
+            }
+
+            // అన్ని వరుసల డేటాను సేకరించండి
+            const budgets = [];
+            rows.forEach(row => {
+                const year = row.querySelector('.budget-alloc').getAttribute('data-year');
+                const alloc = row.querySelector('.budget-alloc').value || 0;
+                const util = row.querySelector('.budget-util').value || 0;
+                const saved = row.querySelector('.budget-saved').value || 0;
+
+                budgets.push({
+                    Year: parseInt(year),
+                    AllocatedBudget: parseFloat(alloc),
+                    BudgetUtilized: parseFloat(util),
+                    CostSaved: parseFloat(saved)
+                });
+            });
+
+            console.log('Saving budgets:', budgets); // Debug కోసం
+
+            // Bulk save కోసం ఒక ఫారమ్ సృష్టించండి
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '@Url.Action("SaveYearlyBudgetsBulk", "Profile")';
+            form.style.display = 'none';
+
+            // Anti-forgery token
+            const token = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (token) {
+                const t = document.createElement('input');
+                t.type = 'hidden';
+                t.name = '__RequestVerificationToken';
+                t.value = token.value;
+                form.appendChild(t);
+            }
+
+            
+            budgets.forEach((b, i) => {
+                form.innerHTML += `<input type="hidden" name="budgets[${i}].Year" value="${b.Year}" />`;
+                form.innerHTML += `<input type="hidden" name="budgets[${i}].AllocatedBudget" value="${b.AllocatedBudget}" />`;
+                form.innerHTML += `<input type="hidden" name="budgets[${i}].BudgetUtilized" value="${b.BudgetUtilized}" />`;
+                form.innerHTML += `<input type="hidden" name="budgets[${i}].CostSaved" value="${b.CostSaved}" />`;
+            });
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+        function addNewYear() {
+            document.getElementById('newYearForm').style.display = 'block';
+        }
+
+        function cancelNewYear() {
+            document.getElementById('newYearForm').style.display = 'none';
+            document.getElementById('newYearInput').value = '';
+        }
+
+        function confirmNewYear() {
+            const year = document.getElementById('newYearInput').value;
+
+            if (!year || year < 2020 || year > 2100) {
+                alert('Please enter a valid year (2020-2100).');
+                return;
+            }
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '@Url.Action("SaveYearlyBudget", "Profile")';
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (token) {
+                const t = document.createElement('input');
+                t.type = 'hidden';
+                t.name = '__RequestVerificationToken';
+                t.value = token.value;
+                form.appendChild(t);
+            }
+
+            form.innerHTML += `<input type="hidden" name="year" value="${year}" />`;
+            form.innerHTML += `<input type="hidden" name="allocatedBudget" value="0" />`;
+            form.innerHTML += `<input type="hidden" name="budgetUtilized" value="0" />`;
+            form.innerHTML += `<input type="hidden" name="costSaved" value="0" />`;
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // =====================================================
+        // EDIT INFO MODAL
+        // =====================================================
+        function openEditInfoModal() {
+            const modal = new bootstrap.Modal(document.getElementById('editInfoModal'));
+            modal.show();
+        }
+
+        // =====================================================
+        // AVATAR UPLOAD MODAL
+        // =====================================================
+        function openAvatarModal() {
+            const preview = document.getElementById('avatarPreview');
+            preview.src = '';
+            preview.style.display = 'none';
+
+            const modal = new bootstrap.Modal(document.getElementById('avatarModal'));
+            modal.show();
+        }
+
+        function previewAvatar(input) {
+            const preview = document.getElementById('avatarPreview');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'inline-block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}

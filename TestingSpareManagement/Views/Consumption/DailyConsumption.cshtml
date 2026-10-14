@@ -1,0 +1,497 @@
+﻿@model TestingSpareManagement.Models.DailyConsumptionViewModel
+
+@{
+    ViewData["Title"] = "Daily Consumption";
+    decimal INR_TO_RMB = 0.0858m;
+}
+
+<div class="consumption-page-wrapper">
+
+    <!-- LEFT PANEL -->
+    <div class="entry-panel">
+        <h5><i class="fa-solid fa-plus-circle"></i> Add / Modify Usage Entry</h5>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success" style="font-size: 0.8rem; padding: 8px;">
+                ✅ @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger" style="font-size: 0.8rem; padding: 8px;">
+                ❌ @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <form asp-controller="Consumption" asp-action="LogUsage" method="post" id="usageForm">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" id="editId" />
+
+            <!-- Interactive Calendar -->
+            <div class="form-group">
+                <label><i class="fa-solid fa-calendar-days"></i> Select Consumption Date</label>
+                <div class="calendar-widget">
+                    <div class="cal-header">
+                        <button type="button" onclick="changeCalendarMonth(-1)">◀ Prev</button>
+                        <span id="calTitle">@Model.SelectedDate.ToString("MMMM yyyy")</span>
+                        <button type="button" onclick="changeCalendarMonth(1)">Next ▶</button>
+                    </div>
+                    <div class="cal-grid" id="calCells"></div>
+                </div>
+                <input asp-for="SelectedDate" type="date" id="selectedDateInput" class="form-control-custom" style="margin-top: 8px;" />
+            </div>
+
+            <!-- Working Shift -->
+            <div class="form-group">
+                <label><i class="fa-solid fa-clock"></i> Working Shift</label>
+                <select asp-for="WorkingShift" class="form-control-custom">
+                    <option value="Shift-A (Day Shift)">Shift A </option>
+                    <option value="Shift-B (Night Shift)">Shift B </option>
+                    <option value="Shift-C (General)">Shift C </option>
+                </select>
+            </div>
+
+            <!-- Project Code from DB -->
+            <div class="form-group">
+                <label><i class="fa-solid fa-folder"></i> Assigned Project Code</label>
+                <select asp-for="ProjectCode" class="form-control-custom">
+                    @foreach (var proj in Model.ProjectCodes)
+                    {
+                        <option value="@proj">@proj</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Spare Details with autocomplete -->
+            <div class="form-group">
+                <label><i class="fa-solid fa-microchip"></i> Spare/Connector Details (Type First 2 Letters)</label>
+                <input asp-for="SpareDetails" class="form-control-custom"
+                       list="connectorDatalist" placeholder="e.g. OS, AT, C70..." />
+                <datalist id="connectorDatalist"></datalist>
+                <span asp-validation-for="SpareDetails" class="text-danger small"></span>
+            </div>
+
+            <!-- Equipment Station from DB -->
+            <div class="form-group">
+                <label>Select Test Equipment Station</label>
+                <select asp-for="EquipmentStation" class="form-control-custom">
+                    @foreach (var st in Model.EquipmentStations)
+                    {
+                        <option value="@st">@st</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Quantity Used -->
+            <div class="form-group">
+                <label>Quantity Used (Pieces)</label>
+                <input asp-for="QuantityUsed" type="number" class="form-control-custom" placeholder="e.g. 5" min="1" />
+                <span asp-validation-for="QuantityUsed" class="text-danger small"></span>
+            </div>
+
+            <!-- Line Target from DB -->
+            <div class="form-group">
+                <label>Allocated Line Target</label>
+                <select asp-for="LineTarget" class="form-control-custom">
+                    @foreach (var line in Model.LineTargets)
+                    {
+                        <option value="@line">@line</option>
+                    }
+                </select>
+            </div>
+
+            <!-- DRI Engineer from DB -->
+            <div class="form-group">
+                <label><i class="fa-solid fa-user-tie"></i> DRI Engineer Selection</label>
+                <select asp-for="DriEngineer" class="form-control-custom" id="driSelect">
+                    <option value="">-- Select Registered User / DRI Engineer --</option>
+                    @foreach (var dri in Model.DriEngineers)
+                    {
+                        <option value="@dri.FullName (@dri.EmployeeId)">@dri.FullName [ID: @dri.EmployeeId] - @dri.Role</option>
+                    }
+                </select>
+                <span asp-validation-for="DriEngineer" class="text-danger small"></span>
+            </div>
+
+            <!-- Buttons -->
+            <button type="submit" class="btn-log-usage" id="submitBtn">
+                Log Usage Row & Report to Admin
+            </button>
+            <button type="button" class="btn-cancel" id="cancelBtn" style="display:none;" onclick="resetForm()">
+                Cancel Modification
+            </button>
+        </form>
+    </div>
+
+    <!-- RIGHT PANEL: HISTORY LOGS -->
+    <div class="history-panel">
+        <div class="history-header">
+            <h5><i class="fa-solid fa-list-check"></i> Daily Consumption Tracking History Logs</h5>
+
+            <div class="header-actions">
+                <!-- Date filter with actual dates -->
+                <select class="form-select form-select-sm" id="dateFilter" onchange="applyDateFilter()">
+                    <option value="">All Dates (Complete History)</option>
+                    @foreach (var dt in Model.AvailableDates)
+                    {
+                        if (Model.FilterDate == dt)
+                        {
+                            <option value="@dt" selected>@dt</option>
+                        }
+                        else
+                        {
+                            <option value="@dt">@dt</option>
+                        }
+                    }
+                </select>
+
+                <a href="@Url.Action("ExportExcel", "Consumption", new { filterDate = Model.FilterDate })"
+                   class="btn-export excel" style="text-decoration: none;">
+                    <i class="fa-solid fa-file-excel"></i> Export Excel
+                </a>
+
+                <a href="@Url.Action("ExportPdf", "Consumption", new { filterDate = Model.FilterDate })"
+                   class="btn-export pdf" style="text-decoration: none;">
+                    <i class="fa-solid fa-file-pdf"></i> Export PDF
+                </a>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="history-table" id="consumptionTable">
+                <thead>
+                    <tr>
+                        <th>DATE</th>
+                        <th>SHIFT</th>
+                        <th>PROJECT</th>
+                        <th>ASSET KEY</th>
+                        <th>STATION</th>
+                        <th>CONSUMED QTY</th>
+                        <th>LINE</th>
+                        <th>DRI NAME</th>
+                        <th>EXPENSES (INR / RMB)</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Consumptions != null && Model.Consumptions.Any())
+                    {
+                        foreach (var item in Model.Consumptions)
+                        {
+                            <tr data-id="@item.Id">
+                                <td>@item.ConsumptionDate.ToString("yyyy-MM-dd")</td>
+                                <td><span class="badge badge-shift">@item.WorkingShift</span></td>
+                                <td style="color:#7e22ce; font-weight:bold;">@item.ProjectCode</td>
+                                <td>@item.SpareDetails</td>
+                                <td>@item.EquipmentStation</td>
+                                <td><strong>@item.QuantityUsed</strong></td>
+                                <td>@item.LineTarget</td>
+                                <td>@item.DriEngineer</td>
+                                <td>
+                                    @if (item.TotalCostINR.HasValue)
+                                    {
+                                        <span style="color: #dc2626; font-weight: 700;">
+                                            ₹@item.TotalCostINR.Value.ToString("N2")
+                                        </span>
+                                        <br />
+                                        <span style="color: #d97706; font-size: 0.85em;">
+                                            ¥@((item.TotalCostINR.Value * INR_TO_RMB).ToString("N2"))
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span style="color: #999;">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    <button type="button" class="btn-matrix-edit"
+                                            onclick="editConsumption(@item.Id)">
+                                        <i class="fa-solid fa-pen"></i> Edit
+                                    </button>
+                                    <button type="button" class="btn-matrix-del"
+                                            onclick="deleteConsumption(@item.Id)">
+                                        <i class="fa-solid fa-trash"></i> Del
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="10">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-inbox"></i>
+                                    No consumption entries found.
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.TotalPages > 1)
+        {
+            <div class="pagination-wrapper">
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <a href="@Url.Action("DailyConsumption", new { pageNumber = i, pageSize = Model.PageSize, filterDate = Model.FilterDate })"
+                       class="page-btn @(i == Model.CurrentPage ? "active" : "")">@i</a>
+                }
+            </div>
+        }
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // =====================================================
+        // INTERACTIVE CALENDAR
+        // =====================================================
+        let calYear = @Model.SelectedDate.Year;
+        let calMonth = @Model.SelectedDate.Month - 1;
+
+        function renderCalendar() {
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"];
+            document.getElementById('calTitle').innerText = monthNames[calMonth] + ' ' + calYear;
+
+            const firstDay = new Date(calYear, calMonth, 1).getDay();
+            const totalDays = new Date(calYear, calMonth + 1, 0).getDate();
+            const selectedDate = document.getElementById('selectedDateInput').value;
+
+            let html = '';
+            html += '<div class="cal-day-name">S</div><div class="cal-day-name">M</div>';
+            html += '<div class="cal-day-name">T</div><div class="cal-day-name">W</div>';
+            html += '<div class="cal-day-name">T</div><div class="cal-day-name">F</div>';
+            html += '<div class="cal-day-name">S</div>';
+
+            for (let i = 0; i < firstDay; i++) {
+                html += '<div class="cal-cell empty"></div>';
+            }
+
+            for (let day = 1; day <= totalDays; day++) {
+                const mm = String(calMonth + 1).padStart(2, '0');
+                const dd = String(day).padStart(2, '0');
+                const dateStr = calYear + '-' + mm + '-' + dd;
+                const isSelected = dateStr === selectedDate ? ' selected' : '';
+                html += '<div class="cal-cell' + isSelected + '" onclick="selectDate(\'' + dateStr + '\')">' + day + '</div>';
+            }
+
+            document.getElementById('calCells').innerHTML = html;
+        }
+
+        function changeCalendarMonth(dir) {
+            calMonth += dir;
+            if (calMonth > 11) { calMonth = 0; calYear++; }
+            else if (calMonth < 0) { calMonth = 11; calYear--; }
+            renderCalendar();
+        }
+
+        function selectDate(dateStr) {
+            document.getElementById('selectedDateInput').value = dateStr;
+            renderCalendar();
+        }
+
+        // =====================================================
+        // AUTO-FILL DRI FROM SESSION
+        // =====================================================
+        document.addEventListener('DOMContentLoaded', function () {
+            renderCalendar();
+
+            const sessionUser = '@(Context.Session.GetString("EmployeeName") ?? "")';
+            if (sessionUser) {
+                const driSelect = document.getElementById('driSelect');
+                for (let opt of driSelect.options) {
+                    if (opt.value.includes(sessionUser)) {
+                        driSelect.value = opt.value;
+                        break;
+                    }
+                }
+            }
+        });
+
+        // =====================================================
+        // EDIT CONSUMPTION
+        // =====================================================
+        function editConsumption(id) {
+            fetch('@Url.Action("GetItemForEdit", "Consumption")?id=' + id)
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('editId').value = data.id;
+                    document.getElementById('selectedDateInput').value =
+                        data.consumptionDate.split('T')[0];
+                    document.querySelector('[name="WorkingShift"]').value = data.workingShift;
+                    document.querySelector('[name="ProjectCode"]').value = data.projectCode;
+                    document.querySelector('[name="SpareDetails"]').value = data.spareDetails;
+                    document.querySelector('[name="EquipmentStation"]').value = data.equipmentStation;
+                    document.querySelector('[name="QuantityUsed"]').value = data.quantityUsed;
+                    document.querySelector('[name="LineTarget"]').value = data.lineTarget;
+                    document.querySelector('[name="DriEngineer"]').value = data.driEngineer;
+
+                    document.getElementById('submitBtn').innerText = 'Update Usage Row';
+                    document.getElementById('cancelBtn').style.display = 'block';
+                    document.querySelector('.entry-panel h5').innerHTML =
+                        '<i class="fa-solid fa-pen"></i> Modify Usage Entry';
+
+                    document.getElementById('usageForm').action =
+                        '@Url.Action("Update", "Consumption")/' + id;
+
+                    renderCalendar();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                })
+                .catch(err => alert('Error loading item: ' + err));
+        }
+
+        function resetForm() {
+            document.getElementById('usageForm').reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('submitBtn').innerText = 'Log Usage Row & Report to Admin';
+            document.getElementById('cancelBtn').style.display = 'none';
+            document.querySelector('.entry-panel h5').innerHTML =
+                '<i class="fa-solid fa-plus-circle"></i> Add / Modify Usage Entry';
+            document.getElementById('usageForm').action = '@Url.Action("LogUsage", "Consumption")';
+            renderCalendar();
+        }
+
+        // =====================================================
+        // DELETE CONSUMPTION
+        // =====================================================
+        function deleteConsumption(id) {
+            if (!confirm('Delete this consumption entry?')) return;
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '@Url.Action("Delete", "Consumption")';
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (token) {
+                const t = document.createElement('input');
+                t.type = 'hidden';
+                t.name = '__RequestVerificationToken';
+                t.value = token.value;
+                form.appendChild(t);
+            }
+
+            const idInput = document.createElement('input');
+            idInput.type = 'hidden';
+            idInput.name = 'id';
+            idInput.value = id;
+            form.appendChild(idInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // =====================================================
+        // APPLY DATE FILTER
+        // =====================================================
+        function applyDateFilter() {
+            const val = document.getElementById('dateFilter').value;
+            window.location.href = '@Url.Action("DailyConsumption", "Consumption")?filterDate=' + val;
+        }
+
+        // =====================================================
+        // EXPORT EXCEL (CSV)
+        // =====================================================
+        function exportConsumptionExcel() {
+            const table = document.getElementById('consumptionTable');
+            const rows = table.querySelectorAll('tr');
+            let csv = '';
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('th, td');
+                const rowData = [];
+                cells.forEach((cell, i) => {
+                    if (i === cells.length - 1) return; // skip Actions
+                    let text = cell.innerText.trim().replace(/\s+/g, ' ');
+                    text = text.replace(/"/g, '""');
+                    rowData.push('"' + text + '"');
+                });
+                if (rowData.length > 0) csv += rowData.join(',') + '\n';
+            });
+
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'DailyConsumption_' + new Date().toISOString().slice(0, 10) + '.csv';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // =====================================================
+        // EXPORT PDF (string concat + escaped closing tags)
+        // =====================================================
+        function exportConsumptionPdf() {
+            const table = document.getElementById('consumptionTable').cloneNode(true);
+
+            const headerCells = table.querySelectorAll('thead th');
+            if (headerCells.length > 0) {
+                headerCells[headerCells.length - 1].remove();
+            }
+
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(r => {
+                const cells = r.querySelectorAll('td');
+                if (cells.length > 0) cells[cells.length - 1].remove();
+            });
+
+            const w = window.open('', '_blank');
+
+            let html = '';
+            html += '<html><head>';
+            html += '<title>Daily Consumption Report<\/title>';
+            html += '<style>';
+            html += 'body { font-family: Arial; padding: 20px; }';
+            html += 'h2 { color: #6f42c1; }';
+            html += 'table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }';
+            html += 'th { background: #f0f0f0; padding: 8px; border: 1px solid #ccc; text-align: left; }';
+            html += 'td { padding: 8px; border: 1px solid #ddd; }';
+            html += 'tr:nth-child(even) { background: #fafafa; }';
+            html += '<\/style>';
+            html += '<\/head><body>';
+            html += '<h2>Daily Consumption Report<\/h2>';
+            html += '<p style="font-size:11px;color:#666;">Generated: ' + new Date().toLocaleString() + '<\/p>';
+            html += table.outerHTML;
+            html += '<\/body><\/html>';
+
+            w.document.open();
+            w.document.write(html);
+            w.document.close();
+
+            setTimeout(function () {
+                w.focus();
+                w.print();
+            }, 300);
+        }
+
+        // =====================================================
+        // AUTOCOMPLETE FOR SPARE DETAILS
+        // =====================================================
+        document.addEventListener('DOMContentLoaded', function () {
+            const input = document.querySelector('[name="SpareDetails"]');
+            if (input) {
+                input.addEventListener('input', function () {
+                    const query = this.value;
+                    if (query.length >= 2) {
+                        fetch('@Url.Action("SearchSpares", "Master")?query=' + encodeURIComponent(query))
+                            .then(r => r.json())
+                            .then(items => {
+                                const datalist = document.getElementById('connectorDatalist');
+                                datalist.innerHTML = items.map(i =>
+                                    '<option value="' + i.assetKey + ' - ' + i.description + '">').join('');
+                            })
+                            .catch(() => { });
+                    }
+                });
+            }
+        });
+    </script>
+}

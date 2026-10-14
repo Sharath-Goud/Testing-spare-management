@@ -1,428 +1,363 @@
-﻿@model TestingSpareManagement.ViewModels.DashboardViewModel
-
+﻿@model TestingSpareManagement.Models.DashboardViewModel
 @{
-    ViewData["Title"] = "Testing Spare Management System";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Real-Time Command Center";
+    var activeYear = Model.ActiveYear;
 }
 
-<div id="mainApp">
+<div class="dashboard-page-wrapper" id="mainApp">
 
-    <div id="globalAlarmBannerTop"
-         class="alarm-banner-top">
-
-        <h3>
-            🚨 SYSTEM ALARM:
-            CRITICAL LOW MATERIAL QUANTITY DETECTED
-        </h3>
-
-        <ul id="globalAlarmListTop"
-            class="alarm-list">
-        </ul>
-
+    <!-- TITLE BAR -->
+    <div class="dashboard-title-bar" style="background: linear-gradient(135deg, #8b5cf6, #6366f1); padding: 18px 24px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
+        <h5 style="margin: 0; color: #ffffff; font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 24px;">⚡</span> Real-Time Factory Command Center & Live Telemetry
+        </h5>
+        <span class="live-status-badge" style="background: #dcfce7; color: #15803d; border: 1px solid #22c55e; padding: 6px 16px; border-radius: 20px; font-size: 11px; font-weight: 900; display: flex; align-items: center; gap: 8px;">
+            <span style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%;"></span>
+            LIVE SYSTEM ONLINE
+        </span>
     </div>
 
-
-    <div id="realTimeView"
-         class="dashboard-view active">
-
-
-        <div class="card">
-
-
-            <h2>
-
-                ⚡ Real-Time Factory Command Center &
-                Live Telemetry
-
-
-                <span class="live-status">
-
-                    🟢 LIVE SYSTEM ONLINE
-
-                </span>
-
-
-            </h2>
-
-
-            <div class="rt-metric-grid">
-
-
-                <div class="rt-metric-card purple-card">
-
-
-                    <div class="rt-card-title">
-
-                        Master Connectors Consolidated
-
-                    </div>
-
-
-                    <div class="rt-card-value">
-
-                        @Model.TotalConnectors
-
-                    </div>
-
-
-                    <div class="rt-card-sub">
-
-                        Matrix Mapped Spares
-
-                    </div>
-
-
-                </div>
-
-
-
-                <div class="rt-metric-card red-card">
-
-
-                    <div class="rt-card-title">
-
-                        Stock-Out Alerts ⚠️
-
-                    </div>
-
-
-                    <div class="rt-card-value">
-
-                        @Model.StockOutAlerts
-
-                    </div>
-
-
-                    <div class="rt-card-sub">
-
-                        Requires Immediate PO
-
-                    </div>
-
-
-                </div>
-
-
-                <div class="rt-metric-card yellow-card">
-
-
-                    <div class="rt-card-title">
-
-                        Pending Requisitions
-
-                    </div>
-
-
-                    <div class="rt-card-value">
-
-                        @Model.PendingRequests
-
-                    </div>
-
-
-                    <div class="rt-card-sub">
-
-                        Awaiting Admin Sign-off
-
-                    </div>
-
-
-                </div>
-
-
-                <div class="rt-metric-card blue-card">
-
-
-                    <div class="rt-card-title">
-
-                        YTD Spares Burn (INR)
-
-                    </div>
-
-
-                    <div class="rt-card-value">
-
-                        ₹ @Model.YtdSpend
-
-                    </div>
-
-
-                    <div class="rt-card-sub">
-
-                        Within Allocated Cap
-
-                    </div>
-
-                </div>
-
-            </div>
-
+    <!-- KPI CARDS -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px;">
+
+        <div onclick="window.location.href='@Url.Action("Index", "MasterConnector")'" style="background: linear-gradient(135deg, #a78bfa, #8b5cf6); padding: 20px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); cursor: pointer;">
+            <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; opacity: 0.9;">Master Connectors Consolidated</div>
+            <div style="font-size: 32px; font-weight: 900; margin: 8px 0;">@Model.TotalConnectors</div>
+            <div style="font-size: 10px; opacity: 0.85;">Mapped Spares (Click to View)</div>
+        </div>
+
+        <div onclick="window.location.href='@Url.Action("Index", "Equipment")'" style="background: linear-gradient(135deg, #f87171, #ef4444); padding: 20px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); cursor: pointer;">
+            <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; opacity: 0.9;">Stock-Out Alerts ⚠</div>
+            <div style="font-size: 32px; font-weight: 900; margin: 8px 0;">@Model.LowStockAlerts</div>
+            <div style="font-size: 10px; opacity: 0.85;">Requires Immediate PO (Click)</div>
+        </div>
+
+        <div onclick="window.location.href='@Url.Action("Index", "MaterialRequest")'" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 20px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); cursor: pointer;">
+            <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; opacity: 0.9;">Pending Requisitions</div>
+            <div style="font-size: 32px; font-weight: 900; margin: 8px 0;">@Model.PendingRequests</div>
+            <div style="font-size: 10px; opacity: 0.85;">Awaiting Admin Sign-off (Click)</div>
+        </div>
+
+        <div onclick="window.location.href='@Url.Action("Index", "Budget")'" style="background: linear-gradient(135deg, #60a5fa, #3b82f6); padding: 20px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); cursor: pointer;">
+            <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; opacity: 0.9;">YTD Spares Burn (INR)</div>
+            <div style="font-size: 32px; font-weight: 900; margin: 8px 0;">₹@Model.YTDBurnINR.ToString("N0")</div>
+            <div style="font-size: 10px; opacity: 0.85;">¥@Model.YTDBurnRMB.ToString("N2") RMB</div>
         </div>
 
     </div>
 
-    <!-- ================= PROJECTS + CLOCK SECTION ================= -->
+    <!-- PROJECTS + CLOCKS -->
+    <div style="display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 16px; margin-bottom: 20px;">
 
-
-    <div class="projects-clock-container">
-
-
-        <!-- ACTIVE PROJECTS -->
-
-        <div class="card project-card">
-
-
-            <h3>
-
-                📁 Active Projects Status Grid
-
-            </h3>
-
-
-            <div id="activeProjectsGridContainer"
-                 class="projects-status-grid">
-
-                <div class="project-status-card">
-                    <div>
-                        <strong>🔌 A246f</strong>
-                        <span>C-C Cable</span>
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+            <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 12px;">
+                <h6 style="margin: 0; color: #7c3aed; font-size: 13px; font-weight: 700; text-transform: uppercase;">
+                    📁 Active Projects Status Grid
+                </h6>
+            </div>
+            <div>
+                @if (Model.ActiveProjects != null && Model.ActiveProjects.Any())
+                {
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
+                        @foreach (var project in Model.ActiveProjects)
+                        {
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <span style="font-weight: 800; color: #0f172a; font-size: 14px; display: block;">🔌 @project.ProjectCode</span>
+                                    <span style="font-size: 10px; color: #64748b; font-weight: 600;">@project.Description</span>
+                                </div>
+                                <span style="background: #dcfce7; border: 1px solid #22c55e; color: #15803d; font-size: 9px; font-weight: 900; padding: 4px 10px; border-radius: 15px; text-transform: uppercase;">
+                                    🟢 @project.Status
+                                </span>
+                            </div>
+                        }
                     </div>
+                }
+                else
+                {
+                    <div style="text-align: center; padding: 20px; color: #999; font-size: 0.85rem;">No active projects.</div>
+                }
+            </div>
+        </div>
 
-                    <span class="green-badge">
-                        🟢 ONLINE
-                    </span>
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+            <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 12px;">
+                <h6 style="margin: 0; color: #7c3aed; font-size: 13px; font-weight: 700; text-transform: uppercase;">
+                    🌐 Factory Time Zone Clocks
+                </h6>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+
+                <div style="background: linear-gradient(135deg, #fff7ed, #ffedd5); border: 1px solid #fdba74; border-top: 4px solid #ea580c; border-radius: 10px; padding: 12px; text-align: center;">
+                    <div style="font-size: 11px; font-weight: 800; color: #c2410c; text-transform: uppercase; margin-bottom: 6px;">🏛️ India (IST)</div>
+                    <div id="indiaTime" style="font-size: 18px; font-weight: 900; color: #0f172a; font-family: monospace;">--:--:--</div>
+                    <div id="indiaDate" style="font-size: 10px; color: #475569; font-weight: 600;">--</div>
                 </div>
 
-                <div class="project-status-card">
-                    <div>
-                        <strong>🔌 A246f</strong>
-                        <span>C-C Cable</span>
-                    </div>
-
-                    <span class="green-badge">
-                        🟢 ONLINE
-                    </span>
-                </div>
-
-                <div class="project-status-card">
-                    <div>
-                        <strong>⚡ A191m</strong>
-                        <span>Lightning Cable</span>
-                    </div>
-
-                    <span class="green-badge">
-                        🟢 ONLINE
-                    </span>
-                </div>
-
-                <div class="project-status-card">
-                    <div>
-                        <strong>🔗 Vivo_zv6</strong>
-                        <span>USB-C Cable</span>
-                    </div>
-
-                    <span class="green-badge">
-                        🟢 ONLINE
-                    </span>
+                <div style="background: linear-gradient(135deg, #fef2f2, #fee2e2); border: 1px solid #fca5a5; border-top: 4px solid #dc2626; border-radius: 10px; padding: 12px; text-align: center;">
+                    <div style="font-size: 11px; font-weight: 800; color: #b91c1c; text-transform: uppercase; margin-bottom: 6px;">🐉 China (CST)</div>
+                    <div id="chinaTime" style="font-size: 18px; font-weight: 900; color: #0f172a; font-family: monospace;">--:--:--</div>
+                    <div id="chinaDate" style="font-size: 10px; color: #475569; font-weight: 600;">--</div>
                 </div>
 
             </div>
-
-
         </div>
-
-
-
-
-        <!-- FACTORY CLOCK -->
-
-
-        <div class="card clock-container">
-
-
-            <h3>
-
-                🌐 Factory Time Zone Clocks
-
-            </h3>
-
-
-
-            <div class="dual-clock-box">
-
-
-
-                <!-- INDIA -->
-
-
-                <div class="clock-card-india">
-
-
-                    <div class="clock-symbol-title">
-
-                        🏛️ INDIA (IST)
-
-                    </div>
-
-
-                    <div id="indiaClockTime"
-                         class="clock-time">
-
-                        00:00:00
-
-                    </div>
-
-
-                    <div id="indiaClockDate"
-                         class="clock-date">
-
-                        --
-
-                    </div>
-
-
-                </div>
-
-
-
-
-                <!-- CHINA -->
-
-
-                <div class="clock-card-china">
-
-
-                    <div class="clock-symbol-title">
-
-                        🐉 CHINA (CST)
-
-                    </div>
-
-
-                    <div id="chinaClockTime"
-                         class="clock-time">
-
-                        00:00:00
-
-                    </div>
-
-
-                    <div id="chinaClockDate"
-                         class="clock-date">
-
-                        --
-
-                    </div>
-
-
-                </div>
-
-
-
-            </div>
-
-
-
-        </div>
-
-
 
     </div>
 
+    <!-- CRITICAL INVENTORY & LIVE REQUISITIONS -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
 
-
-
-
-    <!-- ================= CHART SECTION ================= -->
-
-
-    <div class="chart-grid">
-
-
-        <div class="card">
-
-
-            <div class="card-header">
-
-
-                <h3>
-
-                    📊 Current Month Budget & Expense Analysis
-
-                </h3>
-
-
-
-                <span id="currentMonthDisplay">
-
-                    September 2026
-
-                </span>
-
-
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+            <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                <h6 style="margin: 0; color: #dc2626; font-size: 13px; font-weight: 700; text-transform: uppercase;">
+                    ⚠️ Critical Inventory Watcher
+                </h6>
             </div>
-
-
-
-            <div class="chart-box">
-
-
-                <canvas id="compactTrendCanvas"></canvas>
-
-
+            <div style="max-height: 280px; overflow-y: auto;">
+                @if (Model.EquipmentConsumables != null && Model.EquipmentConsumables.Any(e => e.AvailableQty <= e.MinLimit))
+                {
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <thead>
+                            <tr style="background: #f8fafc; text-align: left; color: #475569;">
+                                <th style="padding: 8px;">Item</th>
+                                <th style="padding: 8px;">Project</th>
+                                <th style="padding: 8px;">Available</th>
+                                <th style="padding: 8px;">Min</th>
+                                <th style="padding: 8px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.EquipmentConsumables.Where(e => e.AvailableQty <= e.MinLimit))
+                            {
+                                var isOut = item.AvailableQty == 0;
+                                <tr style="border-bottom: 1px solid #f1f5f9;">
+                                    <td style="padding: 8px; font-weight: 600; color: #0f172a;">@item.TestItem</td>
+                                    <td style="padding: 8px; color: #7e22ce; font-weight: 600;">@item.ProjectCode</td>
+                                    <td style="padding: 8px; font-weight: 700; color: @(isOut ? "#dc2626" : "#d97706");">@item.AvailableQty</td>
+                                    <td style="padding: 8px; color: #64748b;">@item.MinLimit</td>
+                                    <td style="padding: 8px;">
+                                        @if (isOut)
+                                        {
+                                            <span style="background: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 700;">🛑 OUT</span>
+                                        }
+                                        else
+                                        {
+                                            <span style="background: #fef9c3; color: #854d0e; padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 700;">⚠️ LOW</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div style="text-align: center; padding: 30px; color: #15803d; font-weight: 600;">✅ All Inventory Levels Healthy</div>
+                }
             </div>
-
-
-
         </div>
 
-
-
-
-
-
-        <div class="card">
-
-
-            <div class="card-header">
-
-
-                <h3>
-
-                    📈 Yearly Trend:
-                    Budget Utilized vs Cost Saved
-
-                </h3>
-
-
-                <span>
-
-                    Multi-Year Master View
-
-                </span>
-
-
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+            <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                <h6 style="margin: 0; color: #d97706; font-size: 13px; font-weight: 700; text-transform: uppercase;">
+                    📋 Live Requisitions Queue
+                </h6>
             </div>
-
-
-
-            <div class="chart-box">
-
-
-                <canvas id="yearlyTrendCanvas"></canvas>
-
-
+            <div style="max-height: 280px; overflow-y: auto;">
+                @if (Model.MaterialRequests != null && Model.MaterialRequests.Any())
+                {
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <thead>
+                            <tr style="background: #f8fafc; text-align: left; color: #475569;">
+                                <th style="padding: 8px;">Req ID</th>
+                                <th style="padding: 8px;">Project</th>
+                                <th style="padding: 8px;">Item</th>
+                                <th style="padding: 8px;">Qty</th>
+                                <th style="padding: 8px;">Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var req in Model.MaterialRequests)
+                            {
+                                <tr style="border-bottom: 1px solid #f1f5f9;">
+                                    <td style="padding: 8px; font-weight: 700; color: #7c3aed;">@req.RequestId</td>
+                                    <td style="padding: 8px; color: #7e22ce; font-weight: 600;">@req.ProjectCode</td>
+                                    <td style="padding: 8px; color: #0f172a;">@req.SpareDescription</td>
+                                    <td style="padding: 8px; font-weight: 700; color: #059669;">@req.Quantity</td>
+                                    <td style="padding: 8px;">
+                                        <span style="background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 700;">@req.Priority</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div style="text-align: center; padding: 30px; color: #15803d; font-weight: 600;">✅ No Pending Requisitions</div>
+                }
             </div>
-
-
-
         </div>
-
-
-
 
     </div>
 
+    <!-- CHARTS -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
 
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 12px;">
+                <h6 style="margin: 0; color: #6f42c1; font-size: 13px; font-weight: 700; text-transform: uppercase;">📊 Current Month Budget & Expense Analysis</h6>
+                <span style="font-size: 10px; color: #666; font-weight: 600; background: #f3e8ff; padding: 3px 10px; border-radius: 10px;">@Model.CurrentMonthName @activeYear</span>
+            </div>
+            <div style="height: 260px; position: relative;">
+                <canvas id="currentMonthChart"></canvas>
+            </div>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 12px;">
+                <h6 style="margin: 0; color: #217346; font-size: 13px; font-weight: 700; text-transform: uppercase;">📈 Yearly Trend: Budget Utilized vs Cost Saved</h6>
+                <span style="font-size: 10px; color: #666; font-weight: 600; background: #dcfce7; padding: 3px 10px; border-radius: 10px;">Multi-Year Master View</span>
+            </div>
+            <div style="height: 260px; position: relative;">
+                <canvas id="yearlyTrendChart"></canvas>
+            </div>
+        </div>
+
+    </div>
 
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // =====================================================
+        // LIVE CLOCKS (Accurate IST & CST via Intl API)
+        // =====================================================
+        function updateClocks() {
+            const now = new Date();
+
+            // ---------- IST (India Standard Time - Asia/Kolkata) ----------
+            const istTime = new Intl.DateTimeFormat('en-GB', {
+                timeZone: 'Asia/Kolkata',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).format(now);
+
+            const istDate = new Intl.DateTimeFormat('en-GB', {
+                timeZone: 'Asia/Kolkata',
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            }).format(now);
+
+            const indiaTimeEl = document.getElementById('indiaTime');
+            const indiaDateEl = document.getElementById('indiaDate');
+            if (indiaTimeEl) indiaTimeEl.textContent = istTime;
+            if (indiaDateEl) indiaDateEl.textContent = istDate;
+
+            // ---------- CST (China Standard Time - Asia/Shanghai) ----------
+            const cstTime = new Intl.DateTimeFormat('en-GB', {
+                timeZone: 'Asia/Shanghai',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).format(now);
+
+            const cstDate = new Intl.DateTimeFormat('en-GB', {
+                timeZone: 'Asia/Shanghai',
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            }).format(now);
+
+            const chinaTimeEl = document.getElementById('chinaTime');
+            const chinaDateEl = document.getElementById('chinaDate');
+            if (chinaTimeEl) chinaTimeEl.textContent = cstTime;
+            if (chinaDateEl) chinaDateEl.textContent = cstDate;
+        }
+
+        updateClocks();
+        setInterval(updateClocks, 1000);
+
+        // =====================================================
+        // CHART 1: CURRENT MONTH BUDGET & EXPENSE
+        // =====================================================
+        const monthCtx = document.getElementById('currentMonthChart').getContext('2d');
+        new Chart(monthCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Allocated Budget', 'Total Expenses', 'Balance Remaining'],
+                datasets: [{
+                    data: [@Model.CurrentMonthAllocatedBudget, @Model.CurrentMonthActualExpenses, @Model.CurrentMonthBalanceRemaining],
+                    backgroundColor: ['rgba(52, 152, 219, 0.8)', 'rgba(231, 76, 60, 0.8)', 'rgba(46, 204, 113, 0.8)'],
+                    borderColor: ['#2980b9', '#c0392b', '#27ae60'],
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    barThickness: 70
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: (c) => '₹' + c.parsed.y.toLocaleString('en-IN') } }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { callback: (v) => v >= 100000 ? '₹' + (v / 100000).toFixed(1) + 'L' : '₹' + v, font: { size: 10 } },
+                        grid: { color: '#f0f0f0' }
+                    },
+                    x: { ticks: { font: { size: 10, weight: '600' } }, grid: { display: false } }
+                }
+            }
+        });
+
+        // =====================================================
+        // CHART 2: YEARLY TREND
+        // =====================================================
+        const yearlyCtx = document.getElementById('yearlyTrendChart').getContext('2d');
+        const yearlyLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.YearlyLabels));
+        const yearlyAllocated = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.YearlyAllocatedBudget));
+        const yearlyUtilized = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.YearlyBudgetUtilized));
+        const yearlySaved = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.YearlyCostSaved));
+
+        new Chart(yearlyCtx, {
+            type: 'bar',
+            data: {
+                labels: yearlyLabels,
+                datasets: [
+                    { label: 'Allocated Budget', data: yearlyAllocated, backgroundColor: 'rgba(52, 152, 219, 0.85)', borderColor: '#2980b9', borderWidth: 1.5, borderRadius: 4 },
+                    { label: 'Budget Utilized', data: yearlyUtilized, backgroundColor: 'rgba(192, 57, 43, 0.85)', borderColor: '#922b21', borderWidth: 1.5, borderRadius: 4 },
+                    { label: 'Cost Saved', data: yearlySaved, backgroundColor: 'rgba(39, 174, 96, 0.85)', borderColor: '#1e8449', borderWidth: 1.5, borderRadius: 4 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { font: { size: 10, weight: '600' }, usePointStyle: true, boxWidth: 10, padding: 12 } },
+                    tooltip: { callbacks: { label: (c) => c.dataset.label + ': ₹' + c.parsed.y.toLocaleString('en-IN') } }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: (v) => v >= 10000000 ? '₹' + (v / 10000000).toFixed(1) + ' Cr'
+                                : (v >= 100000 ? '₹' + (v / 100000).toFixed(1) + ' L' : '₹' + v),
+                            font: { size: 10 }
+                        },
+                        grid: { color: '#f0f0f0' }
+                    },
+                    x: { ticks: { font: { size: 10, weight: '600' } }, grid: { display: false } }
+                }
+            }
+        });
+    </script>
+}

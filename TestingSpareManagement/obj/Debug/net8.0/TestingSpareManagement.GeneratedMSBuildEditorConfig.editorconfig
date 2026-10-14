@@ -9,57 +9,81 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = TestingSpareManagement
 build_property.RootNamespace = TestingSpareManagement
-build_property.ProjectDir = C:\Users\2063907\source\repos\TestingSpareManagement\TestingSpareManagement\
+build_property.ProjectDir = C:\Users\2063905\Desktop\TestingSpareManagement\TestingSpareManagement\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\2063907\source\repos\TestingSpareManagement\TestingSpareManagement
+build_property.MSBuildProjectDirectory = C:\Users\2063905\Desktop\TestingSpareManagement\TestingSpareManagement
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/2063907/source/repos/TestingSpareManagement/TestingSpareManagement/Views/Account/Login.cshtml]
+[C:/Users/2063905/Desktop/TestingSpareManagement/TestingSpareManagement/Views/Account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/2063907/source/repos/TestingSpareManagement/TestingSpareManagement/Views/Account/Register.cshtml]
+[C:/Users/2063905/Desktop/TestingSpareManagement/TestingSpareManagement/Views/Account/Register.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/2063907/source/repos/TestingSpareManagement/TestingSpareManagement/Views/Dashboard/Index.cshtml]
+[C:/Users/2063905/Desktop/TestingSpareManagement/TestingSpareManagement/Views/Budget/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnVkZ2V0XEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/2063905/Desktop/TestingSpareManagement/TestingSpareManagement/Views/Consumption/DailyConsumption.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29uc3VtcHRpb25cRGFpbHlDb25zdW1wdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/2063905/Desktop/TestingSpareManagement/TestingSpareManagement/Views/Dashboard/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/2063907/source/repos/TestingSpareManagement/TestingSpareManagement/Views/Home/Index.cshtml]
+[C:/Users/2063905/Desktop/TestingSpareManagement/TestingSpareManagement/Views/Equipment/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXF1aXBtZW50XEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/2063905/Desktop/TestingSpareManagement/TestingSpareManagement/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/2063907/source/repos/TestingSpareManagement/TestingSpareManagement/Views/Home/Privacy.cshtml]
+[C:/Users/2063905/Desktop/TestingSpareManagement/TestingSpareManagement/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/2063907/source/repos/TestingSpareManagement/TestingSpareManagement/Views/MasterConnector/Index.cshtml]
+[C:/Users/2063905/Desktop/TestingSpareManagement/TestingSpareManagement/Views/MasterConnector/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyQ29ubmVjdG9yXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/2063907/source/repos/TestingSpareManagement/TestingSpareManagement/Views/Shared/Error.cshtml]
+[C:/Users/2063905/Desktop/TestingSpareManagement/TestingSpareManagement/Views/MaterialRequest/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWF0ZXJpYWxSZXF1ZXN0XEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/2063905/Desktop/TestingSpareManagement/TestingSpareManagement/Views/Profile/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZmlsZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/2063905/Desktop/TestingSpareManagement/TestingSpareManagement/Views/PrPoTracker/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJQb1RyYWNrZXJcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/2063905/Desktop/TestingSpareManagement/TestingSpareManagement/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/2063907/source/repos/TestingSpareManagement/TestingSpareManagement/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/2063905/Desktop/TestingSpareManagement/TestingSpareManagement/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/2063907/source/repos/TestingSpareManagement/TestingSpareManagement/Views/_ViewImports.cshtml]
+[C:/Users/2063905/Desktop/TestingSpareManagement/TestingSpareManagement/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/2063907/source/repos/TestingSpareManagement/TestingSpareManagement/Views/_ViewStart.cshtml]
+[C:/Users/2063905/Desktop/TestingSpareManagement/TestingSpareManagement/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/2063907/source/repos/TestingSpareManagement/TestingSpareManagement/Views/Shared/_Layout.cshtml]
+[C:/Users/2063905/Desktop/TestingSpareManagement/TestingSpareManagement/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-fs8pucbky8

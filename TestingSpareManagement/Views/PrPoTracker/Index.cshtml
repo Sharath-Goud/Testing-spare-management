@@ -1,0 +1,656 @@
+﻿@model TestingSpareManagement.Models.PrPoTrackerViewModel
+
+@{
+    ViewData["Title"] = "PR & PO Tracker";
+    var activeYear = Model.ActiveYear;
+}
+
+<div class="prpo-page-wrapper">
+
+    <!-- ========================================================= -->
+    <!-- LEFT PANEL: ADD / MODIFY PR/PO RECORD                     -->
+    <!-- ========================================================= -->
+    <div class="prpo-form-panel">
+        <h5><i class="fa-solid fa-cart-shopping"></i> Add / Modify PR/PO Record</h5>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success" style="font-size: 0.78rem; padding: 8px;">
+                ✅ @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger" style="font-size: 0.78rem; padding: 8px;">
+                ⚠ @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <form asp-controller="PrPoTracker" asp-action="Save" method="post" id="prpoForm">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ActiveYear" value="@activeYear" />
+
+            <!-- Calendar -->
+            <div class="form-group">
+                <label><i class="fa-solid fa-calendar-days"></i> Select Requisition Date</label>
+                <div class="calendar-header">
+                    <button type="button"><i class="fa-solid fa-chevron-left"></i> Prev</button>
+                    <span>@Model.RequisitionDate.ToString("MMMM yyyy")</span>
+                    <button type="button">Next <i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+                <div class="calendar-grid">
+                    <div class="day-label">S</div><div class="day-label">M</div><div class="day-label">T</div>
+                    <div class="day-label">W</div><div class="day-label">T</div><div class="day-label">F</div>
+                    <div class="day-label">S</div>
+                    @for (int i = 1; i <= 31; i++)
+                    {
+                        <div class="date-cell @(i == DateTime.Today.Day ? "active" : "")">@i</div>
+                    }
+                </div>
+                <input asp-for="RequisitionDate" type="date" class="form-control-custom" />
+            </div>
+
+            <!-- PROJECT CODE -->
+            <div class="form-group">
+                <label><i class="fa-solid fa-folder"></i> Target Project Code</label>
+                <select id="projectDropdown" class="form-control-custom">
+                    <option value="">-- Select Existing Project --</option>
+                    @if (Model.Projects != null && Model.Projects.Any())
+                    {
+                        foreach (var project in Model.Projects)
+                        {
+                            <option value="@project.ProjectCode">
+                                @project.ProjectCode @(!string.IsNullOrEmpty(project.Description) ? " - " + project.Description : "")
+                            </option>
+                        }
+                    }
+                    <option value="__NEW__">➕ Enter New Project Code...</option>
+                </select>
+                <input type="text" id="projectNewInput" class="form-control-custom"
+                       placeholder="Type new project code (e.g. D123X)"
+                       style="display: none; margin-top: 6px;" />
+                <input type="hidden" asp-for="ProjectCode" id="projectFinalValue" />
+                <span asp-validation-for="ProjectCode" class="text-danger small"></span>
+            </div>
+
+            <!-- PR Number -->
+            <div class="form-group">
+                <label>Purchase Request (PR) No.</label>
+                <input asp-for="PrNumber" class="form-control-custom" placeholder="e.g. PR20260701" />
+                <span asp-validation-for="PrNumber" class="text-danger small"></span>
+            </div>
+
+            <!-- PO STATUS -->
+            <div class="form-group">
+                <label>PO Status</label>
+                <select id="poStatusDropdown" class="form-control-custom">
+                    <option value="">-- Select PO Status --</option>
+                    @if (Model.PoStatuses != null && Model.PoStatuses.Any())
+                    {
+                        foreach (var status in Model.PoStatuses)
+                        {
+                            <option value="@status.StatusName">@status.StatusName</option>
+                        }
+                    }
+                    <option value="__NEW__">➕ Enter New Status...</option>
+                </select>
+                <input type="text" id="poStatusNewInput" class="form-control-custom"
+                       placeholder="Type new PO status"
+                       style="display: none; margin-top: 6px;" />
+                <input type="hidden" asp-for="PoStatus" id="poStatusFinalValue" />
+                <span asp-validation-for="PoStatus" class="text-danger small"></span>
+            </div>
+
+            <!-- ORIGIN -->
+            <div class="form-group">
+                <label>Purchase Origin Region</label>
+                <select id="originDropdown" class="form-control-custom">
+                    <option value="">-- Select Origin --</option>
+                    @if (Model.Origins != null && Model.Origins.Any())
+                    {
+                        foreach (var origin in Model.Origins)
+                        {
+                            <option value="@origin.OriginName"
+                                    data-tax="@origin.TaxPercent"
+                                    data-currency="@origin.CurrencySymbol">
+                                @origin.OriginName
+                            </option>
+                        }
+                    }
+                    <option value="__NEW__">➕ Enter New Origin...</option>
+                </select>
+                <input type="text" id="originNewInput" class="form-control-custom"
+                       placeholder="Type new origin (e.g. Vietnam Purchase_VN)"
+                       style="display: none; margin-top: 6px;" />
+                <input type="hidden" asp-for="PurchaseOriginRegion" id="originFinalValue" />
+                <span asp-validation-for="PurchaseOriginRegion" class="text-danger small"></span>
+            </div>
+
+            <!-- BUYER -->
+            <div class="form-group">
+                <label><i class="fa-solid fa-user"></i> Buyer Name</label>
+                <select id="buyerDropdown" class="form-control-custom">
+                    <option value="">-- Select Existing Buyer --</option>
+                    @if (Model.Buyers != null && Model.Buyers.Any())
+                    {
+                        foreach (var buyer in Model.Buyers)
+                        {
+                            <option value="@buyer.BuyerName">@buyer.BuyerName</option>
+                        }
+                    }
+                    <option value="__NEW__">➕ Enter New Buyer Name...</option>
+                </select>
+                <input type="text" id="buyerNewInput" class="form-control-custom"
+                       placeholder="Type new buyer name"
+                       style="display: none; margin-top: 6px;" />
+                <input type="hidden" asp-for="BuyerName" id="buyerFinalValue" />
+                <span asp-validation-for="BuyerName" class="text-danger small"></span>
+            </div>
+
+            <!-- Asset Target -->
+            <div class="form-group">
+                <label><i class="fa-solid fa-microchip"></i> Target Spare / Test Item Asset</label>
+                <input asp-for="AssetTarget" class="form-control-custom" placeholder="e.g. OS, AT, C70, Bend..." />
+                <span asp-validation-for="AssetTarget" class="text-danger small"></span>
+            </div>
+
+            <!-- Quantity -->
+            <div class="form-group">
+                <label>Quantity</label>
+                <input asp-for="Quantity" type="number" min="1" class="form-control-custom" placeholder="e.g. 5" />
+                <span asp-validation-for="Quantity" class="text-danger small"></span>
+            </div>
+
+            <!-- Unit Price -->
+            <div class="form-group">
+                <label>Unit Price</label>
+                <input asp-for="UnitPrice" type="number" step="0.01" min="0" class="form-control-custom" placeholder="Enter unit price..." />
+                <span asp-validation-for="UnitPrice" class="text-danger small"></span>
+            </div>
+
+            <!-- Tax Summary Box -->
+            <div class="tax-summary-box">
+                <div style="margin-bottom: 6px;">
+                    <span class="label" id="appliedTaxLabel">Applied Tax: -- Select Origin --</span>
+                </div>
+                <div style="margin-bottom: 4px;">
+                    <span class="label">Subtotal:</span>
+                    <span class="value" id="subtotalDisplay">0.00</span>
+                </div>
+                <div style="margin-bottom: 4px;">
+                    <span class="label">Tax Amount:</span>
+                    <span class="value" id="taxDisplay">0.00</span>
+                </div>
+                <div class="total-line">
+                    <span>Total Cost:</span>
+                    <span id="totalDisplay" style="float: right;">0.00</span>
+                </div>
+            </div>
+
+            <input type="hidden" asp-for="TaxPercent" value="0" id="taxPercentInput" />
+
+            <!-- Shipment Tracking -->
+            <div class="form-group">
+                <label>Shipment Tracking Number</label>
+                <input asp-for="ShipmentTrackingNo" class="form-control-custom" placeholder="e.g. TRK-984251" />
+            </div>
+
+            <!-- Delivery Date -->
+            <div class="form-group">
+                <label>Estimated / Actual Delivery Date</label>
+                <input asp-for="DeliveryDate" type="date" class="form-control-custom" />
+            </div>
+
+            <!-- SHIPMENT STATUS -->
+            <div class="form-group">
+                <label>Status of Shipment</label>
+                <select id="shipmentStatusDropdown" class="form-control-custom">
+                    <option value="">-- Select Status --</option>
+                    @if (Model.ShipmentStatuses != null && Model.ShipmentStatuses.Any())
+                    {
+                        foreach (var shipStatus in Model.ShipmentStatuses)
+                        {
+                            <option value="@shipStatus.StatusName">@shipStatus.StatusName</option>
+                        }
+                    }
+                    <option value="__NEW__">➕ Enter New Shipment Status...</option>
+                </select>
+                <input type="text" id="shipmentStatusNewInput" class="form-control-custom"
+                       placeholder="Type new shipment status"
+                       style="display: none; margin-top: 6px;" />
+                <input type="hidden" asp-for="ShipmentStatus" id="shipmentStatusFinalValue" />
+            </div>
+
+            <!-- Remarks -->
+            <div class="form-group">
+                <label>Remarks / Requirement Notes</label>
+                <input asp-for="Remarks" class="form-control-custom" placeholder="Tracking comments notes" />
+            </div>
+
+            <!-- Buttons -->
+            <button type="submit" class="btn-log-prpo">Log Procurement Row</button>
+            <button type="reset" class="btn-cancel-prpo" onclick="resetTax()">Cancel Modification</button>
+        </form>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- RIGHT PANEL: PROCUREMENT LEDGER                           -->
+    <!-- ========================================================= -->
+    <div class="prpo-ledger-panel">
+
+        <div class="prpo-ledger-header">
+            <h5><i class="fa-solid fa-book"></i> Procurement Requisition & Purchase Tracking Ledger</h5>
+            <div class="prpo-ledger-actions">
+                <span style="font-size: 0.75rem; color: #555;">Year:</span>
+                <select onchange="changeYear(this.value)">
+                    <option value="@activeYear" selected>@activeYear</option>
+                    <option value="@(activeYear - 1)">@(activeYear - 1)</option>
+                    <option value="@(activeYear - 2)">@(activeYear - 2)</option>
+                    <option value="@(activeYear + 1)">@(activeYear + 1)</option>
+                </select>
+
+                <a href="@Url.Action("ExportExcel", "PrPoTracker", new { year = activeYear })"
+                   class="btn-export-prpo excel" style="text-decoration: none;">
+                    <i class="fa-solid fa-file-excel"></i> Export Excel
+                </a>
+
+                <a href="@Url.Action("ExportPdf", "PrPoTracker", new { year = activeYear })"
+                   class="btn-export-prpo pdf" style="text-decoration: none;" target="_blank">
+                    <i class="fa-solid fa-file-pdf"></i> Export PDF
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Panel -->
+        <div class="prpo-filter-panel">
+            <div class="prpo-filter-title">🔍 Filtering history for:</div>
+            <div class="prpo-filter-row">
+                <label>Filter By:</label>
+
+                <select id="filterOrigin" onchange="applyFilters()">
+                    <option value="All">🌐 All Origins</option>
+                    @if (Model.Origins != null && Model.Origins.Any())
+                    {
+                        foreach (var origin in Model.Origins)
+                        {
+                            <option value="@origin.OriginName">@origin.OriginName</option>
+                        }
+                    }
+                </select>
+
+                <select id="filterBuyer" onchange="applyFilters()">
+                    <option value="All">👤 All Buyers</option>
+                    @if (Model.Buyers != null && Model.Buyers.Any())
+                    {
+                        foreach (var buyer in Model.Buyers)
+                        {
+                            <option value="@buyer.BuyerName">@buyer.BuyerName</option>
+                        }
+                    }
+                </select>
+
+                <select id="filterMonth" onchange="applyFilters()">
+                    <option value="All">📅 All Months</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+
+                <select id="filterStatus" onchange="applyFilters()">
+                    <option value="All">📌 All Status</option>
+                    @if (Model.PoStatuses != null && Model.PoStatuses.Any())
+                    {
+                        foreach (var status in Model.PoStatuses)
+                        {
+                            <option value="@status.StatusName">@status.StatusName</option>
+                        }
+                    }
+                </select>
+
+                <button type="button" class="btn-filter-reset" onclick="resetFilters()">Reset</button>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="prpo-table-container">
+            <table class="prpo-table" id="prpoTable">
+                <thead>
+                    <tr>
+                        <th>DATE</th>
+                        <th>PR NUMBER</th>
+                        <th>PO STATUS</th>
+                        <th>PROJECT</th>
+                        <th>ORIGIN</th>
+                        <th>BUYER</th>
+                        <th>ASSET TARGET</th>
+                        <th>QTY</th>
+                        <th>UNIT PRICE</th>
+                        <th>TOTAL COST</th>
+                        <th>SHIPMENT STATUS</th>
+                        <th>SHIPMENT NO</th>
+                        <th>DELIVERY DATE</th>
+                        <th>REMARKS</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="prpoTableBody">
+                    @if (Model.Records != null && Model.Records.Any())
+                    {
+                        foreach (var item in Model.Records)
+                        {
+                            <tr data-origin="@item.PurchaseOriginRegion"
+                                data-buyer="@item.BuyerName"
+                                data-month="@item.RequisitionDate.Month"
+                                data-status="@item.PoStatus">
+                                <td>@item.RequisitionDate.ToString("yyyy-MM-dd")</td>
+                                <td><strong>@item.PrNumber</strong></td>
+                                <td>
+                                    @{
+                                        var statusClass = item.PoStatus switch
+                                        {
+                                            "PR Issued" => "badge-pr",
+                                            "PO Created" => "badge-po",
+                                            "Delivered" => "badge-delivered",
+                                            _ => "badge-cancelled"
+                                        };
+                                    }
+                                    <span class="badge-status @statusClass">@item.PoStatus</span>
+                                </td>
+                                <td>@item.ProjectCode</td>
+                                <td>@item.PurchaseOriginRegion</td>
+                                <td>@item.BuyerName</td>
+                                <td>@item.AssetTarget</td>
+                                <td>@item.Quantity</td>
+                                <td>$@item.UnitPrice.ToString("N2")</td>
+                                <td><strong style="color: #28a745;">$@item.TotalCost.ToString("N2")</strong></td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.ShipmentStatus))
+                                    {
+                                        var shipClass = item.ShipmentStatus == "Customs Clearance" ? "badge-customs"
+                                        : item.ShipmentStatus == "In Transit" ? "badge-transit"
+                                        : "badge-po";
+                                        <span class="badge-status @shipClass">@item.ShipmentStatus</span>
+                                    }
+                                </td>
+                                <td>@item.ShipmentTrackingNo</td>
+                                <td>@(item.DeliveryDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+                                <td>@item.Remarks</td>
+                                <td>
+                                    <button type="button" class="btn-prpo-del" onclick="deleteRecord(@item.Id)">
+                                        <i class="fa-solid fa-trash"></i> Del
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="15">
+                                <div class="prpo-empty">
+                                    <i class="fa-solid fa-inbox"></i>
+                                    No PR/PO logs tracked for year @activeYear. Submit a record using the form.
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Razor values - JS variables lo safe store
+        var ACTIVE_YEAR = @activeYear;
+        var PRPO_INDEX_URL = '@Url.Action("Index", "PrPoTracker")';
+        var PRPO_DELETE_URL = '@Url.Action("Delete", "PrPoTracker")';
+
+        console.log('✅ PR/PO Tracker loaded. Year:', ACTIVE_YEAR);
+
+
+        // =====================================================
+        // HELPER: Dropdown + New Input Pattern
+        // =====================================================
+        function setupDropdownWithNew(dropdownId, newInputId, finalValueId, onChangeCallback) {
+            var dropdown = document.getElementById(dropdownId);
+            var newInput = document.getElementById(newInputId);
+            var finalValue = document.getElementById(finalValueId);
+
+            if (!dropdown || !newInput || !finalValue) {
+                console.warn('⚠️ Setup failed for:', dropdownId);
+                return;
+            }
+
+            dropdown.addEventListener('change', function () {
+                if (this.value === '__NEW__') {
+                    newInput.style.display = 'block';
+                    newInput.focus();
+                    finalValue.value = '';
+                } else {
+                    newInput.style.display = 'none';
+                    newInput.value = '';
+                    finalValue.value = this.value;
+                }
+                if (onChangeCallback) onChangeCallback();
+            });
+
+            newInput.addEventListener('input', function () {
+                finalValue.value = this.value.trim();
+                if (onChangeCallback) onChangeCallback();
+            });
+
+            console.log('✅ Bound:', dropdownId);
+        }
+
+
+        // =====================================================
+        // TAX CALCULATION (Dynamic from Origin)
+        // =====================================================
+        function calculateTax() {
+            var qtyInput = document.querySelector('input[name="Quantity"]');
+            var priceInput = document.querySelector('input[name="UnitPrice"]');
+            var originDropdown = document.getElementById('originDropdown');
+            var originNewInput = document.getElementById('originNewInput');
+            var taxInput = document.getElementById('taxPercentInput');
+
+            if (!qtyInput || !priceInput || !originDropdown) return;
+
+            var qty = parseFloat(qtyInput.value) || 0;
+            var price = parseFloat(priceInput.value) || 0;
+
+            var taxPercent = 0;
+            var currencySymbol = '';
+            var originName = '-- Select Origin --';
+
+            if (originDropdown.value === '__NEW__') {
+                taxPercent = 0;
+                currencySymbol = '';
+                originName = originNewInput ? originNewInput.value : 'New Origin';
+            } else if (originDropdown.value) {
+                var selectedOption = originDropdown.options[originDropdown.selectedIndex];
+                taxPercent = parseFloat(selectedOption.getAttribute('data-tax')) || 0;
+                currencySymbol = selectedOption.getAttribute('data-currency') || '';
+                originName = selectedOption.text || '';
+            }
+
+            var subtotal = qty * price;
+            var taxAmount = subtotal * taxPercent / 100;
+            var total = subtotal + taxAmount;
+
+            var subEl = document.getElementById('subtotalDisplay');
+            var taxEl = document.getElementById('taxDisplay');
+            var totEl = document.getElementById('totalDisplay');
+            var taxLabel = document.getElementById('appliedTaxLabel');
+
+            if (subEl) subEl.textContent = currencySymbol + subtotal.toFixed(2);
+            if (taxEl) taxEl.textContent = currencySymbol + taxAmount.toFixed(2);
+            if (totEl) totEl.textContent = currencySymbol + total.toFixed(2);
+
+            if (taxLabel) {
+                if (taxPercent > 0) {
+                    taxLabel.textContent = 'Applied Tax: ' + originName + ' (' + taxPercent + '% VAT)';
+                } else if (originDropdown.value === '__NEW__') {
+                    taxLabel.textContent = 'Applied Tax: New Origin (Tax will be set to 0%)';
+                } else {
+                    taxLabel.textContent = 'Applied Tax: -- Select Origin --';
+                }
+            }
+
+            if (taxInput) taxInput.value = taxPercent;
+        }
+
+        function resetTax() {
+            var subEl = document.getElementById('subtotalDisplay');
+            var taxEl = document.getElementById('taxDisplay');
+            var totEl = document.getElementById('totalDisplay');
+            var taxLabel = document.getElementById('appliedTaxLabel');
+
+            if (subEl) subEl.textContent = '0.00';
+            if (taxEl) taxEl.textContent = '0.00';
+            if (totEl) totEl.textContent = '0.00';
+            if (taxLabel) taxLabel.textContent = 'Applied Tax: -- Select Origin --';
+
+            var taxInput = document.getElementById('taxPercentInput');
+            if (taxInput) taxInput.value = 0;
+        }
+
+
+        // =====================================================
+        // FILTERS
+        // =====================================================
+        function applyFilters() {
+            var origin = document.getElementById('filterOrigin') ? document.getElementById('filterOrigin').value : 'All';
+            var buyer = document.getElementById('filterBuyer') ? document.getElementById('filterBuyer').value : 'All';
+            var month = document.getElementById('filterMonth') ? document.getElementById('filterMonth').value : 'All';
+            var status = document.getElementById('filterStatus') ? document.getElementById('filterStatus').value : 'All';
+
+            var rows = document.querySelectorAll('#prpoTableBody tr');
+
+            rows.forEach(function (row) {
+                var rowOrigin = row.getAttribute('data-origin');
+                var rowBuyer = row.getAttribute('data-buyer');
+                var rowMonth = row.getAttribute('data-month');
+                var rowStatus = row.getAttribute('data-status');
+
+                var matchOrigin = origin === 'All' || rowOrigin === origin;
+                var matchBuyer = buyer === 'All' || rowBuyer === buyer;
+                var matchMonth = month === 'All' || rowMonth === month;
+                var matchStatus = status === 'All' || rowStatus === status;
+
+                row.style.display = (matchOrigin && matchBuyer && matchMonth && matchStatus) ? '' : 'none';
+            });
+        }
+
+        function resetFilters() {
+            var f1 = document.getElementById('filterOrigin');
+            var f2 = document.getElementById('filterBuyer');
+            var f3 = document.getElementById('filterMonth');
+            var f4 = document.getElementById('filterStatus');
+
+            if (f1) f1.value = 'All';
+            if (f2) f2.value = 'All';
+            if (f3) f3.value = 'All';
+            if (f4) f4.value = 'All';
+
+            applyFilters();
+        }
+
+
+        // =====================================================
+        // DELETE RECORD
+        // =====================================================
+        function deleteRecord(id) {
+            if (!confirm('Delete this PR/PO record?')) return;
+
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = PRPO_DELETE_URL;
+
+            var token = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (token) {
+                var t = document.createElement('input');
+                t.type = 'hidden';
+                t.name = '__RequestVerificationToken';
+                t.value = token.value;
+                form.appendChild(t);
+            }
+
+            var idInput = document.createElement('input');
+            idInput.type = 'hidden';
+            idInput.name = 'id';
+            idInput.value = id;
+            form.appendChild(idInput);
+
+            var yearInput = document.createElement('input');
+            yearInput.type = 'hidden';
+            yearInput.name = 'year';
+            yearInput.value = ACTIVE_YEAR;
+            form.appendChild(yearInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+
+        // =====================================================
+        // CHANGE YEAR
+        // =====================================================
+        function changeYear(year) {
+            window.location.href = PRPO_INDEX_URL + '?year=' + year;
+        }
+
+
+        // =====================================================
+        // ATTACH ALL EVENT LISTENERS ON PAGE LOAD
+        // =====================================================
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('📌 DOM Ready - Attaching events...');
+
+            setupDropdownWithNew('projectDropdown', 'projectNewInput', 'projectFinalValue');
+            setupDropdownWithNew('buyerDropdown', 'buyerNewInput', 'buyerFinalValue');
+            setupDropdownWithNew('poStatusDropdown', 'poStatusNewInput', 'poStatusFinalValue');
+            setupDropdownWithNew('originDropdown', 'originNewInput', 'originFinalValue', calculateTax);
+            setupDropdownWithNew('shipmentStatusDropdown', 'shipmentStatusNewInput', 'shipmentStatusFinalValue');
+
+            var qtyInput = document.querySelector('input[name="Quantity"]');
+            var priceInput = document.querySelector('input[name="UnitPrice"]');
+            if (qtyInput) qtyInput.addEventListener('input', calculateTax);
+            if (priceInput) priceInput.addEventListener('input', calculateTax);
+
+            document.querySelectorAll('.date-cell').forEach(function (cell) {
+                cell.addEventListener('click', function () {
+                    document.querySelectorAll('.date-cell').forEach(function (c) {
+                        c.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+            });
+
+            console.log('✅ All events attached');
+        });
+
+
+        // =====================================================
+        // EXPOSE FUNCTIONS GLOBALLY
+        // =====================================================
+        window.changeYear = changeYear;
+        window.deleteRecord = deleteRecord;
+        window.applyFilters = applyFilters;
+        window.resetFilters = resetFilters;
+        window.calculateTax = calculateTax;
+        window.resetTax = resetTax;
+    </script>
+}

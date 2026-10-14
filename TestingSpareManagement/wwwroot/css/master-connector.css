@@ -15,7 +15,7 @@
     background: #ffffff;
     border: 1px solid #dce3ec;
     border-radius: 10px;
-    padding: 15px 20px;
+    padding: 10px 15px;
     margin-bottom: 14px;
 }
 
@@ -66,7 +66,7 @@
 .master-layout {
     display: grid;
     grid-template-columns: 510px minmax(0, 1fr);
-    gap: 14px;
+    gap: 10px;
     align-items: start;
 }
 
@@ -93,7 +93,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 14px 18px;
+    padding: 10px 14px;
     border-bottom: 1px solid #edf0f4;
     color: #111827;
 }
@@ -124,7 +124,7 @@
    ========================================================= */
 
 .connector-form-card form {
-    padding: 15px 18px 18px;
+    padding: 12px 14px 15px;
 }
 
 
@@ -235,7 +235,7 @@
 .report-wrapper {
     width: 100%;
     overflow-x: auto;
-    padding: 0 14px 14px;
+    padding: 0 10px 10px;
     box-sizing: border-box;
 }
 
@@ -448,3 +448,53 @@
         grid-template-columns: 1fr;
     }
 }
+/* Pagination */
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border-top: 1px solid #eee;
+}
+
+.page-btn {
+    background: #e7e3f5;
+    color: #6f42c1;
+    border: 1px solid #d0c4ec;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+    .page-btn:hover {
+        background: #6f42c1;
+        color: white;
+    }
+
+.page-info {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Edit Button as Link */
+a.edit-button {
+    background: #e7e3f5;
+    color: #6f42c1;
+    border: 1px solid #d0c4ec;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+    a.edit-button:hover {
+        background: #6f42c1;
+        color: white;
+    }

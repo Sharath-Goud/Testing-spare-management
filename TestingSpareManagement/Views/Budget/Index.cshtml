@@ -1,0 +1,374 @@
+﻿@model TestingSpareManagement.Models.BudgetExpenditureViewModel
+
+@{
+    ViewData["Title"] = "Budget & Expenditure";
+    var activeYear = Model.ActiveYear;
+
+    var chartLabelsJson = System.Text.Json.JsonSerializer.Serialize(Model.ChartLabels ?? new List<string>());
+    var chartBudgetJson = System.Text.Json.JsonSerializer.Serialize(Model.ChartBudgetLine ?? new List<decimal>());
+    var chartExpensesJson = System.Text.Json.JsonSerializer.Serialize(Model.ChartActualExpenses ?? new List<decimal>());
+}
+
+<div class="budget-page-wrapper">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success" style="font-size: 0.85rem; padding: 10px;">
+            ✅ @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger" style="font-size: 0.85rem; padding: 10px;">
+            ⚠ @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- PAGE HEADER -->
+    <div class="budget-header" style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 15px 20px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+        <h5 style="margin: 0; color: #6f42c1; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-chart-line"></i> Spares Expenditures Trend & Yearly Budget Analytics
+        </h5>
+
+        <div class="budget-header-actions" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 12px; color: #64748b; font-weight: 600;">Active Year:</span>
+                <select onchange="changeYear(this.value)" style="padding: 5px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px; font-weight: 700; color: #6f42c1; background: #ffffff; cursor: pointer;">
+                    <option value="@activeYear" selected>@activeYear</option>
+                    <option value="@(activeYear - 1)">@(activeYear - 1)</option>
+                    <option value="@(activeYear - 2)">@(activeYear - 2)</option>
+                    <option value="@(activeYear + 1)">@(activeYear + 1)</option>
+                </select>
+            </div>
+
+            <button type="button" onclick="openYearlyBudgetModal()" style="background-color: #10b981; color: white; padding: 7px 16px; border: none; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer;">
+                <i class="fa-solid fa-gear"></i> Set Yearly Budget
+            </button>
+
+            <a href="@Url.Action("ExportExcel", "Budget", new { year = activeYear })"
+               style="background-color: #16a34a; color: white; padding: 7px 16px; border: none; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+                <i class="fa-solid fa-file-excel"></i> Export Excel
+            </a>
+
+            <a href="@Url.Action("ExportPdf", "Budget", new { year = activeYear })"
+               style="background-color: #dc2626; color: white; padding: 7px 16px; border: none; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+                <i class="fa-solid fa-file-pdf"></i> Export PDF
+            </a>
+        </div>
+    </div>
+
+    <!-- CHART -->
+    <div class="chart-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); height: 320px; position: relative;">
+        <canvas id="budgetChart"></canvas>
+    </div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="summary-cards-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px;">
+        <div class="summary-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; text-align: center;">
+            <div style="font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 8px;">Total Allocated Budget</div>
+            <div style="font-size: 22px; font-weight: 800; color: #6f42c1; margin-bottom: 4px;">₹@Model.TotalAllocatedBudget.ToString("N0")</div>
+            <div style="font-size: 11px; color: #94a3b8;">¥@Model.TotalAllocatedBudgetRMB.ToString("N2") RMB</div>
+        </div>
+
+        <div class="summary-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; text-align: center;">
+            <div style="font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 8px;">Cumulative Expenses YTD</div>
+            <div style="font-size: 22px; font-weight: 800; color: #dc2626; margin-bottom: 4px;">₹@Model.CumulativeExpensesYTD.ToString("N0")</div>
+            <div style="font-size: 11px; color: #94a3b8;">¥@Model.CumulativeExpensesYTDRMB.ToString("N2") RMB</div>
+        </div>
+
+        <div class="summary-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; text-align: center;">
+            <div style="font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 8px;">Total Cost Saved</div>
+            <div style="font-size: 22px; font-weight: 800; color: #2563eb; margin-bottom: 4px;">₹@Model.TotalCostSaved.ToString("N0")</div>
+            <div style="font-size: 11px; color: #94a3b8;">¥@Model.TotalCostSavedRMB.ToString("N2") RMB</div>
+        </div>
+
+        <div class="summary-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; text-align: center;">
+            <div style="font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 8px;">Budget Allocation Health</div>
+            <div style="font-size: 20px; font-weight: 800; color: #16a34a;">@Model.BudgetAllocationHealth</div>
+        </div>
+    </div>
+
+    <!-- LEDGER TABLE -->
+    <div class="ledger-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+        <div class="ledger-header" style="padding: 14px 20px; border-bottom: 1px solid #f1f5f9; background: #fafafa;">
+            <h5 style="margin: 0; color: #6f42c1; font-size: 13px; font-weight: 700;">
+                <i class="fa-solid fa-table"></i> MONTHLY BUDGET, EXPENSES & SAVINGS LEDGER
+            </h5>
+        </div>
+
+        <div class="ledger-table-container" style="overflow-x: auto;">
+            <table class="ledger-table" id="budgetLedgerTable" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                    <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                        <th style="padding: 12px 16px; text-align: left; font-size: 10px; text-transform: uppercase; color: #475569; font-weight: 800;">CALENDAR MONTH</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 10px; text-transform: uppercase; color: #475569; font-weight: 800;">ALLOCATED BUDGET (INR)</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 10px; text-transform: uppercase; color: #475569; font-weight: 800;">ACTUAL EXPENSES (INR / RMB)</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 10px; text-transform: uppercase; color: #475569; font-weight: 800;">REMAINING AMOUNT (INR)</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 10px; text-transform: uppercase; color: #475569; font-weight: 800;">TOTAL COST SAVED (INR)</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 10px; text-transform: uppercase; color: #475569; font-weight: 800;">STATUS</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 10px; text-transform: uppercase; color: #475569; font-weight: 800;">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.MonthlyLedger != null && Model.MonthlyLedger.Any())
+                    {
+                        foreach (var item in Model.MonthlyLedger)
+                        {
+                            <tr style="border-bottom: 1px solid #f1f5f9;">
+                                <td style="padding: 12px 16px; font-weight: 700; color: #0f172a;">@item.MonthName</td>
+                                <td style="padding: 12px 16px; font-weight: 600;">₹@item.AllocatedBudgetINR.ToString("N0")</td>
+                                <td style="padding: 12px 16px;">
+                                    <div style="color: #dc2626; font-weight: 700; font-size: 11px;">₹@item.ActualExpensesINR.ToString("N0") INR</div>
+                                    <div style="color: #94a3b8; font-size: 10px;">¥@item.ActualExpensesRMB.ToString("N2") RMB</div>
+                                </td>
+                                <td style="padding: 12px 16px; font-weight: 600;">₹@((item.AllocatedBudgetINR - item.ActualExpensesINR).ToString("N0"))</td>
+                                <td style="padding: 12px 16px; color: #16a34a; font-weight: 700;">
+                                    ₹@((item.AllocatedBudgetINR - item.ActualExpensesINR > 0 ? item.AllocatedBudgetINR - item.ActualExpensesINR : 0).ToString("N0"))
+                                </td>
+                                <td style="padding: 12px 16px;">
+                                    @if (item.ActualExpensesINR <= item.AllocatedBudgetINR)
+                                    {
+                                        <span style="background: #dcfce7; color: #15803d; padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 800;">✓ SAFE</span>
+                                    }
+                                    else
+                                    {
+                                        <span style="background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 800;">⚠ DANGER</span>
+                                    }
+                                </td>
+                                <td style="padding: 12px 16px;">
+                                    <button type="button" class="btn-modify-row"
+                                            data-year="@item.Year"
+                                            data-monthnumber="@item.MonthNumber"
+                                            data-month="@item.MonthName"
+                                            data-budget="@item.AllocatedBudgetINR"
+                                            data-expense="@item.ActualExpensesINR"
+                                            style="background: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer;">
+                                        <i class="fa-solid fa-pen"></i> Modify
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="7" style="text-align: center; padding: 40px; color: #94a3b8;">No budget data available for @activeYear.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- MODIFY EXPENSE MODAL -->
+<div id="modifyModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 99999; justify-content: center; align-items: center;">
+    <div style="background: #ffffff; border-radius: 12px; width: 480px; max-width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden;">
+        <div style="padding: 24px 28px 20px 28px; text-align: center; border-bottom: 1px solid #f1f5f9;">
+            <h5 style="margin: 0; color: #6f42c1; font-size: 18px; font-weight: 800;">
+                <i class="fa-solid fa-pen"></i>
+                Edit Budget & Expense for <span id="modalMonthTitle">Month</span> (<span id="modalYearTitle">Year</span>)
+            </h5>
+        </div>
+
+        <form asp-controller="Budget" asp-action="UpdateExpense" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="modalYear" name="year" />
+            <input type="hidden" id="modalMonthNumber" name="monthNumber" />
+
+            <div style="padding: 24px 28px;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 8px;">Allocated Budget Cap (INR ₹)</label>
+                    <input type="number" id="modalBudget" step="0.01" min="0" readonly style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; background: #f8fafc; box-sizing: border-box;" />
+                </div>
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 8px;">Override Actual Expense (INR ₹)</label>
+                    <input type="number" id="modalExpense" name="actualExpensesINR" step="0.01" min="0" required style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; box-sizing: border-box;" />
+                </div>
+            </div>
+
+            <div style="padding: 0 28px 28px 28px; display: flex; flex-direction: column; gap: 10px;">
+                <button type="submit" style="width: 100%; background: #8b5cf6; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;">Save Budget Allocation</button>
+                <button type="button" id="closeModifyModalBtn" style="width: 100%; background: #64748b; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- YEARLY BUDGET MODAL -->
+<div id="yearlyBudgetModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 99999; justify-content: center; align-items: center;">
+    <div style="background: #ffffff; border-radius: 12px; width: 480px; max-width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden;">
+        <div style="padding: 24px 28px 20px 28px; text-align: center; border-bottom: 1px solid #f1f5f9;">
+            <h5 style="margin: 0; color: #6f42c1; font-size: 18px; font-weight: 800;">
+                <i class="fa-solid fa-gear"></i> Set Yearly Budget Allocation
+            </h5>
+        </div>
+
+        <form asp-controller="Budget" asp-action="UpdateYearlyBudget" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="year" value="@activeYear" />
+
+            <div style="padding: 24px 28px;">
+                <p style="font-size: 12px; color: #64748b; margin: 0 0 20px 0; text-align: center;">
+                    This budget value will apply to all <strong>12 months</strong> of <strong style="color: #6f42c1;">@activeYear</strong>.
+                </p>
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 8px;">Monthly Budget per Month (INR ₹)</label>
+                    <input type="number" name="monthlyBudgetINR" step="0.01" min="0" required placeholder="e.g. 250000" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; box-sizing: border-box;" />
+                </div>
+            </div>
+
+            <div style="padding: 0 28px 28px 28px; display: flex; flex-direction: column; gap: 10px;">
+                <button type="submit" style="width: 100%; background: #10b981; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;">Apply to All 12 Months</button>
+                <button type="button" id="closeYearlyBudgetModalBtn" style="width: 100%; background: #64748b; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function () {
+        'use strict';
+
+        var ACTIVE_YEAR = @activeYear;
+        var BUDGET_URL = '@Url.Action("Index", "Budget")';
+
+        var chartLabels = @Html.Raw(chartLabelsJson);
+        var chartBudget = @Html.Raw(chartBudgetJson);
+        var chartExpenses = @Html.Raw(chartExpensesJson);
+
+        console.log('✅ Budget page loaded. Year:', ACTIVE_YEAR);
+
+        function openModifyModalFromButton(btn) {
+            document.getElementById('modalYear').value = btn.getAttribute('data-year') || '';
+            document.getElementById('modalMonthNumber').value = btn.getAttribute('data-monthnumber') || '';
+            document.getElementById('modalMonthTitle').innerText = btn.getAttribute('data-month') || '';
+            document.getElementById('modalYearTitle').innerText = btn.getAttribute('data-year') || '';
+            document.getElementById('modalBudget').value = btn.getAttribute('data-budget') || '0';
+            document.getElementById('modalExpense').value = btn.getAttribute('data-expense') || '0';
+            document.getElementById('modifyModal').style.display = 'flex';
+        }
+
+        function closeModifyModal() { document.getElementById('modifyModal').style.display = 'none'; }
+        function openYearlyBudgetModal() { document.getElementById('yearlyBudgetModal').style.display = 'flex'; }
+        function closeYearlyBudgetModal() { document.getElementById('yearlyBudgetModal').style.display = 'none'; }
+        function changeYear(year) { window.location.href = BUDGET_URL + '?year=' + year; }
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            document.querySelectorAll('.btn-modify-row').forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    openModifyModalFromButton(btn);
+                });
+            });
+
+            var b1 = document.getElementById('closeModifyModalBtn');
+            if (b1) b1.addEventListener('click', closeModifyModal);
+
+            var b2 = document.getElementById('closeYearlyBudgetModalBtn');
+            if (b2) b2.addEventListener('click', closeYearlyBudgetModal);
+
+            var m1 = document.getElementById('modifyModal');
+            if (m1) m1.addEventListener('click', function (e) { if (e.target === m1) closeModifyModal(); });
+
+            var m2 = document.getElementById('yearlyBudgetModal');
+            if (m2) m2.addEventListener('click', function (e) { if (e.target === m2) closeYearlyBudgetModal(); });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') { closeModifyModal(); closeYearlyBudgetModal(); }
+            });
+
+            // =====================================================
+            // CHART — Y-axis FIXED: 0 → 2,00,000
+            // =====================================================
+            var canvasEl = document.getElementById('budgetChart');
+            if (canvasEl && typeof Chart !== 'undefined') {
+                var ctx = canvasEl.getContext('2d');
+
+                console.log('📊 Chart Y-axis: ₹0 → ₹2,00,000');
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [
+                            {
+                                label: 'Budget Cap Line ' + ACTIVE_YEAR + ' (INR ₹)',
+                                data: chartBudget,
+                                borderColor: '#6f42c1',
+                                backgroundColor: 'rgba(111, 66, 193, 0.05)',
+                                borderWidth: 2,
+                                borderDash: [6, 4],
+                                pointBackgroundColor: '#6f42c1',
+                                pointRadius: 4,
+                                tension: 0,
+                                fill: false
+                            },
+                            {
+                                label: 'Actual Expenses Logged ' + ACTIVE_YEAR + ' (INR ₹)',
+                                data: chartExpenses,
+                                borderColor: '#dc3545',
+                                backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                                borderWidth: 3,
+                                pointBackgroundColor: '#dc3545',
+                                pointRadius: 5,
+                                tension: 0.4,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    font: { size: 11, weight: '600' },
+                                    usePointStyle: true,
+                                    boxWidth: 12,
+                                    padding: 15
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (c) {
+                                        return c.dataset.label + ': ₹' + c.parsed.y.toLocaleString('en-IN');
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                min: 0,
+                                max: 200000,
+                                ticks: {
+                                    stepSize: 50000,
+                                    callback: function (v) {
+                                        return v.toLocaleString('en-IN');
+                                    },
+                                    font: { size: 10, weight: '600' }
+                                },
+                                grid: { color: '#f0f0f0' }
+                            },
+                            x: {
+                                ticks: { font: { size: 10, weight: '600' } },
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+                console.log('✅ Chart rendered successfully');
+            } else {
+                console.warn('⚠️ Chart.js not loaded or canvas not found');
+            }
+
+            console.log('✅ All events attached');
+        });
+
+        window.openYearlyBudgetModal = openYearlyBudgetModal;
+        window.closeYearlyBudgetModal = closeYearlyBudgetModal;
+        window.changeYear = changeYear;
+
+    })();
+</script>
