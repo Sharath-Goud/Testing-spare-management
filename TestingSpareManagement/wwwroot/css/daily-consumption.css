@@ -1,0 +1,683 @@
+﻿
+/* =========================================================
+   DAILY CONSUMPTION - MASTER CONNECTOR MATCHING DESIGN
+   ========================================================= */
+
+.consumption-page-wrapper {
+    width: 100%;
+    padding: 4px;
+    box-sizing: border-box;
+    color: #1f2937;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* =========================================================
+   MAIN TWO-COLUMN LAYOUT
+   ========================================================= */
+
+.consumption-page-wrapper {
+    display: grid;
+    grid-template-columns: 350px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+}
+
+    /* =========================================================
+   LEFT FORM AND RIGHT HISTORY CARDS
+   ========================================================= */
+
+    .consumption-page-wrapper .entry-panel,
+    .consumption-page-wrapper .history-panel {
+        min-width: 0;
+        background: #ffffff;
+        border: 1px solid #dce3ec;
+        border-radius: 11px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+    }
+
+        /* =========================================================
+   SECTION HEADERS
+   ========================================================= */
+
+        .consumption-page-wrapper .entry-panel > h5,
+        .consumption-page-wrapper .history-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 48px;
+            margin: 0;
+            padding: 10px 14px;
+            box-sizing: border-box;
+            background: #ffffff;
+            border-bottom: 1px solid #edf0f4;
+            color: #111827;
+        }
+
+        .consumption-page-wrapper .entry-panel > h5 {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+            .consumption-page-wrapper .entry-panel > h5 i,
+            .consumption-page-wrapper .history-header h5 i {
+                color: #7045d6;
+            }
+
+    .consumption-page-wrapper .history-header {
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+        .consumption-page-wrapper .history-header h5 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+    /* =========================================================
+   SUCCESS AND ERROR MESSAGES
+   ========================================================= */
+
+    .consumption-page-wrapper .alert {
+        margin: 10px 12px;
+        padding: 9px 12px;
+        border-radius: 7px;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .consumption-page-wrapper .alert-success {
+        color: #047857;
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+    }
+
+    .consumption-page-wrapper .alert-danger {
+        color: #b91c1c;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+    }
+
+    /* =========================================================
+   FORM
+   ========================================================= */
+
+    .consumption-page-wrapper .entry-panel form {
+        padding: 12px 14px 15px;
+    }
+
+    .consumption-page-wrapper .form-group {
+        margin-bottom: 11px;
+    }
+
+        .consumption-page-wrapper .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #374151;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+            .consumption-page-wrapper .form-group label i {
+                color: #7045d6;
+            }
+
+    .consumption-page-wrapper .form-control-custom {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        height: 35px;
+        padding: 7px 10px;
+        box-sizing: border-box;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        background: #f9fafb;
+        color: #1f2937;
+        font-family: inherit;
+        font-size: 12px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+        .consumption-page-wrapper .form-control-custom:focus {
+            outline: none;
+            border-color: #7c3aed;
+            background: #ffffff;
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+        }
+
+        .consumption-page-wrapper .form-control-custom::placeholder {
+            color: #9ca3af;
+        }
+
+    .consumption-page-wrapper .text-danger {
+        display: block;
+        margin-top: 4px;
+        color: #dc2626 !important;
+        font-size: 10px;
+    }
+
+    /* =========================================================
+   INTERACTIVE CALENDAR
+   ========================================================= */
+
+    .consumption-page-wrapper .calendar-widget {
+        padding: 8px;
+        border: 1px solid #dce3ec;
+        border-radius: 8px;
+        background: #f8fafc;
+    }
+
+    .consumption-page-wrapper .cal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 9px;
+    }
+
+        .consumption-page-wrapper .cal-header span {
+            color: #4c1d95;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .consumption-page-wrapper .cal-header button {
+            padding: 5px 8px;
+            border: 1px solid #d0c4ec;
+            border-radius: 5px;
+            background: #e7e3f5;
+            color: #6f42c1;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+            .consumption-page-wrapper .cal-header button:hover {
+                background: #6f42c1;
+                color: #ffffff;
+            }
+
+    .consumption-page-wrapper .cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 4px;
+    }
+
+    .consumption-page-wrapper .cal-day-name,
+    .consumption-page-wrapper .cal-cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+        min-height: 29px;
+        border-radius: 5px;
+        font-size: 11px;
+    }
+
+    .consumption-page-wrapper .cal-day-name {
+        color: #64748b;
+        font-weight: 700;
+    }
+
+    .consumption-page-wrapper .cal-cell {
+        border: 1px solid transparent;
+        background: #ffffff;
+        color: #374151;
+        cursor: pointer;
+    }
+
+        .consumption-page-wrapper .cal-cell:not(.empty):hover {
+            border-color: #a78bfa;
+            background: #f3efff;
+            color: #6d28d9;
+        }
+
+        .consumption-page-wrapper .cal-cell.selected {
+            background: #8054e8;
+            color: #ffffff;
+            font-weight: 700;
+            box-shadow: 0 2px 5px rgba(109, 40, 217, 0.2);
+        }
+
+        .consumption-page-wrapper .cal-cell.empty {
+            background: transparent;
+            cursor: default;
+        }
+
+    /* =========================================================
+   FORM BUTTONS
+   ========================================================= */
+
+    .consumption-page-wrapper .btn-log-usage,
+    .consumption-page-wrapper .btn-cancel {
+        display: block;
+        width: 100%;
+        min-height: 36px;
+        margin-top: 7px;
+        padding: 9px 12px;
+        border: none;
+        border-radius: 6px;
+        color: #ffffff;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.2s;
+    }
+
+    .consumption-page-wrapper .btn-log-usage {
+        background: #8054e8;
+    }
+
+        .consumption-page-wrapper .btn-log-usage:hover {
+            background: #6d3fd0;
+        }
+
+    .consumption-page-wrapper .btn-cancel {
+        background: #64748b;
+    }
+
+        .consumption-page-wrapper .btn-cancel:hover {
+            background: #475569;
+        }
+
+    /* =========================================================
+   HISTORY HEADER ACTIONS
+   ========================================================= */
+
+    .consumption-page-wrapper .header-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 7px;
+        min-width: 0;
+    }
+
+    .consumption-page-wrapper #dateFilter {
+        width: auto;
+        max-width: 200px;
+        min-width: 135px;
+        height: 32px;
+        padding: 5px 8px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        background: #f9fafb;
+        color: #374151;
+        font-size: 11px;
+    }
+
+        .consumption-page-wrapper #dateFilter:focus {
+            outline: none;
+            border-color: #7c3aed;
+        }
+
+    .consumption-page-wrapper .btn-export {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        min-height: 32px;
+        padding: 6px 9px;
+        border: 1px solid transparent;
+        border-radius: 5px;
+        font-size: 10px;
+        font-weight: 700;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+
+        .consumption-page-wrapper .btn-export.excel {
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+            color: #047857;
+        }
+
+            .consumption-page-wrapper .btn-export.excel:hover {
+                background: #047857;
+                color: #ffffff;
+            }
+
+        .consumption-page-wrapper .btn-export.pdf {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #dc2626;
+        }
+
+            .consumption-page-wrapper .btn-export.pdf:hover {
+                background: #dc2626;
+                color: #ffffff;
+            }
+
+    /* =========================================================
+   HISTORY TABLE
+   ========================================================= */
+
+    .consumption-page-wrapper .table-container {
+        width: 100%;
+        overflow-x: auto;
+        padding: 0 10px 10px;
+        box-sizing: border-box;
+    }
+
+    .consumption-page-wrapper .history-table {
+        width: 100%;
+        min-width: 1100px;
+        border-collapse: collapse;
+        font-size: 11px;
+    }
+
+        .consumption-page-wrapper .history-table thead {
+            background: #f1f5f9;
+        }
+
+        .consumption-page-wrapper .history-table th {
+            padding: 10px 8px;
+            border-bottom: 1px solid #dbe3ec;
+            color: #475569;
+            font-size: 9px;
+            font-weight: 700;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .consumption-page-wrapper .history-table td {
+            padding: 9px 8px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #374151;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .consumption-page-wrapper .history-table tbody tr {
+            transition: background 0.15s;
+        }
+
+            .consumption-page-wrapper .history-table tbody tr:hover {
+                background: #fafbff;
+            }
+
+        .consumption-page-wrapper .history-table td strong {
+            font-weight: 700;
+        }
+
+        .consumption-page-wrapper .history-table td:nth-child(3) {
+            color: #7e22ce;
+            font-weight: 700;
+        }
+
+    /* =========================================================
+   SHIFT BADGE
+   ========================================================= */
+
+    .consumption-page-wrapper .badge-shift {
+        display: inline-block;
+        padding: 4px 7px;
+        border: 1px solid #d0c4ec;
+        border-radius: 5px;
+        background: #f3efff;
+        color: #6d28d9;
+        font-size: 9px;
+        font-weight: 700;
+    }
+
+    /* =========================================================
+   COST DISPLAY
+   ========================================================= */
+
+    .consumption-page-wrapper .history-table td:nth-child(9) {
+        min-width: 110px;
+        line-height: 1.6;
+    }
+
+        .consumption-page-wrapper .history-table td:nth-child(9) span {
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+    /* =========================================================
+   EDIT AND DELETE BUTTONS
+   ========================================================= */
+
+    .consumption-page-wrapper .btn-matrix-edit,
+    .consumption-page-wrapper .btn-matrix-del {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        margin: 2px;
+        padding: 5px 8px;
+        border-radius: 5px;
+        background: #ffffff;
+        font-family: inherit;
+        font-size: 10px;
+        font-weight: 600;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .consumption-page-wrapper .btn-matrix-edit {
+        border: 1px solid #818cf8;
+        color: #4f46e5;
+    }
+
+        .consumption-page-wrapper .btn-matrix-edit:hover {
+            background: #6f42c1;
+            border-color: #6f42c1;
+            color: #ffffff;
+        }
+
+    .consumption-page-wrapper .btn-matrix-del {
+        border: 1px solid #f87171;
+        color: #dc2626;
+    }
+
+        .consumption-page-wrapper .btn-matrix-del:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+            color: #ffffff;
+        }
+
+    /* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+    .consumption-page-wrapper .empty-state {
+        padding: 35px 15px;
+        color: #94a3b8;
+        font-size: 12px;
+        text-align: center;
+    }
+
+        .consumption-page-wrapper .empty-state i {
+            display: block;
+            margin-bottom: 8px;
+            color: #a78bfa;
+            font-size: 24px;
+        }
+
+    /* =========================================================
+   PAGINATION
+   ========================================================= */
+
+    .consumption-page-wrapper .pagination-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 7px;
+        padding: 12px;
+        border-top: 1px solid #edf0f4;
+    }
+
+    .consumption-page-wrapper .page-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 30px;
+        min-height: 30px;
+        padding: 5px 10px;
+        border: 1px solid #d0c4ec;
+        border-radius: 5px;
+        background: #e7e3f5;
+        color: #6f42c1;
+        font-size: 11px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s, color 0.2s;
+    }
+
+        .consumption-page-wrapper .page-btn:hover,
+        .consumption-page-wrapper .page-btn.active {
+            background: #6f42c1;
+            border-color: #6f42c1;
+            color: #ffffff;
+        }
+
+/* =========================================================
+   RESPONSIVE LAYOUT
+   ========================================================= */
+
+@media (min-width: 1600px) {
+    .consumption-page-wrapper {
+        grid-template-columns: 440px minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 1300px) {
+    .consumption-page-wrapper {
+        grid-template-columns: 360px minmax(0, 1fr);
+    }
+
+        .consumption-page-wrapper .history-header {
+            align-items: flex-start;
+        }
+
+        .consumption-page-wrapper .header-actions {
+            justify-content: flex-start;
+        }
+}
+
+@media (max-width: 1000px) {
+    .consumption-page-wrapper {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+        .consumption-page-wrapper .history-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .consumption-page-wrapper .header-actions {
+            justify-content: flex-start;
+        }
+}
+
+@media (max-width: 600px) {
+    .consumption-page-wrapper {
+        padding: 2px;
+        gap: 10px;
+    }
+
+        .consumption-page-wrapper .entry-panel form {
+            padding: 10px;
+        }
+
+        .consumption-page-wrapper .history-header {
+            padding: 10px;
+        }
+
+        .consumption-page-wrapper .header-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 100%;
+        }
+
+        .consumption-page-wrapper #dateFilter {
+            grid-column: 1 / -1;
+            width: 100%;
+            max-width: none;
+        }
+
+        .consumption-page-wrapper .btn-export {
+            width: 100%;
+            box-sizing: border-box;
+        }
+}
+
+
+
+/* FIX: Allow the complete Daily Consumption form to scroll */
+
+html,
+body {
+    height: auto;
+    min-height: 100%;
+}
+
+.consumption-page-wrapper {
+    height: auto !important;
+    min-height: 0;
+    overflow: visible !important;
+    align-items: start;
+}
+
+    .consumption-page-wrapper .entry-panel {
+        height: auto !important;
+        min-height: 0;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+        .consumption-page-wrapper .entry-panel form {
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+        }
+
+/* Keep the full page scrollable when the form has many fields */
+main,
+.container,
+.container-fluid {
+    overflow-y: visible;
+}
+
+
+/* FIX: Show Edit and Delete buttons completely */
+.consumption-page-wrapper .history-table th:last-child,
+.consumption-page-wrapper .history-table td:last-child {
+    min-width: 125px;
+    width: 125px;
+    white-space: nowrap;
+    overflow: visible;
+}
+
+.consumption-page-wrapper .history-table td:last-child {
+    padding: 8px 6px;
+}
+
+.consumption-page-wrapper .btn-matrix-edit,
+.consumption-page-wrapper .btn-matrix-del {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: auto;
+    min-width: 55px;
+    margin: 2px;
+    padding: 6px 8px;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: visible;
+    flex-shrink: 0;
+}
+
+.consumption-page-wrapper .history-table td:last-child {
+    position: relative;
+}

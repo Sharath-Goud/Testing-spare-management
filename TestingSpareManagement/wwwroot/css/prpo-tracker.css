@@ -1,0 +1,693 @@
+﻿
+/* =========================================================
+   PR & PO TRACKER
+   Design aligned with Equipment Consumables
+   ========================================================= */
+
+.prpo-page-wrapper {
+    display: grid;
+    grid-template-columns: 350px minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+    width: 100%;
+    height: auto !important;
+    min-height: 0;
+    max-height: none;
+    padding: 4px;
+    box-sizing: border-box;
+    overflow: visible !important;
+    color: #1f2937;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+    /* =========================================================
+   PANELS
+   ========================================================= */
+
+    .prpo-page-wrapper .prpo-form-panel,
+    .prpo-page-wrapper .prpo-ledger-panel {
+        min-width: 0;
+        background: #ffffff;
+        border: 1px solid #dce3ec;
+        border-radius: 11px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .prpo-page-wrapper .prpo-form-panel {
+        height: auto !important;
+        min-height: 0;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    .prpo-page-wrapper .prpo-ledger-panel {
+        overflow: hidden;
+    }
+
+    /* =========================================================
+   HEADERS
+   ========================================================= */
+
+    .prpo-page-wrapper .prpo-form-panel > h5,
+    .prpo-page-wrapper .prpo-ledger-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        min-height: 48px;
+        margin: 0;
+        padding: 10px 14px;
+        box-sizing: border-box;
+        background: #ffffff;
+        border-bottom: 1px solid #edf0f4;
+        color: #111827;
+    }
+
+    .prpo-page-wrapper .prpo-form-panel > h5 {
+        justify-content: flex-start;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+        .prpo-page-wrapper .prpo-form-panel > h5 i,
+        .prpo-page-wrapper .prpo-ledger-header h5 i {
+            color: #7045d6;
+        }
+
+    .prpo-page-wrapper .prpo-ledger-header h5 {
+        flex: 1 1 240px;
+        min-width: 0;
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.5;
+    }
+
+    /* =========================================================
+   ALERTS
+   ========================================================= */
+
+    .prpo-page-wrapper .alert {
+        margin: 10px 12px;
+        padding: 9px 12px !important;
+        border-radius: 7px;
+        font-size: 12px !important;
+        line-height: 1.5;
+    }
+
+    .prpo-page-wrapper .alert-success {
+        color: #047857;
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+    }
+
+    .prpo-page-wrapper .alert-danger {
+        color: #b91c1c;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+    }
+
+    /* =========================================================
+   FORM
+   ========================================================= */
+
+    .prpo-page-wrapper .prpo-form-panel form {
+        height: auto !important;
+        min-height: 0;
+        max-height: none !important;
+        overflow: visible !important;
+        padding: 12px 14px 18px;
+        box-sizing: border-box;
+    }
+
+    .prpo-page-wrapper .form-group {
+        margin-bottom: 11px;
+    }
+
+        .prpo-page-wrapper .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #374151;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+            .prpo-page-wrapper .form-group label i {
+                margin-right: 3px;
+                color: #7045d6;
+            }
+
+    .prpo-page-wrapper .form-control-custom {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        min-height: 35px;
+        padding: 7px 10px;
+        box-sizing: border-box;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        background: #f9fafb;
+        color: #1f2937;
+        font-family: inherit;
+        font-size: 12px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+        .prpo-page-wrapper .form-control-custom:focus {
+            outline: none;
+            border-color: #7c3aed;
+            background: #ffffff;
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+        }
+
+        .prpo-page-wrapper .form-control-custom::placeholder {
+            color: #9ca3af;
+        }
+
+    .prpo-page-wrapper .text-danger {
+        display: block;
+        margin-top: 4px;
+        color: #dc2626 !important;
+        font-size: 10px;
+    }
+
+    /* =========================================================
+   CALENDAR
+   ========================================================= */
+
+    .prpo-page-wrapper .calendar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        margin-bottom: 8px;
+        padding: 8px;
+        border: 1px solid #dce3ec;
+        border-radius: 8px;
+        background: #f8fafc;
+    }
+
+        .prpo-page-wrapper .calendar-header span {
+            color: #4c1d95;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .prpo-page-wrapper .calendar-header button {
+            padding: 5px 8px;
+            border: 1px solid #d0c4ec;
+            border-radius: 5px;
+            background: #e7e3f5;
+            color: #6f42c1;
+            font-family: inherit;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+            .prpo-page-wrapper .calendar-header button:hover {
+                background: #6f42c1;
+                color: #ffffff;
+            }
+
+    .prpo-page-wrapper .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 5px;
+        margin: 8px 0;
+    }
+
+    .prpo-page-wrapper .day-label {
+        padding: 5px 0;
+        color: #64748b;
+        font-size: 10px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .prpo-page-wrapper .date-cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+        min-height: 31px;
+        padding: 4px 0;
+        box-sizing: border-box;
+        border: 1px solid #edf0f4;
+        border-radius: 6px;
+        background: #ffffff;
+        color: #374151;
+        font-size: 11px;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+    }
+
+        .prpo-page-wrapper .date-cell:hover {
+            border-color: #a78bfa;
+            background: #f3efff;
+            color: #6d28d9;
+        }
+
+        .prpo-page-wrapper .date-cell.active {
+            border-color: #8054e8;
+            background: #8054e8;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+    /* =========================================================
+   TAX SUMMARY
+   ========================================================= */
+
+    .prpo-page-wrapper .tax-summary-box {
+        margin: 5px 0 12px;
+        padding: 11px 12px;
+        border: 1px solid #dce3ec;
+        border-radius: 8px;
+        background: #f8fafc;
+        color: #374151;
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+        .prpo-page-wrapper .tax-summary-box .label {
+            color: #64748b;
+            font-size: 11px;
+        }
+
+        .prpo-page-wrapper .tax-summary-box .value {
+            color: #1f2937;
+            font-weight: 700;
+        }
+
+        .prpo-page-wrapper .tax-summary-box .total-line {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #dce3ec;
+            color: #111827;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+    .prpo-page-wrapper #totalDisplay {
+        color: #059669;
+        font-weight: 700;
+    }
+
+    /* =========================================================
+   SAVE AND CANCEL BUTTONS
+   ========================================================= */
+
+    .prpo-page-wrapper .btn-log-prpo,
+    .prpo-page-wrapper .btn-cancel-prpo {
+        display: block;
+        width: 100%;
+        min-height: 36px;
+        margin-top: 7px;
+        padding: 9px 12px;
+        box-sizing: border-box;
+        border: none;
+        border-radius: 6px;
+        color: #ffffff;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .prpo-page-wrapper .btn-log-prpo {
+        background: #8054e8;
+    }
+
+        .prpo-page-wrapper .btn-log-prpo:hover {
+            background: #6d3fd0;
+        }
+
+    .prpo-page-wrapper .btn-cancel-prpo {
+        background: #64748b;
+    }
+
+        .prpo-page-wrapper .btn-cancel-prpo:hover {
+            background: #475569;
+        }
+
+    /* =========================================================
+   LEDGER HEADER ACTIONS
+   ========================================================= */
+
+    .prpo-page-wrapper .prpo-ledger-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 7px;
+        min-width: 0;
+    }
+
+        .prpo-page-wrapper .prpo-ledger-actions > span {
+            color: #64748b !important;
+            font-size: 11px !important;
+        }
+
+        .prpo-page-wrapper .prpo-ledger-actions select,
+        .prpo-page-wrapper #filterOrigin,
+        .prpo-page-wrapper #filterBuyer,
+        .prpo-page-wrapper #filterMonth,
+        .prpo-page-wrapper #filterStatus {
+            min-height: 32px;
+            max-width: 100%;
+            padding: 6px 8px;
+            box-sizing: border-box;
+            border: 1px solid #cbd5e1;
+            border-radius: 5px;
+            background: #f9fafb;
+            color: #374151;
+            font-family: inherit;
+            font-size: 10px;
+        }
+
+    .prpo-page-wrapper .btn-export-prpo {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        min-height: 32px;
+        padding: 6px 10px;
+        box-sizing: border-box;
+        border: 1px solid transparent;
+        border-radius: 5px;
+        font-family: inherit;
+        font-size: 10px;
+        font-weight: 700;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+    }
+
+        .prpo-page-wrapper .btn-export-prpo.excel {
+            border-color: #a7f3d0;
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+            .prpo-page-wrapper .btn-export-prpo.excel:hover {
+                background: #047857;
+                color: #ffffff;
+            }
+
+        .prpo-page-wrapper .btn-export-prpo.pdf {
+            border-color: #fecaca;
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+            .prpo-page-wrapper .btn-export-prpo.pdf:hover {
+                background: #dc2626;
+                color: #ffffff;
+            }
+
+    /* =========================================================
+   FILTER PANEL
+   ========================================================= */
+
+    .prpo-page-wrapper .prpo-filter-panel {
+        padding: 10px;
+        border-bottom: 1px solid #edf0f4;
+        background: #ffffff;
+    }
+
+    .prpo-page-wrapper .prpo-filter-title {
+        margin-bottom: 8px;
+        color: #475569;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .prpo-page-wrapper .prpo-filter-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 7px;
+    }
+
+        .prpo-page-wrapper .prpo-filter-row label {
+            margin: 0;
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .prpo-page-wrapper .prpo-filter-row select {
+            flex: 1 1 125px;
+            min-width: 100px;
+        }
+
+    .prpo-page-wrapper .btn-filter-reset {
+        min-height: 32px;
+        padding: 6px 12px;
+        border: 1px solid #d0c4ec;
+        border-radius: 5px;
+        background: #e7e3f5;
+        color: #6f42c1;
+        font-family: inherit;
+        font-size: 10px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+        .prpo-page-wrapper .btn-filter-reset:hover {
+            background: #6f42c1;
+            color: #ffffff;
+        }
+
+    /* =========================================================
+   PROCUREMENT TABLE
+   ========================================================= */
+
+    .prpo-page-wrapper .prpo-table-container {
+        width: 100%;
+        overflow-x: auto;
+        padding: 0 10px 10px;
+        box-sizing: border-box;
+    }
+
+    .prpo-page-wrapper .prpo-table {
+        width: 100%;
+        min-width: 1500px;
+        border-collapse: collapse;
+        font-size: 11px;
+    }
+
+        .prpo-page-wrapper .prpo-table thead {
+            background: #f1f5f9;
+        }
+
+        .prpo-page-wrapper .prpo-table th {
+            padding: 10px 8px;
+            border-bottom: 1px solid #dbe3ec;
+            color: #475569;
+            font-size: 9px;
+            font-weight: 700;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .prpo-page-wrapper .prpo-table td {
+            padding: 9px 8px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #374151;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .prpo-page-wrapper .prpo-table tbody tr {
+            transition: background 0.15s;
+        }
+
+            .prpo-page-wrapper .prpo-table tbody tr:hover {
+                background: #fafbff;
+            }
+
+        .prpo-page-wrapper .prpo-table td strong {
+            font-weight: 700;
+        }
+
+    /* =========================================================
+   PR / PO STATUS BADGES
+   ========================================================= */
+
+    .prpo-page-wrapper .badge-status {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        max-width: 190px;
+        padding: 5px 8px;
+        border: 1px solid transparent;
+        border-radius: 5px;
+        font-size: 9px;
+        font-weight: 700;
+        line-height: 1.4;
+        white-space: normal;
+    }
+
+    .prpo-page-wrapper .badge-pr {
+        border-color: #d0c4ec;
+        background: #f3efff;
+        color: #6d28d9;
+    }
+
+    .prpo-page-wrapper .badge-po {
+        border-color: #bfdbfe;
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .prpo-page-wrapper .badge-delivered {
+        border-color: #a7f3d0;
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .prpo-page-wrapper .badge-cancelled {
+        border-color: #fecaca;
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .prpo-page-wrapper .badge-customs {
+        border-color: #fde68a;
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .prpo-page-wrapper .badge-transit {
+        border-color: #bfdbfe;
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    /* =========================================================
+   DELETE ACTION
+   ========================================================= */
+
+    .prpo-page-wrapper .prpo-table th:last-child,
+    .prpo-page-wrapper .prpo-table td:last-child {
+        min-width: 85px;
+        width: 85px;
+        white-space: nowrap;
+    }
+
+    .prpo-page-wrapper .btn-prpo-del {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        min-width: 55px;
+        margin: 2px;
+        padding: 6px 8px;
+        border: 1px solid #f87171;
+        border-radius: 5px;
+        background: #ffffff;
+        color: #dc2626;
+        font-family: inherit;
+        font-size: 10px;
+        font-weight: 600;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+    }
+
+        .prpo-page-wrapper .btn-prpo-del:hover {
+            border-color: #dc2626;
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+    /* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+    .prpo-page-wrapper .prpo-empty {
+        padding: 35px 15px;
+        color: #94a3b8;
+        font-size: 12px;
+        text-align: center;
+    }
+
+        .prpo-page-wrapper .prpo-empty i {
+            display: block;
+            margin-bottom: 8px;
+            color: #a78bfa;
+            font-size: 24px;
+        }
+
+/* =========================================================
+   RESPONSIVE LAYOUT
+   ========================================================= */
+
+@media (min-width: 1600px) {
+    .prpo-page-wrapper {
+        grid-template-columns: 440px minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 1300px) {
+    .prpo-page-wrapper {
+        grid-template-columns: 360px minmax(0, 1fr);
+    }
+
+        .prpo-page-wrapper .prpo-ledger-header {
+            align-items: flex-start;
+        }
+
+        .prpo-page-wrapper .prpo-ledger-actions {
+            flex: 1 1 100%;
+        }
+}
+
+@media (max-width: 1000px) {
+    .prpo-page-wrapper {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .prpo-page-wrapper {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 10px;
+        padding: 2px;
+    }
+
+        .prpo-page-wrapper .prpo-form-panel form {
+            padding: 10px;
+        }
+
+        .prpo-page-wrapper .prpo-ledger-header {
+            align-items: flex-start;
+            padding: 10px;
+        }
+
+        .prpo-page-wrapper .prpo-ledger-actions {
+            width: 100%;
+        }
+
+        .prpo-page-wrapper .prpo-filter-row {
+            align-items: stretch;
+        }
+
+            .prpo-page-wrapper .prpo-filter-row select {
+                flex-basis: 100%;
+            }
+
+        .prpo-page-wrapper .calendar-grid {
+            gap: 3px;
+        }
+}

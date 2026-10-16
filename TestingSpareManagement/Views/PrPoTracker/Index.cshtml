@@ -5,6 +5,10 @@
     var activeYear = Model.ActiveYear;
 }
 
+<link rel="stylesheet"
+      href="~/css/prpo-tracker.css"
+      asp-append-version="true" />
+
 <div class="prpo-page-wrapper">
 
     <!-- ========================================================= -->
@@ -32,45 +36,75 @@
 
             <!-- Calendar -->
             <div class="form-group">
-                <label><i class="fa-solid fa-calendar-days"></i> Select Requisition Date</label>
+                <label>
+                    <i class="fa-solid fa-calendar-days"></i>
+                    Select Requisition Date
+                </label>
+
                 <div class="calendar-header">
-                    <button type="button"><i class="fa-solid fa-chevron-left"></i> Prev</button>
-                    <span>@Model.RequisitionDate.ToString("MMMM yyyy")</span>
-                    <button type="button">Next <i class="fa-solid fa-chevron-right"></i></button>
+                    <button type="button" id="prevMonth">
+                        <i class="fa-solid fa-chevron-left"></i> Prev
+                    </button>
+
+                    <span id="calendarMonthYear">
+                        @Model.RequisitionDate.ToString("MMMM yyyy")
+                    </span>
+
+                    <button type="button" id="nextMonth">
+                        Next <i class="fa-solid fa-chevron-right"></i>
+                    </button>
                 </div>
-                <div class="calendar-grid">
-                    <div class="day-label">S</div><div class="day-label">M</div><div class="day-label">T</div>
-                    <div class="day-label">W</div><div class="day-label">T</div><div class="day-label">F</div>
+
+                <div class="calendar-grid" id="calendarGrid">
                     <div class="day-label">S</div>
-                    @for (int i = 1; i <= 31; i++)
-                    {
-                        <div class="date-cell @(i == DateTime.Today.Day ? "active" : "")">@i</div>
-                    }
+                    <div class="day-label">M</div>
+                    <div class="day-label">T</div>
+                    <div class="day-label">W</div>
+                    <div class="day-label">T</div>
+                    <div class="day-label">F</div>
+                    <div class="day-label">S</div>
                 </div>
-                <input asp-for="RequisitionDate" type="date" class="form-control-custom" />
+
+                <input asp-for="RequisitionDate"
+                       type="date"
+                       id="RequisitionDate"
+                       class="form-control-custom" />
             </div>
 
             <!-- PROJECT CODE -->
             <div class="form-group">
-                <label><i class="fa-solid fa-folder"></i> Target Project Code</label>
+                <label for="projectDropdown">
+                    <i class="fa-solid fa-folder"></i> Target Project Code
+                </label>
+
                 <select id="projectDropdown" class="form-control-custom">
                     <option value="">-- Select Existing Project --</option>
+
                     @if (Model.Projects != null && Model.Projects.Any())
                     {
                         foreach (var project in Model.Projects)
                         {
                             <option value="@project.ProjectCode">
-                                @project.ProjectCode @(!string.IsNullOrEmpty(project.Description) ? " - " + project.Description : "")
+                                @project.ProjectCode
                             </option>
                         }
                     }
+
                     <option value="__NEW__">➕ Enter New Project Code...</option>
                 </select>
-                <input type="text" id="projectNewInput" class="form-control-custom"
+
+                <input type="text"
+                       id="projectNewInput"
+                       class="form-control-custom"
                        placeholder="Type new project code (e.g. D123X)"
                        style="display: none; margin-top: 6px;" />
-                <input type="hidden" asp-for="ProjectCode" id="projectFinalValue" />
-                <span asp-validation-for="ProjectCode" class="text-danger small"></span>
+
+                <input type="hidden"
+                       asp-for="ProjectCode"
+                       id="projectFinalValue" />
+
+                <span asp-validation-for="ProjectCode"
+                      class="text-danger small"></span>
             </div>
 
             <!-- PR Number -->
@@ -147,25 +181,93 @@
                 <span asp-validation-for="BuyerName" class="text-danger small"></span>
             </div>
 
-            <!-- Asset Target -->
+            <!-- Target Spare / Test Item Asset -->
             <div class="form-group">
-                <label><i class="fa-solid fa-microchip"></i> Target Spare / Test Item Asset</label>
-                <input asp-for="AssetTarget" class="form-control-custom" placeholder="e.g. OS, AT, C70, Bend..." />
-                <span asp-validation-for="AssetTarget" class="text-danger small"></span>
+                <label for="AssetTarget">
+                    <i class="fa-solid fa-microchip"></i>
+                    Target Spare / Test Item Asset (Type First 2 Letters)
+                </label>
+
+                <select asp-for="AssetTarget"
+                        id="AssetTarget"
+                        class="form-control-custom">
+
+                    <option value="">-- Select Spare / Test Item Asset --</option>
+
+                    <!-- Bend / Twist Test Items -->
+                    <option value="180 Bend (453g)(TTF)">180 Bend (453g)(TTF)</option>
+                    <option value="180 Bend (225g)(TTF)">180 Bend (225g)(TTF)</option>
+                    <option value="Twist (to spec)">Twist (to spec)</option>
+
+                    <!-- OS -->
+                    <option value="C70">C70</option>
+                    <option value="OS-C70">OS-C70</option>
+                    <option value="OS-C70 - T1 Board / Connector C70">
+                        OS-C70 - T1 Board / Connector C70
+                    </option>
+
+                    <!-- ATE -->
+                    <option value="QT1">QT1</option>
+                    <option value="ATE-QT1">ATE-QT1</option>
+                    <option value="ATE-QT1 - DCR switch Board">
+                        ATE-QT1 - DCR switch Board
+                    </option>
+
+                    <option value="QT3">QT3</option>
+                    <option value="ATE-QT3">ATE-QT3</option>
+                    <option value="ATE-QT3 - HSIO lance Board">
+                        ATE-QT3 - HSIO lance Board
+                    </option>
+
+                    <!-- APP -->
+                    <option value="APP-C70">APP-C70</option>
+                    <option value="APP-C70 - TR_Board_A1.2轉接板">
+                        APP-C70 - TR_Board_A1.2轉接板
+                    </option>
+
+                    <!-- EUT -->
+                    <option value="EUT-C70">EUT-C70</option>
+                    <option value="EUT-C70 - Snoopy Board測試板8層板">
+                        EUT-C70 - Snoopy Board測試板8層板
+                    </option>
+
+                    <!-- FCT -->
+                    <option value="FCT-C70">FCT-C70</option>
+                    <option value="FCT-C70 - 6UP PCBA TypeC轉接板">
+                        FCT-C70 - 6UP PCBA TypeC轉接板
+                    </option>
+
+                </select>
+
+                <span asp-validation-for="AssetTarget"
+                      class="text-danger small"></span>
             </div>
 
             <!-- Quantity -->
             <div class="form-group">
                 <label>Quantity</label>
-                <input asp-for="Quantity" type="number" min="1" class="form-control-custom" placeholder="e.g. 5" />
-                <span asp-validation-for="Quantity" class="text-danger small"></span>
+                <input asp-for="Quantity"
+                       type="number"
+                       min="1"
+                       value=""
+                       class="form-control-custom"
+                       placeholder="e.g. 5" />
+                <span asp-validation-for="Quantity"
+                      class="text-danger small"></span>
             </div>
 
             <!-- Unit Price -->
             <div class="form-group">
                 <label>Unit Price</label>
-                <input asp-for="UnitPrice" type="number" step="0.01" min="0" class="form-control-custom" placeholder="Enter unit price..." />
-                <span asp-validation-for="UnitPrice" class="text-danger small"></span>
+                <input asp-for="UnitPrice"
+                       type="number"
+                       min="0"
+                       step="0.01"
+                       value=""
+                       class="form-control-custom"
+                       placeholder="Enter unit price..." />
+                <span asp-validation-for="UnitPrice"
+                      class="text-danger small"></span>
             </div>
 
             <!-- Tax Summary Box -->
@@ -370,8 +472,12 @@
                                 <td>@item.BuyerName</td>
                                 <td>@item.AssetTarget</td>
                                 <td>@item.Quantity</td>
-                                <td>$@item.UnitPrice.ToString("N2")</td>
-                                <td><strong style="color: #28a745;">$@item.TotalCost.ToString("N2")</strong></td>
+                                <td>&#8377;@item.UnitPrice.ToString("N2")</td>
+                                <td>
+                                    <strong style="color: #28a745;">
+                                        &#8377;@item.TotalCost.ToString("N2")
+                                    </strong>
+                                </td>
                                 <td>
                                     @if (!string.IsNullOrEmpty(item.ShipmentStatus))
                                     {
@@ -483,6 +589,10 @@
                 var selectedOption = originDropdown.options[originDropdown.selectedIndex];
                 taxPercent = parseFloat(selectedOption.getAttribute('data-tax')) || 0;
                 currencySymbol = selectedOption.getAttribute('data-currency') || '';
+
+                if (currencySymbol === '?' || currencySymbol.trim() === '') {
+                    currencySymbol = '\u20B9';
+                }
                 originName = selectedOption.text || '';
             }
 
@@ -495,9 +605,11 @@
             var totEl = document.getElementById('totalDisplay');
             var taxLabel = document.getElementById('appliedTaxLabel');
 
-            if (subEl) subEl.textContent = currencySymbol + subtotal.toFixed(2);
-            if (taxEl) taxEl.textContent = currencySymbol + taxAmount.toFixed(2);
-            if (totEl) totEl.textContent = currencySymbol + total.toFixed(2);
+            const displayCurrency = currencySymbol || '\u20B9';
+
+            if (subEl) subEl.textContent = displayCurrency + subtotal.toFixed(2);
+            if (taxEl) taxEl.textContent = displayCurrency + taxAmount.toFixed(2);
+            if (totEl) totEl.textContent = displayCurrency + total.toFixed(2);
 
             if (taxLabel) {
                 if (taxPercent > 0) {
@@ -605,17 +717,11 @@
         }
 
 
-        // =====================================================
-        // CHANGE YEAR
-        // =====================================================
         function changeYear(year) {
             window.location.href = PRPO_INDEX_URL + '?year=' + year;
         }
 
 
-        // =====================================================
-        // ATTACH ALL EVENT LISTENERS ON PAGE LOAD
-        // =====================================================
         document.addEventListener('DOMContentLoaded', function () {
             console.log('📌 DOM Ready - Attaching events...');
 
@@ -629,6 +735,19 @@
             var priceInput = document.querySelector('input[name="UnitPrice"]');
             if (qtyInput) qtyInput.addEventListener('input', calculateTax);
             if (priceInput) priceInput.addEventListener('input', calculateTax);
+
+            var prpoForm = document.getElementById('prpoForm');
+
+            if (prpoForm) {
+                prpoForm.addEventListener('reset', function () {
+                    setTimeout(function () {
+                        if (qtyInput) qtyInput.value = '';
+                        if (priceInput) priceInput.value = '';
+
+                        calculateTax();
+                    }, 0);
+                });
+            }
 
             document.querySelectorAll('.date-cell').forEach(function (cell) {
                 cell.addEventListener('click', function () {
@@ -652,5 +771,139 @@
         window.resetFilters = resetFilters;
         window.calculateTax = calculateTax;
         window.resetTax = resetTax;
+
+
+
+        // =====================================================
+        // WORKING CALENDAR: PREVIOUS / NEXT MONTH
+        // =====================================================
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const dateInput = document.getElementById('RequisitionDate');
+            const calendarGrid = document.getElementById('calendarGrid');
+            const monthYearLabel = document.getElementById('calendarMonthYear');
+            const prevButton = document.getElementById('prevMonth');
+            const nextButton = document.getElementById('nextMonth');
+
+            if (!dateInput || !calendarGrid ||
+                !monthYearLabel || !prevButton || !nextButton) {
+                console.warn('Calendar elements not found.');
+                return;
+            }
+
+            const initialDate = dateInput.value
+                ? new Date(dateInput.value + 'T00:00:00')
+                : new Date();
+
+            let displayedYear = initialDate.getFullYear();
+            let displayedMonth = initialDate.getMonth();
+
+            function renderCalendar() {
+
+                monthYearLabel.textContent = new Date(
+                    displayedYear,
+                    displayedMonth,
+                    1
+                ).toLocaleDateString('en-US', {
+                    month: 'long',
+                    year: 'numeric'
+                });
+
+                // Preserve the weekday headings and rebuild date cells.
+                calendarGrid.querySelectorAll('.date-cell')
+                    .forEach(cell => cell.remove());
+
+                const firstDay = new Date(
+                    displayedYear,
+                    displayedMonth,
+                    1
+                ).getDay();
+
+                const daysInMonth = new Date(
+                    displayedYear,
+                    displayedMonth + 1,
+                    0
+                ).getDate();
+
+                // Blank cells before the first day of the month.
+                for (let i = 0; i < firstDay; i++) {
+                    const blank = document.createElement('div');
+                    blank.className = 'date-cell calendar-empty';
+                    blank.setAttribute('aria-hidden', 'true');
+                    calendarGrid.appendChild(blank);
+                }
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'date-cell';
+                    cell.textContent = day;
+
+                    const selectedDate = dateInput.value
+                        ? new Date(dateInput.value + 'T00:00:00')
+                        : null;
+
+                    if (
+                        selectedDate &&
+                        selectedDate.getFullYear() === displayedYear &&
+                        selectedDate.getMonth() === displayedMonth &&
+                        selectedDate.getDate() === day
+                    ) {
+                        cell.classList.add('active');
+                    }
+
+                    cell.addEventListener('click', function () {
+
+                        const month = String(displayedMonth + 1).padStart(2, '0');
+                        const dayText = String(day).padStart(2, '0');
+
+                        dateInput.value =
+                            displayedYear + '-' + month + '-' + dayText;
+
+                        dateInput.dispatchEvent(
+                            new Event('change', { bubbles: true })
+                        );
+
+                        renderCalendar();
+                    });
+
+                    calendarGrid.appendChild(cell);
+                }
+            }
+
+            prevButton.addEventListener('click', function () {
+                displayedMonth--;
+
+                if (displayedMonth < 0) {
+                    displayedMonth = 11;
+                    displayedYear--;
+                }
+
+                renderCalendar();
+            });
+
+            nextButton.addEventListener('click', function () {
+                displayedMonth++;
+
+                if (displayedMonth > 11) {
+                    displayedMonth = 0;
+                    displayedYear++;
+                }
+
+                renderCalendar();
+            });
+
+            dateInput.addEventListener('change', function () {
+                if (!dateInput.value) return;
+
+                const selected = new Date(dateInput.value + 'T00:00:00');
+
+                displayedYear = selected.getFullYear();
+                displayedMonth = selected.getMonth();
+
+                renderCalendar();
+            });
+
+            renderCalendar();
+        });
     </script>
 }

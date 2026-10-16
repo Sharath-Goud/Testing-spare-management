@@ -60,18 +60,16 @@ body {
     align-items: center;
     justify-content: center;
     border-radius: 10px;
-    background: linear-gradient( 135deg, #5b21b6, #7c3aed );
     color: white;
     font-size: 22px;
     box-shadow: 0 4px 10px rgba(91, 33, 182, 0.25);
 }
 
-
-.brand-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #202938;
-}
+    .brand-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #202938;
+    }
 
 
 .brand-subtitle {
@@ -3475,3 +3473,41 @@ textarea.form-control-custom {
         grid-template-columns: 1fr !important;
     }
 }
+
+
+/* ===== AUTOMATIC DARK HEADER COLOR CHANGING ===== */
+
+header.app-header {
+    background: #344b70;
+    animation: foxlinkHeaderColors 12s infinite;
+    background-image: none;
+    transition: none;
+}
+
+/* Change the actual background color */
+@keyframes foxlinkHeaderColors {
+    0%, 100% {
+        background-color: #344b70;
+    }
+
+    25% {
+        background-color: #514477;
+    }
+
+    50% {
+        background-color: #285b60;
+    }
+
+    75% {
+        background-color: #704050;
+    }
+}
+
+/* Keep header text readable */
+header.app-header .brand-title,
+header.app-header .brand-subtitle,
+header.app-header .user-name,
+header.app-header .user-label {
+    color: #ffffff;
+}
+

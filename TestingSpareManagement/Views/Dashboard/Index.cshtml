@@ -231,7 +231,10 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script>
+        Chart.register(ChartDataLabels);
+
         // =====================================================
         // LIVE CLOCKS (Accurate IST & CST via Intl API)
         // =====================================================
@@ -284,17 +287,27 @@
         updateClocks();
         setInterval(updateClocks, 1000);
 
+
         // =====================================================
         // CHART 1: CURRENT MONTH BUDGET & EXPENSE
         // =====================================================
         const monthCtx = document.getElementById('currentMonthChart').getContext('2d');
+
         new Chart(monthCtx, {
             type: 'bar',
             data: {
                 labels: ['Allocated Budget', 'Total Expenses', 'Balance Remaining'],
                 datasets: [{
-                    data: [@Model.CurrentMonthAllocatedBudget, @Model.CurrentMonthActualExpenses, @Model.CurrentMonthBalanceRemaining],
-                    backgroundColor: ['rgba(52, 152, 219, 0.8)', 'rgba(231, 76, 60, 0.8)', 'rgba(46, 204, 113, 0.8)'],
+                    data: [
+                        @Model.CurrentMonthAllocatedBudget,
+                        @Model.CurrentMonthActualExpenses,
+                        @Model.CurrentMonthBalanceRemaining
+                    ],
+                    backgroundColor: [
+                        'rgba(52, 152, 219, 0.8)',
+                        'rgba(231, 76, 60, 0.8)',
+                        'rgba(46, 204, 113, 0.8)'
+                    ],
                     borderColor: ['#2980b9', '#c0392b', '#27ae60'],
                     borderWidth: 2,
                     borderRadius: 6,
@@ -304,25 +317,65 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {
+                    padding: { top: 30 }
+                },
                 plugins: {
                     legend: { display: false },
-                    tooltip: { callbacks: { label: (c) => '₹' + c.parsed.y.toLocaleString('en-IN') } }
+                    tooltip: {
+                        callbacks: {
+                            label: (c) =>
+                                '₹ ' + Number(c.parsed.y).toLocaleString('en-IN')
+                        }
+                    },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        offset: 4,
+                        clip: false,
+                        color: (context) =>
+                            context.dataset.borderColor[context.dataIndex],
+                        font: {
+                            size: 10,
+                            weight: 'bold'
+                        },
+                        formatter: (value) =>
+                            '₹ ' + Number(value).toLocaleString('en-IN', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            })
+                    }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: { callback: (v) => v >= 100000 ? '₹' + (v / 100000).toFixed(1) + 'L' : '₹' + v, font: { size: 10 } },
+                        grace: '15%',
+                        ticks: {
+                            callback: (v) =>
+                                v >= 100000
+                                    ? '₹' + (v / 100000).toFixed(1) + 'L'
+                                    : '₹' + v,
+                            font: { size: 10 }
+                        },
                         grid: { color: '#f0f0f0' }
                     },
-                    x: { ticks: { font: { size: 10, weight: '600' } }, grid: { display: false } }
+                    x: {
+                        ticks: {
+                            font: { size: 10, weight: '600' }
+                        },
+                        grid: { display: false }
+                    }
                 }
             }
         });
+
+
 
         // =====================================================
         // CHART 2: YEARLY TREND
         // =====================================================
         const yearlyCtx = document.getElementById('yearlyTrendChart').getContext('2d');
+
         const yearlyLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.YearlyLabels));
         const yearlyAllocated = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.YearlyAllocatedBudget));
         const yearlyUtilized = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.YearlyBudgetUtilized));
@@ -330,34 +383,142 @@
 
         new Chart(yearlyCtx, {
             type: 'bar',
+
             data: {
                 labels: yearlyLabels,
                 datasets: [
-                    { label: 'Allocated Budget', data: yearlyAllocated, backgroundColor: 'rgba(52, 152, 219, 0.85)', borderColor: '#2980b9', borderWidth: 1.5, borderRadius: 4 },
-                    { label: 'Budget Utilized', data: yearlyUtilized, backgroundColor: 'rgba(192, 57, 43, 0.85)', borderColor: '#922b21', borderWidth: 1.5, borderRadius: 4 },
-                    { label: 'Cost Saved', data: yearlySaved, backgroundColor: 'rgba(39, 174, 96, 0.85)', borderColor: '#1e8449', borderWidth: 1.5, borderRadius: 4 }
+                    {
+                        label: 'Allocated Budget',
+                        data: yearlyAllocated,
+                        backgroundColor: 'rgba(52, 152, 219, 0.85)',
+                        borderColor: '#2980b9',
+                        borderWidth: 1.5,
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Budget Utilized',
+                        data: yearlyUtilized,
+                        backgroundColor: 'rgba(192, 57, 43, 0.85)',
+                        borderColor: '#922b21',
+                        borderWidth: 1.5,
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Cost Saved',
+                        data: yearlySaved,
+                        backgroundColor: 'rgba(39, 174, 96, 0.85)',
+                        borderColor: '#1e8449',
+                        borderWidth: 1.5,
+                        borderRadius: 4
+                    }
                 ]
             },
+
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'top', labels: { font: { size: 10, weight: '600' }, usePointStyle: true, boxWidth: 10, padding: 12 } },
-                    tooltip: { callbacks: { label: (c) => c.dataset.label + ': ₹' + c.parsed.y.toLocaleString('en-IN') } }
+
+                // Reserve space above the tallest bar
+                layout: {
+                    padding: {
+                        top: 35,
+                        left: 5,
+                        right: 5
+                    }
                 },
+
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: { size: 10, weight: '600' },
+                            usePointStyle: true,
+                            boxWidth: 10,
+                            padding: 12
+                        }
+                    },
+
+                    // Keep hover details
+                    tooltip: {
+                        callbacks: {
+                            label: (c) =>
+                                c.dataset.label + ': ₹' +
+                                Number(c.parsed.y).toLocaleString('en-IN', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })
+                        }
+                    },
+
+                    // Display amounts above the bars
+                    datalabels: {
+                        display: true,
+                        anchor: 'end',
+                        align: 'top',
+                        offset: 5,
+                        clamp: true,
+                        clip: false,
+
+                        color: function (context) {
+                            return context.dataset.borderColor;
+                        },
+
+                        font: {
+                            size: 9,
+                            weight: 'bold'
+                        },
+
+                        textAlign: 'center',
+
+                        formatter: function (value) {
+                            if (value === null || value === undefined ||
+                                !Number.isFinite(Number(value))) {
+                                return '';
+                            }
+
+                            return '₹ ' + Number(value).toLocaleString('en-IN', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        }
+                    }
+                },
+
                 scales: {
                     y: {
                         beginAtZero: true,
+                        grace: '20%',
+
                         ticks: {
-                            callback: (v) => v >= 10000000 ? '₹' + (v / 10000000).toFixed(1) + ' Cr'
-                                : (v >= 100000 ? '₹' + (v / 100000).toFixed(1) + ' L' : '₹' + v),
+                            callback: function (value) {
+                                return value >= 10000000
+                                    ? '₹' + (value / 10000000).toFixed(1) + ' Cr'
+                                    : value >= 100000
+                                        ? '₹' + (value / 100000).toFixed(1) + ' L'
+                                        : '₹' + value;
+                            },
                             font: { size: 10 }
                         },
-                        grid: { color: '#f0f0f0' }
+
+                        grid: {
+                            color: '#f0f0f0'
+                        }
                     },
-                    x: { ticks: { font: { size: 10, weight: '600' } }, grid: { display: false } }
+
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 10,
+                                weight: '600'
+                            }
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
                 }
             }
         });
+
     </script>
 }

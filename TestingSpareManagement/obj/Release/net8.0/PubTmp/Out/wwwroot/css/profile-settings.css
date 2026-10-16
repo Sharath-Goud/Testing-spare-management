@@ -1,0 +1,760 @@
+﻿
+/* =========================================================
+   PROFILE & USER SETTINGS
+   Aligned with Equipment Consumables styling
+   ========================================================= */
+
+.profile-page-wrapper {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: start;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+    height: auto !important;
+    min-height: 0;
+    max-height: none;
+    padding: 4px;
+    box-sizing: border-box;
+    overflow: visible !important;
+    color: #1f2937;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.profile-col-left,
+.profile-col-right {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+    width: 100%;
+}
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.profile-page-wrapper .profile-card {
+    min-width: 0;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1px solid #dce3ec;
+    border-radius: 11px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+.profile-page-wrapper .profile-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 48px;
+    padding: 10px 14px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #edf0f4;
+    background: #ffffff;
+}
+
+    .profile-page-wrapper .profile-card-header h5 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1 1 180px;
+        min-width: 0;
+        margin: 0;
+        color: #111827;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.5;
+    }
+
+        .profile-page-wrapper .profile-card-header h5 i {
+            flex-shrink: 0;
+            color: #7045d6;
+        }
+
+.profile-page-wrapper .profile-card-body {
+    min-width: 0;
+    padding: 14px;
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   ALERTS
+   ========================================================= */
+
+.profile-page-wrapper > .alert {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 10px 14px !important;
+    border-radius: 7px;
+    font-size: 12px !important;
+    line-height: 1.5;
+}
+
+.profile-page-wrapper .alert-success {
+    color: #047857;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+}
+
+.profile-page-wrapper .alert-danger {
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+}
+
+/* =========================================================
+   OPERATOR IDENTITY
+   ========================================================= */
+
+.profile-page-wrapper .identity-row {
+    display: grid;
+    grid-template-columns: 115px minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+}
+
+.profile-page-wrapper .avatar-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 92px;
+    height: 92px;
+    margin: 0 auto 10px;
+    box-sizing: border-box;
+    border: 3px solid #e7e3f5;
+    border-radius: 50%;
+    background: #f3efff;
+    color: #7045d6;
+    font-size: 30px;
+    overflow: hidden;
+}
+
+.profile-page-wrapper .identity-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-width: 0;
+}
+
+.profile-page-wrapper .identity-field {
+    display: grid;
+    grid-template-columns: minmax(105px, 0.85fr) minmax(0, 1.15fr);
+    align-items: start;
+    gap: 8px;
+    padding: 9px 0;
+    border-bottom: 1px solid #edf0f4;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+    .profile-page-wrapper .identity-field:last-child {
+        border-bottom: none;
+    }
+
+    .profile-page-wrapper .identity-field .label {
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .profile-page-wrapper .identity-field .value {
+        min-width: 0;
+        color: #1f2937;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+        .profile-page-wrapper .identity-field .value.email,
+        .profile-page-wrapper .col-email {
+            color: #6d28d9;
+            overflow-wrap: anywhere;
+        }
+
+.profile-page-wrapper .btn-edit-identity,
+.profile-page-wrapper .btn-upload-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 32px;
+    padding: 6px 10px;
+    box-sizing: border-box;
+    border: 1px solid #818cf8;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #4f46e5;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+    .profile-page-wrapper .btn-edit-identity:hover,
+    .profile-page-wrapper .btn-upload-avatar:hover {
+        background: #6f42c1;
+        border-color: #6f42c1;
+        color: #ffffff;
+    }
+
+.profile-page-wrapper .btn-upload-avatar {
+    display: flex;
+    width: 100%;
+    margin-top: 5px;
+    padding: 7px 5px;
+    font-size: 9px;
+}
+
+/* =========================================================
+   BACKUP / RESTORE
+   ========================================================= */
+
+.profile-page-wrapper .profile-card-body h5 {
+    color: #111827;
+    line-height: 1.5;
+}
+
+.profile-page-wrapper .profile-card-body p {
+    color: #64748b !important;
+    font-size: 11px !important;
+    line-height: 1.6;
+}
+
+.profile-page-wrapper .backup-btn-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.profile-page-wrapper .btn-backup {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 0;
+    min-height: 36px;
+    padding: 8px 10px;
+    box-sizing: border-box;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+    .profile-page-wrapper .btn-backup.download {
+        border-color: #bfdbfe;
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+        .profile-page-wrapper .btn-backup.download:hover {
+            background: #1d4ed8;
+            color: #ffffff;
+        }
+
+    .profile-page-wrapper .btn-backup.restore {
+        border-color: #a7f3d0;
+        background: #ecfdf5;
+        color: #047857;
+    }
+
+        .profile-page-wrapper .btn-backup.restore:hover {
+            background: #047857;
+            color: #ffffff;
+        }
+
+/* =========================================================
+   THEME SELECTOR
+   ========================================================= */
+
+.profile-page-wrapper .theme-selector {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 36px;
+    padding: 8px 10px;
+    box-sizing: border-box;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #f9fafb;
+    color: #1f2937;
+    font-family: inherit;
+    font-size: 12px;
+}
+
+    .profile-page-wrapper .theme-selector:focus {
+        outline: none;
+        border-color: #7c3aed;
+        background: #ffffff;
+        box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+    }
+
+/* =========================================================
+   ROSTER FORMS
+   ========================================================= */
+
+.profile-page-wrapper .roster-form {
+    margin-bottom: 15px;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.profile-page-wrapper .roster-form-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 12px;
+    color: #374151;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+    .profile-page-wrapper .roster-form-title i {
+        color: #7045d6;
+    }
+
+.profile-page-wrapper .roster-form-group {
+    min-width: 0;
+    margin-bottom: 11px;
+}
+
+    .profile-page-wrapper .roster-form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #374151;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1.5;
+    }
+
+    .profile-page-wrapper .roster-form-group input,
+    .profile-page-wrapper .roster-form-group select,
+    .profile-page-wrapper .roster-form-group textarea {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        min-height: 35px;
+        padding: 7px 10px;
+        box-sizing: border-box;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        background: #ffffff;
+        color: #1f2937;
+        font-family: inherit;
+        font-size: 12px;
+    }
+
+        .profile-page-wrapper .roster-form-group input:focus,
+        .profile-page-wrapper .roster-form-group select:focus,
+        .profile-page-wrapper .roster-form-group textarea:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+        }
+
+        .profile-page-wrapper .roster-form-group input::placeholder {
+            color: #9ca3af;
+        }
+
+/* =========================================================
+   COMMON BUTTONS
+   ========================================================= */
+
+.profile-page-wrapper .btn-roster-save,
+.profile-page-wrapper .btn-roster-cancel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 35px;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.profile-page-wrapper .roster-form .btn-roster-save,
+.profile-page-wrapper .roster-form .btn-roster-cancel {
+    display: flex;
+    width: 100%;
+    margin-top: 7px;
+}
+
+.profile-page-wrapper .btn-roster-save {
+    background: #8054e8;
+    color: #ffffff;
+}
+
+    .profile-page-wrapper .btn-roster-save:hover {
+        background: #6d3fd0;
+    }
+
+    .profile-page-wrapper .btn-roster-save.blue {
+        background: #2563eb;
+    }
+
+        .profile-page-wrapper .btn-roster-save.blue:hover {
+            background: #1d4ed8;
+        }
+
+    .profile-page-wrapper .btn-roster-save.success {
+        background: #059669;
+    }
+
+        .profile-page-wrapper .btn-roster-save.success:hover {
+            background: #047857;
+        }
+
+    .profile-page-wrapper .btn-roster-save.danger {
+        background: #dc2626;
+    }
+
+        .profile-page-wrapper .btn-roster-save.danger:hover {
+            background: #b91c1c;
+        }
+
+.profile-page-wrapper .btn-roster-cancel {
+    border-color: #cbd5e1;
+    background: #64748b;
+    color: #ffffff;
+}
+
+    .profile-page-wrapper .btn-roster-cancel:hover {
+        background: #475569;
+    }
+
+/* =========================================================
+   ROSTER TABLES
+   ========================================================= */
+
+.profile-page-wrapper .roster-table,
+.profile-page-wrapper .budget-master-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.profile-page-wrapper .roster-table {
+    margin-top: 5px;
+}
+
+    .profile-page-wrapper .roster-table thead,
+    .profile-page-wrapper .budget-master-table thead {
+        background: #f1f5f9;
+    }
+
+    .profile-page-wrapper .roster-table th,
+    .profile-page-wrapper .budget-master-table th {
+        padding: 10px 8px;
+        border-bottom: 1px solid #dbe3ec;
+        color: #475569;
+        font-size: 9px;
+        font-weight: 700;
+        text-align: left;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    .profile-page-wrapper .roster-table td,
+    .profile-page-wrapper .budget-master-table td {
+        padding: 9px 8px;
+        border-bottom: 1px solid #e2e8f0;
+        color: #374151;
+        vertical-align: middle;
+    }
+
+    .profile-page-wrapper .roster-table tbody tr:hover,
+    .profile-page-wrapper .budget-master-table tbody tr:hover {
+        background: #fafbff;
+    }
+
+    .profile-page-wrapper .roster-table td:last-child {
+        white-space: nowrap;
+    }
+
+.profile-page-wrapper .col-station,
+.profile-page-wrapper .col-project,
+.profile-page-wrapper .col-buyer,
+.profile-page-wrapper .col-id {
+    color: #6d28d9;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.profile-page-wrapper .status-badge-active {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 8px;
+    border: 1px solid #a7f3d0;
+    border-radius: 5px;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 9px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   ROW ACTIONS
+   ========================================================= */
+
+.profile-page-wrapper .btn-row-edit,
+.profile-page-wrapper .btn-row-del {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 54px;
+    min-height: 29px;
+    margin: 2px;
+    padding: 5px 8px;
+    box-sizing: border-box;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.profile-page-wrapper .btn-row-edit {
+    border-color: #818cf8;
+    color: #4f46e5;
+}
+
+    .profile-page-wrapper .btn-row-edit:hover {
+        border-color: #6f42c1;
+        background: #6f42c1;
+        color: #ffffff;
+    }
+
+.profile-page-wrapper .btn-row-del {
+    border-color: #f87171;
+    color: #dc2626;
+}
+
+    .profile-page-wrapper .btn-row-del:hover {
+        border-color: #dc2626;
+        background: #dc2626;
+        color: #ffffff;
+    }
+
+/* =========================================================
+   USER TABLE
+   ========================================================= */
+
+.profile-page-wrapper .profile-col-right .roster-table {
+    table-layout: auto;
+}
+
+    .profile-page-wrapper .profile-col-right .roster-table td {
+        overflow-wrap: anywhere;
+    }
+
+        .profile-page-wrapper .profile-col-right .roster-table td:nth-child(1) {
+            min-width: 95px;
+        }
+
+        .profile-page-wrapper .profile-col-right .roster-table td:nth-child(2) {
+            min-width: 105px;
+        }
+
+        .profile-page-wrapper .profile-col-right .roster-table td:nth-child(4) {
+            min-width: 150px;
+        }
+
+/* =========================================================
+   YEARLY BUDGET TABLE
+   ========================================================= */
+
+.profile-page-wrapper .budget-master-table {
+    table-layout: fixed;
+}
+
+    .profile-page-wrapper .budget-master-table th {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-page-wrapper .budget-master-table td {
+        padding: 7px 5px;
+    }
+
+    .profile-page-wrapper .budget-master-table input {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        min-height: 33px;
+        padding: 6px;
+        box-sizing: border-box;
+        border: 1px solid #cbd5e1;
+        border-radius: 5px;
+        background: #f9fafb;
+        color: #1f2937;
+        font-family: inherit;
+        font-size: 11px;
+    }
+
+        .profile-page-wrapper .budget-master-table input:focus {
+            outline: none;
+            border-color: #7c3aed;
+            background: #ffffff;
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+        }
+
+.profile-page-wrapper .budget-btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+    .profile-page-wrapper .budget-btn-row > button {
+        flex: 1 1 140px;
+    }
+
+.profile-page-wrapper #newYearForm {
+    border: 1px solid #dce3ec;
+    background: #f8fafc !important;
+}
+
+/* =========================================================
+   MODALS
+   ========================================================= */
+
+#editInfoModal .modal-content,
+#avatarModal .modal-content {
+    overflow: hidden;
+    border: 1px solid #dce3ec;
+    border-radius: 11px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+#editInfoModal .modal-header,
+#avatarModal .modal-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #edf0f4;
+    background: #ffffff;
+}
+
+#editInfoModal .modal-title,
+#avatarModal .modal-title {
+    color: #111827;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+#editInfoModal .modal-body,
+#avatarModal .modal-body {
+    padding: 16px;
+}
+
+#editInfoModal .modal-footer,
+#avatarModal .modal-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #edf0f4;
+    background: #ffffff;
+}
+
+    #editInfoModal .modal-footer .btn-primary,
+    #avatarModal .modal-footer .btn-primary {
+        border-color: #8054e8;
+        background: #8054e8;
+    }
+
+        #editInfoModal .modal-footer .btn-primary:hover,
+        #avatarModal .modal-footer .btn-primary:hover {
+            border-color: #6d3fd0;
+            background: #6d3fd0;
+        }
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (min-width: 1600px) {
+    .profile-page-wrapper {
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+        gap: 14px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .profile-page-wrapper {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+        .profile-page-wrapper .identity-row {
+            grid-template-columns: 115px minmax(0, 1fr);
+        }
+}
+
+@media (max-width: 600px) {
+    .profile-page-wrapper {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 10px;
+        padding: 2px;
+    }
+
+        .profile-page-wrapper .profile-card-body {
+            padding: 10px;
+        }
+
+        .profile-page-wrapper .profile-card-header {
+            padding: 10px;
+        }
+
+        .profile-page-wrapper .identity-row {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+            .profile-page-wrapper .identity-row > div:first-child {
+                width: 100%;
+                max-width: 150px;
+                margin: 0 auto;
+            }
+
+        .profile-page-wrapper .identity-field {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 3px;
+        }
+
+        .profile-page-wrapper .backup-btn-row {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .profile-page-wrapper .roster-table,
+        .profile-page-wrapper .budget-master-table {
+            font-size: 10px;
+        }
+
+            .profile-page-wrapper .roster-table th,
+            .profile-page-wrapper .roster-table td,
+            .profile-page-wrapper .budget-master-table th,
+            .profile-page-wrapper .budget-master-table td {
+                padding: 7px 5px;
+            }
+}

@@ -1,14 +1,4 @@
-﻿/* =========================================================
-   TESTING SPARE MANAGEMENT SYSTEM
-   REAL-TIME COMMAND CENTER
-   EXACT ORIGINAL DASHBOARD STYLE
-========================================================= */
-
-
-/* =========================================================
-   GLOBAL
-========================================================= */
-
+﻿
 * {
     box-sizing: border-box;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -942,7 +932,7 @@ body {
     .brand-icon i {
         display: inline-block;
         animation: gearRotate 4s linear infinite;
-        color: #1677ff;
+        color: white;
         filter: drop-shadow(0 0 5px rgba(22, 119, 255, 0.35));
     }
 
@@ -962,8 +952,8 @@ body {
    ========================================================= */
 
 .company-logo {
-    width: 64px;
-    height: 52px;
+    width: 100px;
+    height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -973,6 +963,7 @@ body {
 }
 
     .company-logo img {
+        border-radius: 50%;
         max-width: 100%;
         max-height: 100%;
         width: auto;
@@ -980,3 +971,107 @@ body {
         object-fit: contain;
         display: block;
     }
+
+
+
+/* ==========================================
+   DASHBOARD MAIN CONTAINER - FINAL FIX
+========================================== */
+
+#mainApp.dashboard-page-wrapper {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 12px !important;
+    box-sizing: border-box !important;
+    border-radius: 12px;
+}
+
+    /* Keep all dashboard content within its container */
+    #mainApp.dashboard-page-wrapper,
+    #mainApp.dashboard-page-wrapper * {
+        box-sizing: border-box;
+    }
+
+/* Title bar: use the available width */
+#mainApp .dashboard-title-bar {
+    width: 100%;
+    margin-top: 0 !important;
+    margin-bottom: 16px !important;
+}
+
+/* Four KPI cards */
+#mainApp > div:nth-child(2) {
+    width: 100%;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+}
+
+/* Projects and clocks */
+#mainApp > div:nth-child(3) {
+    width: 100%;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+}
+
+/* Inventory and requisitions */
+#mainApp > div:nth-child(4) {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+}
+
+/* Both chart cards */
+#mainApp > div:nth-child(5) {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    margin-bottom: 0 !important;
+}
+
+    /* Prevent cards from exceeding their grid columns */
+    #mainApp > div:nth-child(2) > div,
+    #mainApp > div:nth-child(3) > div,
+    #mainApp > div:nth-child(4) > div,
+    #mainApp > div:nth-child(5) > div {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+/* Tablet */
+@media (max-width: 1000px) {
+    #mainApp > div:nth-child(2) {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    #mainApp > div:nth-child(3),
+    #mainApp > div:nth-child(4),
+    #mainApp > div:nth-child(5) {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    #mainApp.dashboard-page-wrapper {
+        padding: 8px !important;
+    }
+
+    #mainApp > div:nth-child(2),
+    #mainApp > div:nth-child(3),
+    #mainApp > div:nth-child(4),
+    #mainApp > div:nth-child(5) {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 10px !important;
+    }
+
+    #mainApp .dashboard-title-bar {
+        align-items: flex-start !important;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}

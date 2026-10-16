@@ -1,5 +1,10 @@
+wwwroot\css\daily-consumption.css
 wwwroot\css\dashboard.css
+wwwroot\css\equipment-consumables.css
 wwwroot\css\master-connector.css
+wwwroot\css\material-request.css
+wwwroot\css\profile-settings.css
+wwwroot\css\prpo-tracker.css
 wwwroot\css\site.css
 wwwroot\favicon.ico
 wwwroot\images\Foxlink-logo.png

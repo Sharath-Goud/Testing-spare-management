@@ -4,6 +4,10 @@
     ViewData["Title"] = "Profile & User Settings";
 }
 
+<link rel="stylesheet"
+      href="~/css/profile-settings.css"
+      asp-append-version="true" />
+
 <div class="profile-page-wrapper">
 
     <!-- Success / Error Messages -->
@@ -279,6 +283,15 @@
                         <div class="roster-form-group">
                             <label>Official Email Address</label>
                             <input type="email" name="OfficialEmail" placeholder="e.g. saibalaji_m@foxlink.com" required />
+                        </div>
+
+                        <div class="roster-form-group">
+                            <label>User Role</label>
+                            <select name="Role" class="form-control-custom" required>
+                                <option value="">-- Select Role --</option>
+                                <option value="Admin">Admin</option>
+                                <option value="Employee">Employee</option>
+                            </select>
                         </div>
 
                         <div class="roster-form-group">

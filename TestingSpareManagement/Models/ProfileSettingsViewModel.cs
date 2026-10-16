@@ -63,6 +63,11 @@ namespace TestingSpareManagement.Models
         public string OfficialEmail { get; set; } = string.Empty;
 
         [Required]
+        [RegularExpression("^(Admin|Employee)$",
+        ErrorMessage = "Please select Admin or Employee.")]
+        public string Role { get; set; } = "Employee";
+
+        [Required]
         public string AssignedRole { get; set; } = string.Empty;
     }
 

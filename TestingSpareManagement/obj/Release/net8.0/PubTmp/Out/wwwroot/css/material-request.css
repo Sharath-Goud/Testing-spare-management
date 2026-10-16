@@ -1,0 +1,485 @@
+﻿
+/* =========================================================
+   MATERIAL REQUEST - DAILY CONSUMPTION MATCHING DESIGN
+   ========================================================= */
+
+.material-request-page-wrapper {
+    display: grid;
+    grid-template-columns: 420px minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+    width: 100%;
+    padding: 4px;
+    box-sizing: border-box;
+    color: #1f2937;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+    /* =========================================================
+   PANELS
+   ========================================================= */
+
+    .material-request-page-wrapper .request-panel,
+    .material-request-page-wrapper .queue-panel {
+        min-width: 0;
+        background: #ffffff;
+        border: 1px solid #dce3ec;
+        border-radius: 11px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Allow the complete form to display */
+    .material-request-page-wrapper .request-panel {
+        height: auto;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .material-request-page-wrapper .queue-panel {
+        overflow: hidden;
+    }
+
+    /* =========================================================
+   HEADERS
+   ========================================================= */
+
+    .material-request-page-wrapper .request-panel > h5,
+    .material-request-page-wrapper .queue-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 48px;
+        margin: 0;
+        padding: 10px 14px;
+        box-sizing: border-box;
+        background: #ffffff;
+        border-bottom: 1px solid #edf0f4;
+        color: #111827;
+    }
+
+    .material-request-page-wrapper .request-panel > h5 {
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+        .material-request-page-wrapper .request-panel > h5 i,
+        .material-request-page-wrapper .queue-header h5 i {
+            color: #7045d6;
+        }
+
+    .material-request-page-wrapper .queue-header h5 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.5;
+    }
+
+    /* =========================================================
+   ALERTS
+   ========================================================= */
+
+    .material-request-page-wrapper .alert {
+        margin: 10px 12px;
+        padding: 9px 12px;
+        border-radius: 7px;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .material-request-page-wrapper .alert-success {
+        color: #047857;
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+    }
+
+    .material-request-page-wrapper .alert-danger {
+        color: #b91c1c;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+    }
+
+    /* =========================================================
+   FORM
+   ========================================================= */
+
+    .material-request-page-wrapper .request-panel form {
+        height: auto;
+        max-height: none;
+        overflow: visible;
+        padding: 12px 14px 15px;
+    }
+
+    .material-request-page-wrapper .form-group {
+        margin-bottom: 11px;
+    }
+
+        .material-request-page-wrapper .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #374151;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+            .material-request-page-wrapper .form-group label i {
+                color: #7045d6;
+                margin-right: 3px;
+            }
+
+    .material-request-page-wrapper .form-control-custom {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        min-height: 35px;
+        padding: 7px 10px;
+        box-sizing: border-box;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        background: #f9fafb;
+        color: #1f2937;
+        font-family: inherit;
+        font-size: 12px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .material-request-page-wrapper textarea.form-control-custom {
+        min-height: 80px;
+        height: auto;
+        resize: vertical;
+    }
+
+    .material-request-page-wrapper .form-control-custom:focus {
+        outline: none;
+        border-color: #7c3aed;
+        background: #ffffff;
+        box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+    }
+
+    .material-request-page-wrapper .form-control-custom::placeholder {
+        color: #9ca3af;
+    }
+
+    .material-request-page-wrapper .text-danger {
+        display: block;
+        margin-top: 4px;
+        color: #dc2626 !important;
+        font-size: 10px;
+    }
+
+    /* =========================================================
+   CALENDAR HEADER
+   ========================================================= */
+
+    .material-request-page-wrapper .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 6px;
+        padding: 8px;
+        margin-bottom: 8px;
+        border: 1px solid #dce3ec;
+        border-radius: 8px;
+        background: #f8fafc;
+    }
+
+        .material-request-page-wrapper .calendar-header span {
+            color: #4c1d95;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .material-request-page-wrapper .calendar-header button {
+            padding: 5px 8px;
+            border: 1px solid #d0c4ec;
+            border-radius: 5px;
+            background: #e7e3f5;
+            color: #6f42c1;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+            .material-request-page-wrapper .calendar-header button:hover {
+                background: #6f42c1;
+                color: #ffffff;
+            }
+
+    /* =========================================================
+   SUBMIT BUTTON
+   ========================================================= */
+
+    .material-request-page-wrapper .btn-submit-request {
+        display: block;
+        width: 100%;
+        min-height: 36px;
+        margin-top: 7px;
+        padding: 9px 12px;
+        border: none;
+        border-radius: 6px;
+        background: #8054e8;
+        color: #ffffff;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .material-request-page-wrapper .btn-submit-request:hover {
+            background: #6d3fd0;
+        }
+
+    /* =========================================================
+   REQUEST QUEUE TABLE
+   ========================================================= */
+
+    .material-request-page-wrapper .queue-table-container {
+        width: 100%;
+        overflow-x: auto;
+        padding: 0 10px 10px;
+        box-sizing: border-box;
+    }
+
+    .material-request-page-wrapper .queue-table {
+        width: 100%;
+        min-width: 1350px;
+        border-collapse: collapse;
+        font-size: 11px;
+    }
+
+        .material-request-page-wrapper .queue-table thead {
+            background: #f1f5f9;
+        }
+
+        .material-request-page-wrapper .queue-table th {
+            padding: 10px 8px;
+            border-bottom: 1px solid #dbe3ec;
+            color: #475569;
+            font-size: 9px;
+            font-weight: 700;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .material-request-page-wrapper .queue-table td {
+            padding: 9px 8px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #374151;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .material-request-page-wrapper .queue-table tbody tr {
+            transition: background 0.15s;
+        }
+
+            .material-request-page-wrapper .queue-table tbody tr:hover {
+                background: #fafbff;
+            }
+
+        .material-request-page-wrapper .queue-table td:first-child {
+            color: #7c3aed;
+            font-weight: 700;
+        }
+
+    /* =========================================================
+   PRIORITY BADGES
+   ========================================================= */
+
+    .material-request-page-wrapper .priority-normal,
+    .material-request-page-wrapper .priority-urgent {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border-radius: 5px;
+        font-size: 9px;
+        font-weight: 700;
+    }
+
+    .material-request-page-wrapper .priority-normal {
+        background: #f3efff;
+        color: #6d28d9;
+        border: 1px solid #d0c4ec;
+    }
+
+    .material-request-page-wrapper .priority-urgent {
+        background: #fee2e2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+    }
+
+    /* =========================================================
+   STATUS BADGES
+   ========================================================= */
+
+    .material-request-page-wrapper .status-badge {
+        display: inline-block;
+        max-width: 190px;
+        padding: 5px 8px;
+        border-radius: 5px;
+        font-size: 9px;
+        font-weight: 700;
+        white-space: normal;
+        line-height: 1.4;
+    }
+
+    .material-request-page-wrapper .status-approved {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .material-request-page-wrapper .status-rejected {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .material-request-page-wrapper .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    /* =========================================================
+   DELETE ACTION
+   ========================================================= */
+
+    .material-request-page-wrapper .queue-table th:last-child,
+    .material-request-page-wrapper .queue-table td:last-child {
+        min-width: 85px;
+        width: 85px;
+        white-space: nowrap;
+    }
+
+    .material-request-page-wrapper .btn-matrix-del {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        min-width: 55px;
+        margin: 2px;
+        padding: 6px 8px;
+        border: 1px solid #f87171;
+        border-radius: 5px;
+        background: #ffffff;
+        color: #dc2626;
+        font-family: inherit;
+        font-size: 10px;
+        font-weight: 600;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+    }
+
+        .material-request-page-wrapper .btn-matrix-del:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+            color: #ffffff;
+        }
+
+    /* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+    .material-request-page-wrapper .empty-state {
+        padding: 35px 15px;
+        color: #94a3b8;
+        font-size: 12px;
+        text-align: center;
+    }
+
+        .material-request-page-wrapper .empty-state i {
+            display: block;
+            margin-bottom: 8px;
+            color: #a78bfa;
+            font-size: 24px;
+        }
+
+/* =========================================================
+   RESPONSIVE LAYOUT
+   ========================================================= */
+
+@media (min-width: 1600px) {
+    .material-request-page-wrapper {
+        grid-template-columns: 440px minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 1300px) {
+    .material-request-page-wrapper {
+        grid-template-columns: 360px minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 1000px) {
+    .material-request-page-wrapper {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .material-request-page-wrapper {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 10px;
+        padding: 2px;
+    }
+
+        .material-request-page-wrapper .request-panel form {
+            padding: 10px;
+        }
+
+        .material-request-page-wrapper .queue-header {
+            padding: 10px;
+        }
+}
+
+
+/* FIX: Show the complete Material Request form and submit button */
+
+.material-request-page-wrapper {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    align-items: start;
+}
+
+    .material-request-page-wrapper .request-panel {
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+        .material-request-page-wrapper .request-panel form {
+            height: auto !important;
+            min-height: 0 !important;
+            max-height: none !important;
+            overflow: visible !important;
+            padding-bottom: 20px !important;
+        }
+
+    .material-request-page-wrapper .btn-submit-request {
+        position: relative !important;
+        display: block !important;
+        width: 100% !important;
+        min-height: 40px !important;
+        margin: 10px 0 5px !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        z-index: 1;
+    }
+
+/* Allow the page to scroll vertically */
+html,
+body {
+    min-height: 100%;
+    height: auto;
+}
+
+main,
+.container,
+.container-fluid {
+    overflow-y: visible;
+}

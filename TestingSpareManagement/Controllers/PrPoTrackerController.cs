@@ -409,35 +409,37 @@ namespace TestingSpareManagement.Controllers
             }
         }
 
-
-        // =====================================================
-        // PRIVATE: DROPDOWN LOADERS
-        // =====================================================
         private async Task<List<ProjectMasterModel>> GetProjectsFromDb()
         {
             var list = new List<ProjectMasterModel>();
-            try
+
+            using SqlConnection connection = new SqlConnection(GetConnectionString());
+
+            const string query = @"
+                SELECT Id, ProjectCode
+                FROM dbo.ProjectMaster
+                WHERE IsActive = 1
+                ORDER BY ProjectCode;";
+
+            using SqlCommand command = new SqlCommand(query, connection);
+
+            await connection.OpenAsync();
+
+            using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
             {
-                using SqlConnection connection = new SqlConnection(GetConnectionString());
-                using SqlCommand command = new SqlCommand("dbo.GetActiveProjects", connection);
-                command.CommandType = CommandType.StoredProcedure;
-
-                await connection.OpenAsync();
-                using SqlDataReader reader = await command.ExecuteReaderAsync();
-
-                while (await reader.ReadAsync())
+                list.Add(new ProjectMasterModel
                 {
-                    list.Add(new ProjectMasterModel
-                    {
-                        Id = Convert.ToInt32(reader["Id"]),
-                        ProjectCode = reader["ProjectCode"]?.ToString() ?? "",
-                        Description = reader["Description"] == DBNull.Value ? null : reader["Description"].ToString()
-                    });
-                }
+                    Id = Convert.ToInt32(reader["Id"]),
+                    ProjectCode = reader["ProjectCode"]?.ToString() ?? "",
+                    Description = null
+                });
             }
-            catch (Exception ex) { Console.WriteLine($"Error loading projects: {ex.Message}"); }
+
             return list;
         }
+
 
         private async Task<List<BuyerMasterModel>> GetBuyersFromDb()
         {

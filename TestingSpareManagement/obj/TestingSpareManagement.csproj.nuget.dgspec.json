@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\2063905\\Desktop\\TestingSpareManagement\\TestingSpareManagement\\TestingSpareManagement.csproj": {}
+    "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\TestingSpareManagement.csproj": {}
   },
   "projects": {
-    "C:\\Users\\2063905\\Desktop\\TestingSpareManagement\\TestingSpareManagement\\TestingSpareManagement.csproj": {
+    "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\TestingSpareManagement.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\2063905\\Desktop\\TestingSpareManagement\\TestingSpareManagement\\TestingSpareManagement.csproj",
+        "projectUniqueName": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\TestingSpareManagement.csproj",
         "projectName": "TestingSpareManagement",
-        "projectPath": "C:\\Users\\2063905\\Desktop\\TestingSpareManagement\\TestingSpareManagement\\TestingSpareManagement.csproj",
-        "packagesPath": "C:\\Users\\2063905\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\2063905\\Desktop\\TestingSpareManagement\\TestingSpareManagement\\obj\\",
+        "projectPath": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\TestingSpareManagement.csproj",
+        "packagesPath": "C:\\Users\\2063907\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\2063907\\source\\repos\\TestingSpareManagement\\TestingSpareManagement\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\2063905\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\2063907\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -25,7 +25,6 @@
           "net8.0"
         ],
         "sources": {
-          "C:\\NuGetPackages": {},
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },

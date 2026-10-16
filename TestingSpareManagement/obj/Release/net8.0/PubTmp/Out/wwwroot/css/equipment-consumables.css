@@ -1,0 +1,696 @@
+﻿
+/* =========================================================
+   EQUIPMENT CONSUMABLES
+   Matching Material Request / Daily Consumption design
+   ========================================================= */
+
+.equipment-page-wrapper {
+    display: grid;
+    grid-template-columns: 420px minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+    width: 100%;
+    height: auto !important;
+    min-height: 0;
+    max-height: none;
+    padding: 4px;
+    box-sizing: border-box;
+    overflow: visible !important;
+    color: #1f2937;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+    /* =========================================================
+   FORM AND MATRIX PANELS
+   ========================================================= */
+
+    .equipment-page-wrapper .equipment-form-panel,
+    .equipment-page-wrapper .equipment-matrix-panel {
+        min-width: 0;
+        background: #ffffff;
+        border: 1px solid #dce3ec;
+        border-radius: 11px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .equipment-page-wrapper .equipment-form-panel {
+        height: auto !important;
+        min-height: 0;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    .equipment-page-wrapper .equipment-matrix-panel {
+        overflow: hidden;
+    }
+
+    /* =========================================================
+   PANEL HEADERS
+   ========================================================= */
+
+    .equipment-page-wrapper .equipment-form-panel > h5,
+    .equipment-page-wrapper .matrix-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        min-height: 48px;
+        margin: 0;
+        padding: 10px 14px;
+        box-sizing: border-box;
+        background: #ffffff;
+        border-bottom: 1px solid #edf0f4;
+        color: #111827;
+    }
+
+    .equipment-page-wrapper .equipment-form-panel > h5 {
+        justify-content: flex-start;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+        .equipment-page-wrapper .equipment-form-panel > h5 i,
+        .equipment-page-wrapper .matrix-header h5 i {
+            color: #7045d6;
+        }
+
+    .equipment-page-wrapper .matrix-header h5 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.5;
+    }
+
+    /* =========================================================
+   SUCCESS AND ERROR MESSAGES
+   ========================================================= */
+
+    .equipment-page-wrapper .alert {
+        margin: 10px 12px;
+        padding: 9px 12px !important;
+        border-radius: 7px;
+        font-size: 12px !important;
+        line-height: 1.5;
+    }
+
+    .equipment-page-wrapper .alert-success {
+        color: #047857;
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+    }
+
+    .equipment-page-wrapper .alert-danger {
+        color: #b91c1c;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+    }
+
+    /* =========================================================
+   EQUIPMENT FORM
+   ========================================================= */
+
+    .equipment-page-wrapper .equipment-form-panel form {
+        height: auto !important;
+        min-height: 0;
+        max-height: none !important;
+        overflow: visible !important;
+        padding: 12px 14px 18px;
+        box-sizing: border-box;
+    }
+
+    .equipment-page-wrapper .form-group {
+        margin-bottom: 11px;
+    }
+
+        .equipment-page-wrapper .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #374151;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+            .equipment-page-wrapper .form-group label i {
+                margin-right: 3px;
+                color: #7045d6;
+            }
+
+    .equipment-page-wrapper .form-control-custom {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        min-height: 35px;
+        padding: 7px 10px;
+        box-sizing: border-box;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        background: #f9fafb;
+        color: #1f2937;
+        font-family: inherit;
+        font-size: 12px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+        .equipment-page-wrapper .form-control-custom:focus {
+            outline: none;
+            border-color: #7c3aed;
+            background: #ffffff;
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+        }
+
+        .equipment-page-wrapper .form-control-custom::placeholder {
+            color: #9ca3af;
+        }
+
+    .equipment-page-wrapper input[type="file"].form-control-custom {
+        height: auto;
+        min-height: 35px;
+        padding: 6px;
+    }
+
+    .equipment-page-wrapper .text-danger {
+        display: block;
+        margin-top: 4px;
+        color: #dc2626 !important;
+        font-size: 10px;
+    }
+
+    /* =========================================================
+   IMAGE PREVIEW
+   ========================================================= */
+
+    .equipment-page-wrapper .image-preview-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 115px;
+        margin: 8px 0 12px;
+        padding: 8px;
+        box-sizing: border-box;
+        border: 2px dashed #cbd5e1;
+        border-radius: 8px;
+        background: #f8fafc;
+        color: #64748b;
+        overflow: hidden;
+    }
+
+    .equipment-page-wrapper .preview-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 11px;
+        text-align: center;
+    }
+
+        .equipment-page-wrapper .preview-placeholder i {
+            color: #a78bfa;
+            font-size: 24px;
+        }
+
+    .equipment-page-wrapper #previewImg {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 5px;
+    }
+
+    /* =========================================================
+   SAVE AND CANCEL BUTTONS
+   ========================================================= */
+
+    .equipment-page-wrapper .btn-save-equipment,
+    .equipment-page-wrapper .btn-cancel-equipment {
+        display: block;
+        width: 100%;
+        min-height: 36px;
+        margin-top: 7px;
+        padding: 9px 12px;
+        box-sizing: border-box;
+        border: none;
+        border-radius: 6px;
+        color: #ffffff;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .equipment-page-wrapper .btn-save-equipment {
+        background: #8054e8;
+    }
+
+        .equipment-page-wrapper .btn-save-equipment:hover {
+            background: #6d3fd0;
+        }
+
+    .equipment-page-wrapper .btn-cancel-equipment {
+        background: #64748b;
+    }
+
+        .equipment-page-wrapper .btn-cancel-equipment:hover {
+            background: #475569;
+        }
+
+    /* =========================================================
+   MATRIX HEADER AND EXPORT BUTTONS
+   ========================================================= */
+
+    .equipment-page-wrapper .matrix-header > div {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 7px !important;
+    }
+
+    .equipment-page-wrapper .matrix-header button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        min-height: 32px;
+        padding: 6px 10px !important;
+        border: 1px solid transparent !important;
+        border-radius: 5px !important;
+        font-size: 10px !important;
+        font-weight: 700 !important;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .equipment-page-wrapper .matrix-header button:first-of-type {
+            background: #ecfdf5 !important;
+            border-color: #a7f3d0 !important;
+            color: #047857 !important;
+        }
+
+            .equipment-page-wrapper .matrix-header button:first-of-type:hover {
+                background: #047857 !important;
+                color: #ffffff !important;
+            }
+
+        .equipment-page-wrapper .matrix-header button:last-of-type {
+            background: #fef2f2 !important;
+            border-color: #fecaca !important;
+            color: #dc2626 !important;
+        }
+
+            .equipment-page-wrapper .matrix-header button:last-of-type:hover {
+                background: #dc2626 !important;
+                color: #ffffff !important;
+            }
+
+    /* =========================================================
+   SEARCH BOX
+   ========================================================= */
+
+    .equipment-page-wrapper .matrix-search {
+        padding: 10px;
+        border-bottom: 1px solid #edf0f4;
+    }
+
+    .equipment-page-wrapper .matrix-search-box {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        padding: 0 10px;
+        box-sizing: border-box;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        background: #f9fafb;
+    }
+
+        .equipment-page-wrapper .matrix-search-box i {
+            color: #7045d6;
+            font-size: 12px;
+        }
+
+        .equipment-page-wrapper .matrix-search-box input {
+            width: 100%;
+            min-width: 0;
+            height: 35px;
+            padding: 7px 0;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: #1f2937;
+            font-family: inherit;
+            font-size: 11px;
+        }
+
+            .equipment-page-wrapper .matrix-search-box input::placeholder {
+                color: #9ca3af;
+            }
+
+    /* =========================================================
+   MATRIX TABLE
+   ========================================================= */
+
+    .equipment-page-wrapper .matrix-table-container {
+        width: 100%;
+        overflow-x: auto;
+        padding: 0 10px 10px;
+        box-sizing: border-box;
+    }
+
+    .equipment-page-wrapper .matrix-table {
+        width: 100%;
+        min-width: 1250px;
+        border-collapse: collapse;
+        font-size: 11px;
+    }
+
+        .equipment-page-wrapper .matrix-table thead {
+            background: #f1f5f9;
+        }
+
+        .equipment-page-wrapper .matrix-table th {
+            padding: 10px 8px;
+            border-bottom: 1px solid #dbe3ec;
+            color: #475569;
+            font-size: 9px;
+            font-weight: 700;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .equipment-page-wrapper .matrix-table td {
+            padding: 9px 8px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #374151;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .equipment-page-wrapper .matrix-table tbody tr {
+            transition: background 0.15s;
+        }
+
+            .equipment-page-wrapper .matrix-table tbody tr:hover {
+                background: #fafbff;
+            }
+
+        .equipment-page-wrapper .matrix-table td strong {
+            font-weight: 700;
+        }
+
+    /* =========================================================
+   PHOTO THUMBNAILS
+   ========================================================= */
+
+    .equipment-page-wrapper .photo-thumb {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 65px;
+        height: 58px;
+        box-sizing: border-box;
+        overflow: hidden;
+        border: 1px solid #d5dce5;
+        border-radius: 7px;
+        background: #f8fafc;
+        color: #94a3b8;
+        font-size: 10px;
+    }
+
+        .equipment-page-wrapper .photo-thumb img {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+    .equipment-page-wrapper .project-code {
+        display: inline-block;
+        padding: 4px 7px;
+        border: 1px solid #d0c4ec;
+        border-radius: 5px;
+        background: #f3efff;
+        color: #6d28d9;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .equipment-page-wrapper .storage-location {
+        color: #475569;
+        font-weight: 600;
+    }
+
+    .equipment-page-wrapper .available-qty {
+        color: #059669;
+        font-weight: 700;
+    }
+
+    .equipment-page-wrapper .unit-price-inr {
+        display: block;
+        color: #059669;
+        font-weight: 700;
+    }
+
+    .equipment-page-wrapper .unit-price-rmb {
+        display: block;
+        margin-top: 3px;
+        color: #d97706;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+    /* =========================================================
+   STOCK STATUS
+   ========================================================= */
+
+    .equipment-page-wrapper .status-pill-low,
+    .equipment-page-wrapper .status-pill-safe {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 8px;
+        border-radius: 5px;
+        font-size: 9px;
+        font-weight: 700;
+        line-height: 1.4;
+        text-align: center;
+    }
+
+    .equipment-page-wrapper .status-pill-low {
+        border: 1px solid #fecaca;
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .equipment-page-wrapper .status-pill-safe {
+        border: 1px solid #a7f3d0;
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    /* =========================================================
+   EDIT AND DELETE ACTIONS
+   ========================================================= */
+
+    .equipment-page-wrapper .matrix-actions {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        min-width: 125px;
+        white-space: nowrap;
+    }
+
+    .equipment-page-wrapper .btn-matrix-edit,
+    .equipment-page-wrapper .btn-matrix-del {
+        display: inline-flex;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        min-width: 55px;
+        margin: 2px;
+        padding: 6px 8px;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background: #ffffff;
+        font-family: inherit;
+        font-size: 10px;
+        font-weight: 600;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .equipment-page-wrapper .btn-matrix-edit {
+        border: 1px solid #818cf8;
+        color: #4f46e5;
+    }
+
+        .equipment-page-wrapper .btn-matrix-edit:hover {
+            background: #6f42c1;
+            border-color: #6f42c1;
+            color: #ffffff;
+        }
+
+    .equipment-page-wrapper .btn-matrix-del {
+        border: 1px solid #f87171;
+        color: #dc2626;
+    }
+
+        .equipment-page-wrapper .btn-matrix-del:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+            color: #ffffff;
+        }
+
+    .equipment-page-wrapper .matrix-table th:last-child,
+    .equipment-page-wrapper .matrix-table td:last-child {
+        min-width: 145px;
+        width: 145px;
+        white-space: nowrap;
+    }
+
+    /* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+    .equipment-page-wrapper .matrix-empty {
+        padding: 35px 15px;
+        color: #94a3b8;
+        font-size: 12px;
+        text-align: center;
+    }
+
+        .equipment-page-wrapper .matrix-empty i {
+            display: block;
+            margin-bottom: 8px;
+            color: #a78bfa;
+            font-size: 24px;
+        }
+
+/* =========================================================
+   EDIT MODAL
+   ========================================================= */
+
+#editEquipmentModal .modal-content {
+    overflow: hidden;
+    border: 1px solid #dce3ec;
+    border-radius: 11px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+#editEquipmentModal .modal-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #edf0f4;
+    background: #ffffff;
+}
+
+#editEquipmentModal .modal-title {
+    color: #111827;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+#editEquipmentModal .modal-body {
+    padding: 16px;
+}
+
+#editEquipmentModal .form-group {
+    margin-bottom: 12px;
+}
+
+    #editEquipmentModal .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #374151;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+#editEquipmentModal .form-control-custom {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 35px;
+    padding: 7px 10px;
+    box-sizing: border-box;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #f9fafb;
+    color: #1f2937;
+    font-size: 12px;
+}
+
+    #editEquipmentModal .form-control-custom:focus {
+        outline: none;
+        border-color: #7c3aed;
+        background: #ffffff;
+        box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+    }
+
+#editEquipmentModal .modal-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #edf0f4;
+    background: #ffffff;
+}
+
+    #editEquipmentModal .modal-footer .btn-primary {
+        border-color: #8054e8;
+        background: #8054e8;
+    }
+
+        #editEquipmentModal .modal-footer .btn-primary:hover {
+            border-color: #6d3fd0;
+            background: #6d3fd0;
+        }
+
+/* =========================================================
+   RESPONSIVE LAYOUT
+   ========================================================= */
+
+@media (min-width: 1600px) {
+    .equipment-page-wrapper {
+        grid-template-columns: 440px minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 1300px) {
+    .equipment-page-wrapper {
+        grid-template-columns: 360px minmax(0, 1fr);
+    }
+
+        .equipment-page-wrapper .matrix-header {
+            align-items: flex-start;
+        }
+}
+
+@media (max-width: 1000px) {
+    .equipment-page-wrapper {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .equipment-page-wrapper {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 10px;
+        padding: 2px;
+    }
+
+        .equipment-page-wrapper .equipment-form-panel form {
+            padding: 10px;
+        }
+
+        .equipment-page-wrapper .matrix-header {
+            align-items: flex-start;
+            padding: 10px;
+        }
+
+            .equipment-page-wrapper .matrix-header > div {
+                flex-wrap: wrap;
+            }
+}

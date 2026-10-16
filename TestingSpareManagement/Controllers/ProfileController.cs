@@ -64,6 +64,7 @@ namespace TestingSpareManagement.Controllers
             command.Parameters.Add("@PasswordHash", SqlDbType.NVarChar, 255).Value =
                 (object?)form.Password ?? DBNull.Value;
             command.Parameters.Add("@OfficialEmail", SqlDbType.NVarChar, 100).Value = form.OfficialEmail;
+            command.Parameters.Add("@Role", SqlDbType.NVarChar, 20).Value = form.Role;
             command.Parameters.Add("@AssignedRole", SqlDbType.NVarChar, 100).Value = form.AssignedRole;
 
             await connection.OpenAsync();

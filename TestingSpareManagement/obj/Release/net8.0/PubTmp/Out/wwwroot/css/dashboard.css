@@ -1,0 +1,1086 @@
+﻿/* =========================================================
+   TESTING SPARE MANAGEMENT SYSTEM
+   REAL-TIME COMMAND CENTER
+   EXACT ORIGINAL DASHBOARD STYLE
+========================================================= */
+
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+body {
+    background-color: #f1f5f9;
+    color: #1e293b;
+    margin: 0;
+    padding: 12px;
+    min-height: 100vh;
+    font-size: 12.5px;
+}
+
+
+/* =========================================================
+   MAIN APPLICATION
+========================================================= */
+
+#mainApp {
+    display: block;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 18px;
+    min-height: 94vh;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =========================================================
+   ALARM BANNER
+   Hidden initially - original behavior
+========================================================= */
+
+.alarm-banner-top {
+    display: none;
+    background: linear-gradient( 135deg, #fef2f2, #fee2e2 );
+    border: 1px solid #ef4444;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    color: #991b1b;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.15);
+}
+
+
+    .alarm-banner-top h3 {
+        margin: 0 0 6px 0;
+        font-size: 13.5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+    }
+
+
+.alarm-list {
+    font-size: 12px;
+    font-weight: bold;
+    margin: 0;
+    padding-left: 18px;
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   COMMON CARD
+========================================================= */
+
+.card {
+    background: #ffffff;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    height: fit-content;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    color: #1e293b;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border: 1px solid #bae6fd;
+    border-radius: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+
+.animated-header-bg {
+    background: linear-gradient( 135deg, #0284c7, #3b82f6, #0284c7 );
+    background-size: 300% 300%;
+    animation: headerAnimation 10s ease infinite;
+}
+
+
+@keyframes headerAnimation {
+
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+
+.header-left {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+
+.system-title {
+    font-size: 36px;
+    margin: 0;
+    color: #ecf0f1;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+.gear {
+    display: inline-block;
+    animation: spinGear 6s linear infinite;
+}
+
+
+@keyframes spinGear {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+.platform-title {
+    color: #38d629;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 3px;
+}
+
+
+/* =========================================================
+   HEADER ACTIONS
+========================================================= */
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+
+.user-badge {
+    background: #f3e8ff;
+    color: #7c3aed;
+    padding: 4px 12px;
+    border-radius: 15px;
+    border: 1px solid #d8b4fe;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+
+.logout-btn {
+    width: auto !important;
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    margin: 0 !important;
+    border-radius: 5px;
+    font-size: 11px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
+    transition: all 0.2s;
+}
+
+
+    .logout-btn:hover {
+        background: #dc2626;
+        transform: translateY(-1px);
+    }
+
+
+/* =========================================================
+   AI SEARCH
+========================================================= */
+
+.ai-search {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 6px;
+    padding: 4px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+
+    .ai-search input {
+        width: 180px;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: #1e293b;
+        font-size: 11px;
+        padding: 2px 4px;
+    }
+
+
+/* =========================================================
+   FOXlink LOGO
+========================================================= */
+
+.foxlink-logo-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffffff;
+    border: 1px solid #bae6fd;
+    padding: 6px 14px;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+}
+
+
+.foxlink-logo {
+    height: 80px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
+
+
+/* =========================================================
+   TAB BAR
+========================================================= */
+
+.tab-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 14px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+
+/* =========================================================
+   TAB BUTTON
+========================================================= */
+
+.tab-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto !important;
+    min-height: 30px;
+    background-color: #f8fafc;
+    color: #475569;
+    padding: 7px 13px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 11.5px;
+    line-height: 1.2;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    white-space: nowrap;
+}
+
+
+    .tab-btn:hover {
+        background-color: #f1f5f9;
+        transform: translateY(-1px);
+        color: #0f172a;
+    }
+
+
+/* =========================================================
+   TAB LEFT BORDER COLORS
+========================================================= */
+
+.tab-red {
+    border-left: 4px solid #ef4444;
+}
+
+
+.tab-purple {
+    border-left: 4px solid #8b5cf6;
+}
+
+
+.tab-orange {
+    border-left: 4px solid #f59e0b;
+}
+
+
+.tab-green {
+    border-left: 4px solid #10b981;
+}
+
+
+.tab-blue {
+    border-left: 4px solid #3b82f6;
+}
+
+
+/* Active first tab - exact light red style */
+
+.tab-red.active {
+    background: #fff5f5;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+}
+
+
+/* Other active tabs */
+
+.tab-purple.active {
+    background: #8b5cf6;
+    color: #ffffff;
+    border-color: #8b5cf6;
+    box-shadow: 0 3px 10px rgba(139, 92, 246, 0.3);
+}
+
+
+.tab-orange.active {
+    background: #d97706;
+    color: #ffffff;
+    border-color: #d97706;
+    box-shadow: 0 3px 10px rgba(217, 119, 6, 0.3);
+}
+
+
+.tab-green.active {
+    background: #059669;
+    color: #ffffff;
+    border-color: #059669;
+    box-shadow: 0 3px 10px rgba(5, 150, 105, 0.3);
+}
+
+
+.tab-blue.active {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.3);
+}
+
+
+/* =========================================================
+   BADGE
+========================================================= */
+
+.nav-badge-count {
+    background-color: #ef4444;
+    color: #ffffff;
+    font-size: 9.5px;
+    font-weight: 900;
+    padding: 2px 5px;
+    border-radius: 10px;
+    margin-left: 4px;
+    display: inline-block;
+}
+
+
+/* =========================================================
+   DASHBOARD VIEW
+========================================================= */
+
+.dashboard-view {
+    display: none;
+}
+
+
+    .dashboard-view.active {
+        display: block;
+    }
+
+
+/* =========================================================
+   REAL-TIME MAIN CARD
+========================================================= */
+
+#realTimeView > .card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+}
+
+
+    #realTimeView > .card h2 {
+        margin-top: 0;
+        margin-bottom: 14px;
+        color: #0f172a;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 10px;
+        font-size: 14.5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+        gap: 10px;
+    }
+
+
+/* =========================================================
+   LIVE SYSTEM ONLINE
+========================================================= */
+
+.live-status {
+    font-size: 10.5px;
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #22c55e;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   METRIC GRID
+========================================================= */
+
+.rt-metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+
+/* =========================================================
+   METRIC CARD COMMON
+========================================================= */
+
+.rt-metric-card {
+    padding: 16px;
+    border-radius: 12px;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-height: 138px;
+}
+
+
+    .rt-metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+    }
+
+
+/* =========================================================
+   METRIC CARD COLORS
+========================================================= */
+
+.purple-card {
+    background: linear-gradient( 135deg, #a78bfa, #8b5cf6 );
+}
+
+
+.red-card {
+    background: linear-gradient( 135deg, #f87171, #ef4444 );
+}
+
+
+.yellow-card {
+    background: linear-gradient( 135deg, #fbbf24, #f59e0b );
+}
+
+
+.blue-card {
+    background: linear-gradient( 135deg, #60a5fa, #3b82f6 );
+}
+
+
+/* =========================================================
+   METRIC TEXT
+========================================================= */
+
+.rt-card-title {
+    color: #ffffff !important;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 0.3px;
+}
+
+
+.rt-card-value {
+    color: #ffffff !important;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 6px 0;
+    line-height: 1.2;
+}
+
+
+.rt-card-sub {
+    color: #ffffff !important;
+    font-size: 10px;
+    opacity: 0.9;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   PROJECT + CLOCK LAYOUT
+========================================================= */
+
+.projects-clock-container {
+    display: grid;
+    grid-template-columns: 1.8fr 1.2fr;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+
+.project-card,
+.clock-container {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 0;
+    height: 100%;
+}
+
+
+    /* =========================================================
+   PROJECT / CLOCK HEADINGS
+========================================================= */
+
+    .project-card h3,
+    .clock-container h3 {
+        color: #7c3aed;
+        font-size: 12px;
+        text-transform: uppercase;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 6px;
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+
+
+.clock-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+    .clock-container h3 {
+        text-align: center;
+    }
+
+
+/* =========================================================
+   PROJECT GRID
+========================================================= */
+
+.projects-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+}
+
+
+/* =========================================================
+   PROJECT CARD
+========================================================= */
+
+.project-status-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    transition: all 0.2s;
+    min-height: 68px;
+}
+
+
+    .project-status-card:hover {
+        border-color: #8b5cf6;
+        transform: translateY(-1px);
+    }
+
+
+    .project-status-card > div {
+        min-width: 0;
+    }
+
+
+    .project-status-card strong {
+        margin: 0 0 2px 0;
+        color: #0f172a;
+        font-size: 13px;
+        font-weight: 800;
+        display: block;
+    }
+
+
+    .project-status-card > div > span {
+        font-size: 9.5px;
+        color: #64748b;
+        font-weight: 600;
+        display: block;
+        margin-top: 2px;
+    }
+
+
+/* =========================================================
+   PROJECT ONLINE BADGE
+========================================================= */
+
+.green-badge {
+    background: #dcfce7;
+    border: 1px solid #22c55e;
+    color: #15803d;
+    font-size: 9.5px;
+    font-weight: 900;
+    padding: 3px 8px;
+    border-radius: 15px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 6px rgba(34, 197, 94, 0.15);
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   CLOCKS
+========================================================= */
+
+.dual-clock-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+
+.clock-card-india {
+    background: linear-gradient( 135deg, #fff7ed, #ffedd5 );
+    border: 1px solid #fdba74;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(234, 88, 12, 0.1);
+    border-top: 4px solid #ea580c;
+}
+
+
+.clock-card-china {
+    background: linear-gradient( 135deg, #fef2f2, #fee2e2 );
+    border: 1px solid #fca5a5;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.1);
+    border-top: 4px solid #dc2626;
+}
+
+
+.clock-symbol-title {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+
+.clock-card-india .clock-symbol-title {
+    color: #c2410c;
+}
+
+
+.clock-card-china .clock-symbol-title {
+    color: #b91c1c;
+}
+
+
+.clock-time {
+    font-size: 14.5px;
+    font-weight: 900;
+    color: #0f172a;
+    font-family: monospace;
+    margin: 3px 0;
+}
+
+
+.clock-date {
+    font-size: 9px;
+    color: #475569;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   CHART GRID
+========================================================= */
+
+.chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    width: 100%;
+    margin-bottom: 14px;
+}
+
+
+    /* =========================================================
+   CHART CARD
+========================================================= */
+
+    .chart-grid .card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 14px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        max-width: 100%;
+        width: 100%;
+    }
+
+
+    /* =========================================================
+   CHART HEADER
+========================================================= */
+
+    .chart-grid .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 8px;
+        margin-bottom: 10px;
+        gap: 10px;
+    }
+
+
+        .chart-grid .card-header h3 {
+            color: #7c3aed;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+        }
+
+
+    /* Second chart title */
+
+    .chart-grid .card:last-child
+    .card-header h3 {
+        color: #0284c7;
+    }
+
+
+    .chart-grid .card-header span {
+        font-size: 10px;
+        color: #64748b;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+
+/* =========================================================
+   CHART BOX
+========================================================= */
+
+.chart-box {
+    height: 220px;
+    position: relative;
+    width: 100%;
+}
+
+
+    .chart-box canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1250px) {
+
+    .rt-metric-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+@media (max-width: 1100px) {
+
+    .projects-clock-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 900px) {
+
+    .chart-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .system-title {
+        font-size: 28px;
+    }
+
+
+    .platform-title {
+        font-size: 13px;
+    }
+}
+
+
+@media (max-width: 650px) {
+
+    body {
+        padding: 6px;
+    }
+
+
+    #mainApp {
+        padding: 10px;
+    }
+
+
+    .rt-metric-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .dual-clock-box {
+        grid-template-columns: 1fr;
+    }
+
+
+    .header-actions {
+        flex-wrap: wrap;
+    }
+
+
+    .ai-search input {
+        width: 140px;
+    }
+
+
+    .projects-status-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .chart-grid .card-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+
+/* =========================================================
+   ANIMATED BLUE GEAR
+   ========================================================= */
+
+.brand-icon {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-right: 10px;
+    color: #1677ff;
+    font-size: 32px;
+}
+
+    /* Continuous gear rotation */
+    .brand-icon i {
+        display: inline-block;
+        animation: gearRotate 4s linear infinite;
+        color: #1677ff;
+        filter: drop-shadow(0 0 5px rgba(22, 119, 255, 0.35));
+    }
+
+@keyframes gearRotate {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* =========================================================
+   COMPANY LOGO
+   ========================================================= */
+
+.company-logo {
+    width: 64px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-right: 14px;
+    overflow: hidden;
+}
+
+    .company-logo img {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        display: block;
+    }
+
+
+
+/* ==========================================
+   DASHBOARD MAIN CONTAINER - FINAL FIX
+========================================== */
+
+#mainApp.dashboard-page-wrapper {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 12px !important;
+    box-sizing: border-box !important;
+    border-radius: 12px;
+}
+
+    /* Keep all dashboard content within its container */
+    #mainApp.dashboard-page-wrapper,
+    #mainApp.dashboard-page-wrapper * {
+        box-sizing: border-box;
+    }
+
+/* Title bar: use the available width */
+#mainApp .dashboard-title-bar {
+    width: 100%;
+    margin-top: 0 !important;
+    margin-bottom: 16px !important;
+}
+
+/* Four KPI cards */
+#mainApp > div:nth-child(2) {
+    width: 100%;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+}
+
+/* Projects and clocks */
+#mainApp > div:nth-child(3) {
+    width: 100%;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+}
+
+/* Inventory and requisitions */
+#mainApp > div:nth-child(4) {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+}
+
+/* Both chart cards */
+#mainApp > div:nth-child(5) {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    margin-bottom: 0 !important;
+}
+
+    /* Prevent cards from exceeding their grid columns */
+    #mainApp > div:nth-child(2) > div,
+    #mainApp > div:nth-child(3) > div,
+    #mainApp > div:nth-child(4) > div,
+    #mainApp > div:nth-child(5) > div {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+/* Tablet */
+@media (max-width: 1000px) {
+    #mainApp > div:nth-child(2) {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    #mainApp > div:nth-child(3),
+    #mainApp > div:nth-child(4),
+    #mainApp > div:nth-child(5) {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    #mainApp.dashboard-page-wrapper {
+        padding: 8px !important;
+    }
+
+    #mainApp > div:nth-child(2),
+    #mainApp > div:nth-child(3),
+    #mainApp > div:nth-child(4),
+    #mainApp > div:nth-child(5) {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 10px !important;
+    }
+
+    #mainApp .dashboard-title-bar {
+        align-items: flex-start !important;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}

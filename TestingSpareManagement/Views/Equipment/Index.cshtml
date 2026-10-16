@@ -4,6 +4,10 @@
     ViewData["Title"] = "Equipment Consumables";
 }
 
+<link rel="stylesheet"
+      href="~/css/equipment-consumables.css"
+      asp-append-version="true" />
+
 <div class="equipment-page-wrapper">
 
     <!-- ========================================================= -->
@@ -157,7 +161,12 @@
                                     <div class="photo-thumb">
                                         @if (!string.IsNullOrEmpty(item.PhotoPath))
                                         {
-                                            <img src="@item.PhotoPath" alt="Photo" />
+                                            <img src="@item.PhotoPath"
+                                                 alt="Equipment Spare Photo"
+                                                 class="clickable-equipment-photo"
+                                                 title="Click to view full image"
+                                                 onclick="openEquipmentImage(this.src, this.alt)"
+                                                 loading="lazy" />
                                         }
                                         else
                                         {
@@ -212,6 +221,28 @@
                     }
                 </tbody>
             </table>
+            <div id="equipmentImageModal"
+                 class="equipment-image-modal"
+                 onclick="closeEquipmentImage(event)">
+
+                <button type="button"
+                        class="equipment-image-close"
+                        onclick="hideEquipmentImage()"
+                        aria-label="Close image">
+                    &times;
+                </button>
+
+                <div class="equipment-image-container">
+                    <img id="equipmentImageLarge"
+                         src=""
+                         alt="Equipment Spare Photo" />
+                </div>
+
+                <div id="equipmentImageCaption"
+                     class="equipment-image-caption">
+                    Equipment Spare Photo
+                </div>
+            </div>
         </div>
     </div>
 
@@ -543,5 +574,62 @@
                 printWindow.print();
             }, 500);
         }
+
+                function openEquipmentImage(imageUrl, imageAlt) {
+            if (!imageUrl) {
+                return;
+            }
+
+            const modal = document.getElementById("equipmentImageModal");
+            const largeImage = document.getElementById("equipmentImageLarge");
+            const caption = document.getElementById("equipmentImageCaption");
+
+            if (!modal || !largeImage) {
+                return;
+            }
+
+            largeImage.src = imageUrl;
+            largeImage.alt = imageAlt || "Equipment Spare Photo";
+
+            if (caption) {
+                caption.textContent = imageAlt || "Equipment Spare Photo";
+            }
+
+            modal.classList.add("active");
+            document.body.classList.add("equipment-image-modal-open");
+        }
+
+        // ==========================================
+        // CLOSE EQUIPMENT IMAGE
+        // ==========================================
+
+        function hideEquipmentImage() {
+            const modal = document.getElementById("equipmentImageModal");
+            const largeImage = document.getElementById("equipmentImageLarge");
+
+            if (modal) {
+                modal.classList.remove("active");
+            }
+
+            document.body.classList.remove("equipment-image-modal-open");
+
+            if (largeImage) {
+                largeImage.src = "";
+            }
+        }
+
+        // Close when clicking outside the image
+        function closeEquipmentImage(event) {
+            if (event.target.id === "equipmentImageModal") {
+                hideEquipmentImage();
+            }
+        }
+
+        // Close using Escape key
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                hideEquipmentImage();
+            }
+        });
     </script>
 }

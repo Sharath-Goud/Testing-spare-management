@@ -1,0 +1,500 @@
+﻿.master-connector-page {
+    padding: 4px;
+    width: 100%;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.page-title-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #dce3ec;
+    border-radius: 10px;
+    padding: 10px 15px;
+    margin-bottom: 14px;
+}
+
+
+    .page-title-bar h2 {
+        margin: 0;
+        font-size: 19px;
+        color: #1f2937;
+    }
+
+
+    .page-title-bar span {
+        display: block;
+        margin-top: 4px;
+        color: #7b8494;
+        font-size: 11px;
+    }
+
+
+.record-count {
+    background: #f3efff;
+    color: #6d28d9;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   SUCCESS
+   ========================================================= */
+
+.success-message {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #047857;
+    padding: 10px 14px;
+    border-radius: 7px;
+    margin-bottom: 12px;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   MAIN TWO COLUMN LAYOUT
+   ========================================================= */
+
+.master-layout {
+    display: grid;
+    grid-template-columns: 510px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+}
+
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.connector-form-card,
+.connector-report-card {
+    background: #ffffff;
+    border: 1px solid #dce3ec;
+    border-radius: 11px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   SECTION TITLE
+   ========================================================= */
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #edf0f4;
+    color: #111827;
+}
+
+
+    .section-title > span {
+        color: #7045d6;
+        font-size: 18px;
+    }
+
+
+    .section-title strong {
+        display: block;
+        font-size: 15px;
+    }
+
+
+    .section-title small {
+        display: block;
+        margin-top: 2px;
+        color: #9ca3af;
+        font-size: 10px;
+    }
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.connector-form-card form {
+    padding: 12px 14px 15px;
+}
+
+
+.form-group {
+    margin-bottom: 11px;
+}
+
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #374151;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+
+.form-control {
+    width: 100%;
+    height: 35px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 12px;
+    color: #1f2937;
+    background: #f9fafb;
+    box-sizing: border-box;
+}
+
+
+    .form-control:focus {
+        outline: none;
+        border-color: #7c3aed;
+        background: #ffffff;
+        box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+    }
+
+
+/* =========================================================
+   IMAGE PREVIEW
+   ========================================================= */
+
+.image-preview {
+    height: 105px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 7px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 11px;
+}
+
+
+    .image-preview img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 5px;
+    }
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.save-button,
+.cancel-button {
+    width: 100%;
+    height: 36px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+
+.save-button {
+    background: #8054e8;
+    color: #ffffff;
+}
+
+
+    .save-button:hover {
+        background: #6d3fd0;
+    }
+
+
+.cancel-button {
+    background: #64748b;
+    color: #ffffff;
+}
+
+
+    .cancel-button:hover {
+        background: #475569;
+    }
+
+
+/* =========================================================
+   REPORT
+   ========================================================= */
+
+.report-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    padding: 0 10px 10px;
+    box-sizing: border-box;
+}
+
+
+.connector-table {
+    width: 100%;
+    min-width: 1050px;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+
+    .connector-table thead {
+        background: #f1f5f9;
+    }
+
+
+    .connector-table th {
+        padding: 10px 8px;
+        text-align: left;
+        color: #475569;
+        font-size: 9px;
+        font-weight: 700;
+        white-space: nowrap;
+        border-bottom: 1px solid #dbe3ec;
+    }
+
+
+    .connector-table td {
+        padding: 8px;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: middle;
+        color: #374151;
+        white-space: nowrap;
+    }
+
+
+    .connector-table tbody tr:hover {
+        background: #fafbff;
+    }
+
+
+/* =========================================================
+   PHOTO
+   ========================================================= */
+
+.connector-photo,
+.photo-placeholder {
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+    object-fit: contain;
+    border: 1px solid #d5dce5;
+    background: #f8fafc;
+}
+
+
+.photo-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   ASSET
+   ========================================================= */
+
+.asset-key {
+    color: #7c3aed;
+    font-weight: 700;
+}
+
+
+.stock-safe {
+    color: #059669;
+}
+
+
+.stock-low {
+    color: #dc2626;
+}
+
+
+/* =========================================================
+   COST
+   ========================================================= */
+
+.cost-inr {
+    color: #059669;
+    font-weight: 700;
+}
+
+
+.cost-cny {
+    color: #f97316;
+    margin-top: 3px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status-safe,
+.status-danger {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+
+.status-safe {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+
+.status-danger {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+
+.edit-button,
+.delete-button {
+    border-radius: 5px;
+    padding: 5px 9px;
+    background: #ffffff;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+
+.edit-button {
+    border: 1px solid #818cf8;
+    color: #4f46e5;
+}
+
+
+.delete-button {
+    border: 1px solid #f87171;
+    color: #dc2626;
+}
+
+
+.edit-button:hover {
+    background: #eef2ff;
+}
+
+
+.delete-button:hover {
+    background: #fef2f2;
+}
+
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
+.empty-report {
+    text-align: center;
+    padding: 50px !important;
+    color: #94a3b8 !important;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   VALIDATION
+   ========================================================= */
+
+.validation-message {
+    color: #dc2626;
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1300px) {
+
+    .master-layout {
+        grid-template-columns: 420px minmax(0, 1fr);
+    }
+}
+
+
+@media (max-width: 1000px) {
+
+    .master-layout {
+        grid-template-columns: 1fr;
+    }
+}
+/* Pagination */
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border-top: 1px solid #eee;
+}
+
+.page-btn {
+    background: #e7e3f5;
+    color: #6f42c1;
+    border: 1px solid #d0c4ec;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+    .page-btn:hover {
+        background: #6f42c1;
+        color: white;
+    }
+
+.page-info {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Edit Button as Link */
+a.edit-button {
+    background: #e7e3f5;
+    color: #6f42c1;
+    border: 1px solid #d0c4ec;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+    a.edit-button:hover {
+        background: #6f42c1;
+        color: white;
+    }

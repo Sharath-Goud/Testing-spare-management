@@ -397,12 +397,15 @@
                                     <!-- PHOTO -->
 
                                     <td>
-
                                         @if (!string.IsNullOrEmpty(item.PhotoPath))
                                         {
                                             <img src="@item.PhotoPath"
-                                                 class="connector-photo"
-                                                 alt="Connector" />
+                                                 class="connector-photo clickable-connector-photo"
+                                                 alt="Connector Photo"
+                                                 title="Click to view full image"
+                                                 onclick="openConnectorImage(this.src, this.alt)"
+                                                 style="cursor: zoom-in;"
+                                                 loading="lazy" />
                                         }
                                         else
                                         {
@@ -410,7 +413,6 @@
                                                 Photo
                                             </div>
                                         }
-
                             </td>
 
 
@@ -557,7 +559,28 @@
                     </tbody>
 
                 </table>
+                <div id="connectorImageModal"
+                     class="connector-image-modal"
+                     onclick="closeConnectorImage(event)">
 
+                    <button type="button"
+                            class="connector-image-close"
+                            onclick="hideConnectorImage()"
+                            aria-label="Close image">
+                        &times;
+                    </button>
+
+                    <div class="connector-image-container">
+                        <img id="connectorImageLarge"
+                             src=""
+                             alt="Full Connector Image" />
+                    </div>
+
+                    <div class="connector-image-caption"
+                         id="connectorImageCaption">
+                        Connector Photo
+                    </div>
+                </div>
             </div>
 
 
@@ -666,5 +689,62 @@
             form.submit();
         }
 
+
+        function openConnectorImage(imageUrl, imageAlt) {
+            if (!imageUrl) {
+                return;
+            }
+
+            const modal = document.getElementById("connectorImageModal");
+            const largeImage = document.getElementById("connectorImageLarge");
+            const caption = document.getElementById("connectorImageCaption");
+
+            if (!modal || !largeImage) {
+                return;
+            }
+
+            largeImage.src = imageUrl;
+            largeImage.alt = imageAlt || "Connector Photo";
+
+            if (caption) {
+                caption.textContent = imageAlt || "Connector Photo";
+            }
+
+            modal.classList.add("active");
+            document.body.classList.add("connector-image-modal-open");
+        }
+
+        // ==========================================
+        // CLOSE CONNECTOR IMAGE
+        // ==========================================
+
+        function hideConnectorImage() {
+            const modal = document.getElementById("connectorImageModal");
+            const largeImage = document.getElementById("connectorImageLarge");
+
+            if (modal) {
+                modal.classList.remove("active");
+            }
+
+            document.body.classList.remove("connector-image-modal-open");
+
+            if (largeImage) {
+                largeImage.src = "";
+            }
+        }
+
+        // Close when clicking the dark background
+        function closeConnectorImage(event) {
+            if (event.target.id === "connectorImageModal") {
+                hideConnectorImage();
+            }
+        }
+
+        // Close when pressing Escape
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                hideConnectorImage();
+            }
+        });
     </script>
 }

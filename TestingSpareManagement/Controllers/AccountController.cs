@@ -90,6 +90,7 @@ namespace TestingSpareManagement.Controllers
         // LOGIN - POST
         // =========================================================
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -100,47 +101,116 @@ namespace TestingSpareManagement.Controllers
             }
 
             string employeeId = model.EmployeeId.Trim();
-
             string password = model.Password;
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(x =>
-                    x.EmployeeId == employeeId &&
-                    x.Password == password &&
-                    x.IsActive
-                );
+            var connection = _context.Database.GetDbConnection();
 
-            if (user == null)
+            bool closeConnection =
+                connection.State != System.Data.ConnectionState.Open;
+
+            try
+            {
+                if (closeConnection)
+                {
+                    await connection.OpenAsync();
+                }
+
+                await using var command = connection.CreateCommand();
+
+                command.CommandText = @"
+            SELECT TOP (1)
+                Id,
+                EmployeeId,
+                FullName,
+                PasswordHash,
+                [Role]
+            FROM dbo.SystemUsers
+            WHERE EmployeeId = @EmployeeId
+              AND IsActive = 1;";
+
+                var parameter = command.CreateParameter();
+                parameter.ParameterName = "@EmployeeId";
+                parameter.Value = employeeId;
+                parameter.DbType = System.Data.DbType.String;
+                parameter.Size = 50;
+                command.Parameters.Add(parameter);
+
+                int userId;
+                string dbEmployeeId;
+                string employeeName;
+                string storedPassword;
+                string role;
+
+                await using (var reader = await command.ExecuteReaderAsync())
+                {
+                    if (!await reader.ReadAsync())
+                    {
+                        ModelState.AddModelError(
+                            string.Empty,
+                            "Invalid Employee ID or Password.");
+
+                        return View(model);
+                    }
+
+                    userId = Convert.ToInt32(reader["Id"]);
+                    dbEmployeeId = reader["EmployeeId"].ToString() ?? "";
+                    employeeName = reader["FullName"].ToString() ?? "";
+                    storedPassword = reader["PasswordHash"].ToString() ?? "";
+                    role = reader["Role"] == DBNull.Value
+                        ? ""
+                        : reader["Role"].ToString()?.Trim() ?? "";
+                }
+
+                // Existing database values appear to be plain-text passwords.
+                // This comparison matches that current storage format.
+                if (!string.Equals(
+                        password, storedPassword, StringComparison.Ordinal))
+                {
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "Invalid Employee ID or Password.");
+
+                    return View(model);
+                }
+
+                if (!string.Equals(role, "Admin",
+                        StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(role, "Employee",
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "Your account does not have a valid role. Please contact the administrator.");
+
+                    return View(model);
+                }
+
+                // Save authenticated user details in Session.
+                HttpContext.Session.SetInt32("UserId", userId);
+                HttpContext.Session.SetString("EmployeeId", dbEmployeeId);
+                HttpContext.Session.SetString("EmployeeName", employeeName);
+                HttpContext.Session.SetString("Role", role);
+
+                return RedirectToAction("Index", "Dashboard");
+            }
+            catch (Exception)
             {
                 ModelState.AddModelError(
                     string.Empty,
-                    "Invalid Employee ID or Password."
-                );
+                    "Unable to process login right now. Please try again.");
 
                 return View(model);
             }
-
-            // Store login information in Session
-            HttpContext.Session.SetInt32(
-                "UserId",
-                user.Id
-            );
-
-            HttpContext.Session.SetString(
-                "EmployeeId",
-                user.EmployeeId
-            );
-
-            HttpContext.Session.SetString(
-                "EmployeeName",
-                user.EmployeeName
-            );
-
-            return RedirectToAction(
-                "Index",
-                "Dashboard"
-            );
+            finally
+            {
+                if (closeConnection &&
+                    connection.State == System.Data.ConnectionState.Open)
+                {
+                    await connection.CloseAsync();
+                }
+            }
         }
+
 
         // =========================================================
         // LOGOUT

@@ -33,6 +33,15 @@
 
 <body>
 
+
+    @{
+        var userRole = Context.Session.GetString("Role") ?? "Employee";
+        var isAdmin = string.Equals(
+        userRole,
+        "Admin",
+        StringComparison.OrdinalIgnoreCase);
+    }
+
     <!-- ========================================================= -->
     <!-- TOP HEADER -->
     <!-- ========================================================= -->
@@ -281,23 +290,22 @@
                 <!-- ================================================= -->
                 <!-- BUDGET & EXPENDITURE                               -->
                 <!-- ================================================= -->
-
-                <button class="sidebar-item admin-only
-           @(ViewContext.RouteData.Values["controller"]?.ToString() == "Budget"
-                                                                                                                                               ? "active"
-                                                                                                                                               : "")"
+                @if (isAdmin)
+                {
+                    <button class="sidebar-item
+                        @(ViewContext.RouteData.Values["controller"]?.ToString() == "Budget"
+                                        ? "active" : "")"
                         type="button"
                         onclick="window.location.href='@Url.Action("Index", "Budget")'">
 
-                    <span class="sidebar-icon sidebar-purple">
-                        <i class="fa-solid fa-chart-line"></i>
-                    </span>
+                        <span class="sidebar-icon sidebar-purple">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </span>
 
-                    <span class="sidebar-text">
-                        Budget & Expenditure
-                    </span>
+                        <span class="sidebar-text">Budget &amp; Expenditure</span>
+                    </button>
+                                }
 
-                </button>
 
 
                 <!-- ================================================= -->
@@ -325,59 +333,57 @@
                 <!-- ================================================= -->
                 <!-- PR & PO TRACKER                                    -->
                 <!-- ================================================= -->
-
-                <button class="sidebar-item admin-only
-           @(ViewContext.RouteData.Values["controller"]?.ToString() == "PrPoTracker"
-                                                                                                                                               ? "active"
-                                                                                                                                               : "")"
+                @if (isAdmin)
+                {
+                    <button class="sidebar-item admin-only
+                        @(ViewContext.RouteData.Values["controller"]?.ToString() == "PrPoTracker"
+                                                                                                                                                                           ? "active"
+                                                                                                                                                                           : "")"
                         type="button"
                         onclick="window.location.href='@Url.Action("Index", "PrPoTracker")'">
 
-                    <span class="sidebar-icon sidebar-red">
-                        <i class="fa-solid fa-cart-shopping"></i>
-                    </span>
+                        <span class="sidebar-icon sidebar-red">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                        </span>
 
-                    <span class="sidebar-text">
-                        PR & PO Tracker
-                    </span>
+                        <span class="sidebar-text">
+                            PR & PO Tracker
+                        </span>
 
-                </button>
-
+                    </button>
+                }
             </div>
 
 
-            <!-- ================================================= -->
-            <!-- USER -->
-            <!-- ================================================= -->
-
             <div class="sidebar-section">
 
-                <div class="sidebar-section-title">
-                    USER
-                </div>
+                @if (isAdmin)
+                {
+                    <div class="sidebar-section-title">
+                        USER
+                    </div>
+                }
+                
 
-
-                <!-- ================================================= -->
-                <!-- PROFILE & USER SETTINGS                            -->
-                <!-- ================================================= -->
-
-                <button class="sidebar-item admin-only
-           @(ViewContext.RouteData.Values["controller"]?.ToString() == "Profile"
-                                                                                                                                               ? "active"
-                                                                                                                                               : "")"
+                @if (isAdmin)
+                {
+                    <button class="sidebar-item admin-only
+                        @(ViewContext.RouteData.Values["controller"]?.ToString() == "Profile"
+                               ? "active"
+                                : "")"
                         type="button"
                         onclick="window.location.href='@Url.Action("Index", "Profile")'">
 
-                    <span class="sidebar-icon sidebar-purple">
-                        <i class="fa-solid fa-user-gear"></i>
-                    </span>
+                        <span class="sidebar-icon sidebar-purple">
+                            <i class="fa-solid fa-user-gear"></i>
+                        </span>
 
-                    <span class="sidebar-text">
-                        Profile & User Settings
-                    </span>
+                        <span class="sidebar-text">
+                            Profile & User Settings
+                        </span>
 
-                </button>
-
+                    </button>
+                }
             </div>
 
 
@@ -403,10 +409,6 @@
 
                     </div>
 
-                </div>
-
-                <div class="sidebar-version">
-                    v1.0.0
                 </div>
 
             </div>
