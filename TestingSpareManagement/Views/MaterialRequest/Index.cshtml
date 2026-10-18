@@ -27,28 +27,61 @@
         <form asp-controller="MaterialRequest" asp-action="Submit" method="post">
             @Html.AntiForgeryToken()
 
-            <!-- Calendar Section -->
+
+            <!-- Interactive Calendar - Material Request -->
             <div class="form-group">
-                <label><i class="fa-solid fa-calendar-days"></i> Select Request Date</label>
-                <div class="calendar-header">
-                    <button type="button"><i class="fa-solid fa-chevron-left"></i> Prev</button>
-                    <span>@Model.RequestDate.ToString("MMMM yyyy")</span>
-                    <button type="button">Next <i class="fa-solid fa-chevron-right"></i></button>
+                <label>
+                    <i class="fa-solid fa-calendar-days"></i>
+                    Select Request Date
+                </label>
+
+                <div class="calendar-widget">
+                    <div class="cal-header">
+                        <button type="button" onclick="changeRequestCalendarMonth(-1)">
+                            ◀ Prev
+                        </button>
+
+                        <span id="requestCalTitle">
+                            @Model.RequestDate.ToString("MMMM yyyy")
+                        </span>
+
+                        <button type="button" onclick="changeRequestCalendarMonth(1)">
+                            Next ▶
+                        </button>
+                    </div>
+
+                    <div class="cal-grid" id="requestCalCells"></div>
                 </div>
 
-                <input asp-for="RequestDate" type="date" class="form-control-custom" style="margin-top: 8px;" />
+                <input asp-for="RequestDate"
+                       type="date"
+                       id="requestDateInput"
+                       class="form-control-custom"
+                       style="margin-top: 8px;" />
+
+                <span asp-validation-for="RequestDate"
+                      class="text-danger small"></span>
             </div>
 
+
             <!-- Target Project Code -->
+
             <div class="form-group">
-                <label><i class="fa-solid fa-folder"></i> Target Project Code</label>
-                <select asp-for="ProjectCode" class="form-control-custom">
-                    <option value="A246F">A246F</option>
-                    <option value="B112G">B112G</option>
-                    <option value="C089H">C089H</option>
+                <label>
+                    <i class="fa-solid fa-folder"></i>
+                    Target Project Code
+                </label>
+
+                <select asp-for="ProjectCode"
+                        asp-items="Model.ProjectCodes"
+                        class="form-control-custom">
+                    <option value="">-- Select Project Code --</option>
                 </select>
-                <span asp-validation-for="ProjectCode" class="text-danger small"></span>
+
+                <span asp-validation-for="ProjectCode"
+                      class="text-danger small"></span>
             </div>
+
 
             <!-- Spare Description -->
             <div class="form-group">
@@ -71,15 +104,28 @@
             </div>
 
             <!-- Machine / Target Station -->
+
             <div class="form-group">
-                <label>Machine / Target Station</label>
+                <label>
+                    <i class="fa-solid fa-gears"></i>
+                    Machine / Target Station
+                </label>
+
                 <select asp-for="TargetMachine" class="form-control-custom">
                     <option value="OS">OS</option>
                     <option value="ATE">ATE</option>
+                    <option value="AOI">AOI</option>
+                    <option value="APP">APP</option>
+                    <option value="RFID">RFID</option>
                     <option value="FCT">FCT</option>
+                    <option value="EUT">EUT</option>
+                    <option value="Others">Others</option>
                 </select>
-                <span asp-validation-for="TargetMachine" class="text-danger small"></span>
+
+                <span asp-validation-for="TargetMachine"
+                      class="text-danger small"></span>
             </div>
+
 
             <!-- Requested Quantity -->
             <div class="form-group">
@@ -88,15 +134,21 @@
                 <span asp-validation-for="RequestedQuantity" class="text-danger small"></span>
             </div>
 
+
             <!-- Priority Level -->
             <div class="form-group">
                 <label>Requirement Priority Level</label>
+
                 <select asp-for="PriorityLevel" class="form-control-custom">
                     <option value="Normal Reorder">Normal Reorder</option>
-                    <option value="Urgent">Urgent</option>
-                    <option value="Critical">Critical</option>
+                    <option value="HIGH - Line Down Risk">HIGH - Line Down Risk </option>
+                    <option value="URGENT CRITICAL">URGENT CRITICAL</option>
                 </select>
+
+                <span asp-validation-for="PriorityLevel"
+                      class="text-danger small"></span>
             </div>
+
 
             <!-- Justification -->
             <div class="form-group">
@@ -135,63 +187,119 @@
                         <th>PRIORITY</th>
                         <th>STATUS</th>
                         <th>ADMIN ACTIONS</th>
-                        <th>ACTIONS</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     @if (Model.Requests != null && Model.Requests.Any())
                     {
                         foreach (var item in Model.Requests)
                         {
+                            var isPending =
+                            item.Status == "Pending Admin Approval" ||
+                            item.Status == "Pending" ||
+                            string.IsNullOrWhiteSpace(item.Status);
+
                             <tr>
                                 <td><strong>@item.ReqId</strong></td>
+
                                 <td>@item.RequestDate.ToString("yyyy-MM-dd")</td>
-                                <td>@item.ProjectCode</td>
+
+                                <td><strong class="request-project">@item.ProjectCode</strong></td>
+
                                 <td>@item.RequestedBy</td>
-                                <td>@item.SpareDescription</td>
+
+                                <td><strong class="request-description">@item.SpareDescription</strong></td>
+
                                 <td>@item.PartNumber</td>
+
                                 <td>@item.Brand</td>
+
                                 <td>@item.TargetMachine</td>
-                                <td><strong>@item.RequestedQuantity</strong></td>
+
+                                <td> <strong class="request-quantity">@item.RequestedQuantity</strong></td>
+
                                 <td>
-                                    @if (item.PriorityLevel == "Urgent" || item.PriorityLevel == "Critical")
+                                    @if (item.PriorityLevel == "Urgent" ||
+                                                                item.PriorityLevel == "Critical")
                                     {
-                                        <span class="priority-urgent">@item.PriorityLevel</span>
+                                        <span class="priority-urgent">
+                                            @item.PriorityLevel
+                                        </span>
                                     }
                                     else
                                     {
-                                        <span class="priority-normal">@item.PriorityLevel</span>
+                                        <span class="priority-normal">
+                                            @item.PriorityLevel
+                                        </span>
                                     }
                                 </td>
+
+
                                 <td>
-                                    @if (item.Status == "Approved & PR Created")
+                                    @if (item.Status == "Approved" ||
+                                                                item.Status == "Approved & PR Created")
                                     {
-                                        <span class="status-badge status-approved">@item.Status</span>
+                                        <span class="status-badge status-approved">
+                                            Approved 
+                                        </span>
                                     }
                                     else if (item.Status == "Rejected")
                                     {
-                                        <span class="status-badge status-rejected">@item.Status</span>
+                                        <span class="status-badge status-rejected">
+                                            Rejected 
+                                        </span>
                                     }
                                     else
                                     {
-                                        <span class="status-badge status-pending">@item.Status</span>
+                                        <span class="status-badge status-pending">
+                                            @item.Status
+                                        </span>
                                     }
                                 </td>
-                                <td>@item.AdminActions</td>
-                                <td>
-                                    <button type="button" class="btn-matrix-del"
-                                            onclick="deleteRequest(@item.Id)"
-                                            title="Delete Request">
-                                        <i class="fa-solid fa-trash"></i> Del
-                                    </button>
+
+                                <td class="admin-action-cell">
+                                    @if (item.Status == "Pending Admin Approval" ||
+                                                                item.Status == "Pending" ||
+                                                                string.IsNullOrWhiteSpace(item.Status))
+                                    {
+                                        <div class="admin-action-buttons">
+                                            <form asp-controller="MaterialRequest"
+                                                  asp-action="Approve"
+                                                  method="post"
+                                                  onsubmit="return confirm('Approve this material request?');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <button type="submit" class="btn-admin-approve">
+                                                    <i class="fa-solid fa-check"></i> Approve
+                                                </button>
+                                            </form>
+
+                                            <form asp-controller="MaterialRequest"
+                                                  asp-action="Reject"
+                                                  method="post"
+                                                  onsubmit="return confirm('Reject this material request?');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <button type="submit" class="btn-admin-reject">
+                                                    <i class="fa-solid fa-xmark"></i> Reject
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="admin-action-completed">Processed</span>
+                                    }
                                 </td>
+
                             </tr>
                         }
                     }
                     else
                     {
                         <tr>
-                            <td colspan="13">
+                            <td colspan="12">
                                 <div class="empty-state">
                                     <i class="fa-solid fa-inbox"></i>
                                     No material requests found. Submit a request using the form.
@@ -200,6 +308,7 @@
                         </tr>
                     }
                 </tbody>
+
             </table>
         </div>
     </div>
@@ -248,5 +357,138 @@
             document.body.appendChild(form);
             form.submit();
         }
+
+
+        /* ==========================================
+           MATERIAL REQUEST INTERACTIVE CALENDAR
+           ========================================== */
+
+        (function () {
+            const dateInput = document.getElementById("requestDateInput");
+            const title = document.getElementById("requestCalTitle");
+            const cells = document.getElementById("requestCalCells");
+
+            if (!dateInput || !title || !cells) return;
+
+            // Initialize from the selected request date.
+            // Fall back to today's local date if no date is available.
+            function getLocalDateString(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, "0");
+                const day = String(date.getDate()).padStart(2, "0");
+
+                return `${year}-${month}-${day}`;
+            }
+
+            let initialDate = dateInput.value
+                ? dateInput.value.split("T")[0]
+                : getLocalDateString(new Date());
+
+            if (!dateInput.value) {
+                dateInput.value = initialDate;
+            }
+
+            const initialParts = initialDate.split("-").map(Number);
+
+            let calYear = initialParts[0];
+            let calMonth = initialParts[1] - 1;
+
+            function renderRequestCalendar() {
+                const monthNames = [
+                    "January", "February", "March", "April",
+                    "May", "June", "July", "August",
+                    "September", "October", "November", "December"
+                ];
+
+                title.textContent = `${monthNames[calMonth]} ${calYear}`;
+
+                const firstDay = new Date(calYear, calMonth, 1).getDay();
+                const totalDays = new Date(calYear, calMonth + 1, 0).getDate();
+                const selectedDate = dateInput.value;
+
+                const dayNames = ["S", "M", "T", "W", "T", "F", "S"];
+
+                let html = dayNames
+                    .map(day => `<div class="cal-day-name">${day}</div>`)
+                    .join("");
+
+                for (let i = 0; i < firstDay; i++) {
+                    html += '<div class="cal-cell empty"></div>';
+                }
+
+                for (let day = 1; day <= totalDays; day++) {
+                    const mm = String(calMonth + 1).padStart(2, "0");
+                    const dd = String(day).padStart(2, "0");
+                    const dateStr = `${calYear}-${mm}-${dd}`;
+
+                    const isSelected = dateStr === selectedDate;
+                    const isToday = dateStr === getLocalDateString(new Date());
+
+                    const classes = [
+                        "cal-cell",
+                        isSelected ? "selected" : "",
+                        isToday ? "today" : ""
+                    ].filter(Boolean).join(" ");
+
+                    html += `
+                        <button type="button"
+                                class="${classes}"
+                                data-date="${dateStr}"
+                                aria-pressed="${isSelected}">
+                            ${day}
+                        </button>`;
+                }
+
+                cells.innerHTML = html;
+            }
+
+            // Previous / Next month buttons
+            window.changeRequestCalendarMonth = function (direction) {
+                const nextMonth = new Date(
+                    calYear,
+                    calMonth + direction,
+                    1
+                );
+
+                calYear = nextMonth.getFullYear();
+                calMonth = nextMonth.getMonth();
+
+                renderRequestCalendar();
+            };
+
+            // Select a date from the calendar
+            cells.addEventListener("click", function (event) {
+                const button = event.target.closest("button[data-date]");
+
+                if (!button) return;
+
+                dateInput.value = button.dataset.date;
+
+                const parts = dateInput.value.split("-").map(Number);
+                calYear = parts[0];
+                calMonth = parts[1] - 1;
+
+                dateInput.dispatchEvent(new Event("change", {
+                    bubbles: true
+                }));
+
+                renderRequestCalendar();
+            });
+
+            // Also synchronize when the user changes the native date input.
+            dateInput.addEventListener("change", function () {
+                if (!this.value) return;
+
+                const parts = this.value.split("-").map(Number);
+
+                calYear = parts[0];
+                calMonth = parts[1] - 1;
+
+                renderRequestCalendar();
+            });
+
+            renderRequestCalendar();
+        })();
+
     </script>
 }

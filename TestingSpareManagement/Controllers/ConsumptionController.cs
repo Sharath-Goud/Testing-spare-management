@@ -67,7 +67,7 @@ namespace TestingSpareManagement.Controllers
             // Load dropdown data
             model.ProjectCodes = await GetProjectCodes();
             model.EquipmentStations = await GetEquipmentStations();
-            model.DriEngineers = await GetDriEngineers();
+            //model.DriEngineers = await GetDriEngineers();
             model.LineTargets = await GetLineTargets();
 
             return View(model);
@@ -515,26 +515,39 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // PRIVATE: GET DROPDOWN DATA
-        // =====================================================
+
         private async Task<List<string>> GetProjectCodes()
         {
             var list = new List<string>();
             string connectionString = GetConnectionString();
-            try
+
+            using SqlConnection connection = new SqlConnection(connectionString);
+
+            string query = @"
+        SELECT ProjectCode
+        FROM dbo.ProjectMaster
+        WHERE IsActive = 1
+        ORDER BY ProjectCode;";
+
+            using SqlCommand command = new SqlCommand(query, connection);
+
+            await connection.OpenAsync();
+
+            using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
             {
-                using SqlConnection connection = new SqlConnection(connectionString);
-                using SqlCommand command = new SqlCommand(
-                    "SELECT ProjectCode FROM ProjectMaster ORDER BY ProjectCode", connection);
-                await connection.OpenAsync();
-                using SqlDataReader reader = await command.ExecuteReaderAsync();
-                while (await reader.ReadAsync())
-                    list.Add(reader["ProjectCode"].ToString() ?? "");
+                string projectCode = reader["ProjectCode"]?.ToString() ?? "";
+
+                if (!string.IsNullOrWhiteSpace(projectCode))
+                {
+                    list.Add(projectCode);
+                }
             }
-            catch { }
+
             return list;
         }
+
 
         private async Task<List<string>> GetEquipmentStations()
         {
@@ -625,7 +638,7 @@ namespace TestingSpareManagement.Controllers
             model.AvailableDates = await GetDistinctConsumptionDates();
             model.ProjectCodes = await GetProjectCodes();
             model.EquipmentStations = await GetEquipmentStations();
-            model.DriEngineers = await GetDriEngineers();
+            //model.DriEngineers = await GetDriEngineers();
             model.LineTargets = await GetLineTargets();
         }
 

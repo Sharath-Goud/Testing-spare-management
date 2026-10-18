@@ -511,27 +511,28 @@
                                         }
 
                                     </td>
-
-
+                                    
                                     <!-- ACTIONS -->
-
                                     <td>
-
                                         <div class="action-buttons">
 
-                                            <a href="@Url.Action("Edit", "MasterConnector", new { id = item.Id, pageNumber = Model.CurrentPage, pageSize = Model.PageSize })"
+                                            <a href="@Url.Action("Edit", "MasterConnector",
+                                                     new { id = item.Id,
+                                                           pageNumber = Model.CurrentPage,
+                                                           pageSize = Model.PageSize })"
                                                class="edit-button">
-                                                ✏ Edit
+                                                <span class="action-icon edit-pencil" aria-hidden="true">✏</span>
+                                                <span>Edit</span>
                                             </a>
 
                                             <button type="button"
                                                     class="delete-button"
                                                     onclick="deleteConnector(@item.Id)">
-                                                🗑 Del
+                                                <span class="action-icon">🗑</span>
+                                                <span>Del</span>
                                             </button>
 
                                         </div>
-
                                     </td>
 
                                 </tr>

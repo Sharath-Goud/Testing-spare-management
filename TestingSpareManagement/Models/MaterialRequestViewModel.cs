@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -60,6 +61,9 @@ namespace TestingSpareManagement.Models
 
         // Table Data
         public List<MaterialRequestItem> Requests { get; set; } = new List<MaterialRequestItem>();
+
+        public List<SelectListItem> ProjectCodes { get; set; }
+    = new List<SelectListItem>();
     }
 
 

@@ -47,15 +47,25 @@
                 <span asp-validation-for="TestItemName" class="text-danger small"></span>
             </div>
 
+
             <div class="form-group">
                 <label>Target Test Equipment Station</label>
+
                 <select asp-for="TargetStation" class="form-control-custom">
                     <option value="OS">OS</option>
                     <option value="ATE">ATE</option>
                     <option value="AOI">AOI</option>
+                    <option value="APP">APP</option>
+                    <option value="RFID">RFID</option>
                     <option value="FCT">FCT</option>
+                    <option value="EUT">EUT</option>
+                    <option value="Others">Others</option>
                 </select>
+
+                <span asp-validation-for="TargetStation"
+                      class="text-danger small"></span>
             </div>
+
 
             <div class="form-group">
                 <label><i class="fa-solid fa-boxes-stacked"></i> Spare Bin / Storage Location</label>
@@ -175,7 +185,22 @@
                                     </div>
                                 </td>
                                 <td><span class="project-code">@item.ProjectCode</span></td>
-                                <td><strong>@item.TestItemName</strong></td>
+                                <td>
+                                    <button type="button"
+                                            class="equipment-history-link"
+                                            data-id="@item.Id"
+                                            data-name="@item.TestItemName"
+                                            data-project="@item.ProjectCode"
+                                            data-equipment="@item.AssignedEquipment"
+                                            data-location="@item.StorageLocation"
+                                            data-price="@item.UnitPriceINR.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
+                                            data-quantity="@item.AvailableQuantity"
+                                            data-cycles="@item.SpecCycles"
+                                            data-photo="@item.PhotoPath"
+                                            onclick="openPurchaseHistory(this)">
+                                        @item.TestItemName
+                                    </button>
+                                </td>
                                 <td>@item.AssignedEquipment</td>
                                 <td><span class="storage-location">@item.StorageLocation</span></td>
                                 <td><span class="available-qty">@item.AvailableQuantity Sets</span></td>
@@ -244,6 +269,130 @@
                 </div>
             </div>
         </div>
+
+
+        <!-- PURCHASE HISTORY MODAL -->
+        <div id="purchaseHistoryModal"
+             class="purchase-history-modal"
+             aria-hidden="true">
+
+            <div class="purchase-history-dialog"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-labelledby="purchaseHistoryTitle">
+
+                <div class="purchase-history-header">
+                    <h3 id="purchaseHistoryTitle">
+                        <span>📦</span>
+                        <span id="historyItemTitle">Purchase History</span>
+                    </h3>
+
+                    <button type="button"
+                            class="purchase-history-close"
+                            onclick="closePurchaseHistory()"
+                            aria-label="Close">
+                        &times;
+                    </button>
+                </div>
+
+                <div class="purchase-history-content">
+
+                    <!-- LEFT: ITEM DETAILS -->
+                    <section class="purchase-history-details">
+
+                        <div class="history-product-card">
+                            <div class="history-product-photo">
+                                <img id="historyItemPhoto"
+                                     src=""
+                                     alt="Equipment"
+                                     hidden />
+
+                                <span id="historyPhotoPlaceholder">
+                                    No Image
+                                </span>
+                            </div>
+
+                            <div class="history-product-info">
+                                <span class="history-eyebrow">
+                                    TARGET CONSUMABLE
+                                </span>
+
+                                <h4 id="historyItemName">—</h4>
+                            </div>
+                        </div>
+
+                        <div class="history-specifications">
+                            <h4>📊 Technical Specifications &amp; Parameters:</h4>
+
+                            <ul>
+                                <li>
+                                    <strong>Assigned Equipment:</strong>
+                                    <span id="historyEquipment">—</span>
+                                </li>
+                                <li>
+                                    <strong>Project Code:</strong>
+                                    <span id="historyProject">—</span>
+                                </li>
+                                <li>
+                                    <strong>Storage Location:</strong>
+                                    <span id="historyLocation">—</span>
+                                </li>
+                                <li>
+                                    <strong>Unit Cost:</strong>
+                                    <span id="historyPrice">—</span>
+                                </li>
+                                <li>
+                                    <strong>Available Quantity:</strong>
+                                    <span id="historyQuantity">—</span>
+                                </li>
+                                <li>
+                                    <strong>Specification Cycles:</strong>
+                                    <span id="historyCycles">—</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="history-tracking-note">
+                            <h4>💡 Deep Tracking Note:</h4>
+                            <p>
+                                Previous purchase records associated with
+                                this test item are displayed on the right.
+                            </p>
+                        </div>
+
+                    </section>
+
+                    <!-- RIGHT: PURCHASE HISTORY -->
+                    <section class="purchase-history-records">
+                        <h4>📋 Previous Purchase Records</h4>
+
+                        <div class="history-table-wrapper">
+                            <table class="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>DATE</th>
+                                        <th>PR NO</th>
+                                        <th>QTY</th>
+                                        <th>TOTAL COST</th>
+                                        <th>STATUS</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="purchaseHistoryRows">
+                                    <tr>
+                                        <td colspan="5" class="history-message">
+                                            Select an item to load purchase history.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+        </div>
+
     </div>
 
 </div>
@@ -631,5 +780,163 @@
                 hideEquipmentImage();
             }
         });
+
+
+
+        async function openPurchaseHistory(button) {
+            const modal = document.getElementById("purchaseHistoryModal");
+            const itemId = button.dataset.id;
+
+            document.getElementById("historyItemTitle").textContent =
+                button.dataset.name || "Purchase History";
+
+            document.getElementById("historyItemName").textContent =
+                button.dataset.name || "—";
+
+            document.getElementById("historyProject").textContent =
+                button.dataset.project || "—";
+
+            document.getElementById("historyEquipment").textContent =
+                button.dataset.equipment || "—";
+
+            document.getElementById("historyLocation").textContent =
+                button.dataset.location || "—";
+
+            document.getElementById("historyPrice").textContent =
+                "₹" + (button.dataset.price || "0.00");
+
+            document.getElementById("historyQuantity").textContent =
+                (button.dataset.quantity || "0") + " Sets";
+
+            document.getElementById("historyCycles").textContent =
+                button.dataset.cycles || "—";
+
+            const photo = document.getElementById("historyItemPhoto");
+            const placeholder = document.getElementById("historyPhotoPlaceholder");
+
+            photo.onerror = () => {
+                photo.hidden = true;
+                photo.removeAttribute("src");
+                placeholder.hidden = false;
+            };
+
+            if (button.dataset.photo) {
+                photo.src = button.dataset.photo;
+                photo.hidden = false;
+                placeholder.hidden = true;
+            } else {
+                photo.hidden = true;
+                photo.removeAttribute("src");
+                placeholder.hidden = false;
+            }
+
+            modal.classList.add("active");
+            modal.setAttribute("aria-hidden", "false");
+            document.body.classList.add("purchase-history-open");
+
+            const rows = document.getElementById("purchaseHistoryRows");
+            rows.replaceChildren();
+
+            const loadingRow = document.createElement("tr");
+            const loadingCell = document.createElement("td");
+            loadingCell.colSpan = 5;
+            loadingCell.className = "history-message";
+            loadingCell.textContent = "Loading purchase history...";
+            loadingRow.appendChild(loadingCell);
+            rows.appendChild(loadingRow);
+
+            try {
+                // This endpoint must return purchase history for this equipment ID.
+                const response = await fetch(
+                    '@Url.Action("PurchaseHistory", "Equipment")?id=' +
+                    encodeURIComponent(itemId),
+                    { headers: { "Accept": "application/json" } }
+                );
+
+                if (!response.ok) {
+                    throw new Error("Unable to retrieve purchase history.");
+                }
+
+                const records = await response.json();
+
+                // Ignore a response if the user has already opened another item.
+                if (!modal.classList.contains("active") ||
+                    document.getElementById("historyItemTitle").textContent !==
+                    (button.dataset.name || "Purchase History")) {
+                    return;
+                }
+
+                rows.replaceChildren();
+
+                if (!Array.isArray(records) || records.length === 0) {
+                    showHistoryMessage(rows, "No previous purchase records found.");
+                    return;
+                }
+
+                records.forEach(record => {
+                    const tr = document.createElement("tr");
+
+                    [
+                        record.date,
+                        record.prNo,
+                        record.quantity,
+                        record.totalCost,
+                        record.status
+                    ].forEach((value, index) => {
+                        const td = document.createElement("td");
+                        td.textContent = value ?? "—";
+
+                        if (index === 1) {
+                            td.className = "history-pr-number";
+                        }
+
+                        tr.appendChild(td);
+                    });
+
+                    rows.appendChild(tr);
+                });
+            } catch (error) {
+                rows.replaceChildren();
+                showHistoryMessage(
+                    rows,
+                    "Purchase history could not be loaded. Please check the server endpoint."
+                );
+                console.error(error);
+            }
+        }
+
+        function showHistoryMessage(tbody, message) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+
+            td.colSpan = 5;
+            td.className = "history-message";
+            td.textContent = message;
+
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+        }
+
+        function closePurchaseHistory() {
+            const modal = document.getElementById("purchaseHistoryModal");
+
+            modal.classList.remove("active");
+            modal.setAttribute("aria-hidden", "true");
+            document.body.classList.remove("purchase-history-open");
+        }
+
+        document.getElementById("purchaseHistoryModal")
+            .addEventListener("click", function (event) {
+                if (event.target === this) {
+                    closePurchaseHistory();
+                }
+            });
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                closePurchaseHistory();
+            }
+        });
+
     </script>
 }

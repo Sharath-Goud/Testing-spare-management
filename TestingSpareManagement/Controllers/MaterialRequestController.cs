@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using TestingSpareManagement.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
-// Aliases to avoid SqlDbType conflict
 using SqlDbType = System.Data.SqlDbType;
 using CommandType = System.Data.CommandType;
 using ParameterDirection = System.Data.ParameterDirection;
@@ -18,34 +18,50 @@ namespace TestingSpareManagement.Controllers
             _configuration = configuration;
         }
 
-        // =====================================================
-        // GET: MaterialRequest/Index
-        // =====================================================
+
         [HttpGet]
         public async Task<IActionResult> Index(
             int pageNumber = 1,
             int pageSize = 25)
         {
-            if (pageNumber < 1) pageNumber = 1;
+            if (pageNumber < 1)
+                pageNumber = 1;
 
             int[] allowedPageSizes = { 10, 25, 50, 100 };
-            if (!allowedPageSizes.Contains(pageSize)) pageSize = 25;
+
+            if (!allowedPageSizes.Contains(pageSize))
+                pageSize = 25;
 
             var model = new MaterialRequestViewModel
             {
                 RequestDate = DateTime.Today,
-                ProjectCode = "A246F",
                 CurrentPage = pageNumber,
                 PageSize = pageSize
             };
 
-            // Load paginated records
-            var (records, totalRecords) = await GetMaterialRequests(pageNumber, pageSize);
+            // Load active projects from ProjectMaster
+            model.ProjectCodes = await GetActiveProjectCodes();
+
+            // Select A246f by default if it is active
+            model.ProjectCode =
+                model.ProjectCodes.FirstOrDefault(p =>
+                    string.Equals(
+                        p.Value,
+                        "A246f",
+                        StringComparison.OrdinalIgnoreCase))
+                ?.Value
+                ?? model.ProjectCodes.FirstOrDefault()?.Value
+                ?? "";
+
+            // Load existing material request records
+            var (records, totalRecords) =
+                await GetMaterialRequests(pageNumber, pageSize);
+
             model.Requests = records;
             model.TotalRecords = totalRecords;
 
-            // If requested page doesn't exist, redirect to last valid page
-            if (model.TotalRecords > 0 && pageNumber > model.TotalPages)
+            if (model.TotalRecords > 0 &&
+                pageNumber > model.TotalPages)
             {
                 return RedirectToAction(nameof(Index), new
                 {
@@ -56,6 +72,7 @@ namespace TestingSpareManagement.Controllers
 
             return View(model);
         }
+
 
 
         // =====================================================
@@ -71,6 +88,7 @@ namespace TestingSpareManagement.Controllers
                 var (records, totalRecords) = await GetMaterialRequests(1, 25);
                 model.Requests = records;
                 model.TotalRecords = totalRecords;
+                model.ProjectCodes = await GetActiveProjectCodes();
                 return View("Index", model);
             }
 
@@ -84,7 +102,7 @@ namespace TestingSpareManagement.Controllers
             command.Parameters.Add("@RequestDate", SqlDbType.Date).Value = model.RequestDate;
             command.Parameters.Add("@ProjectCode", SqlDbType.NVarChar, 50).Value = model.ProjectCode;
 
-            string requestedBy = HttpContext.Session.GetString("EmployeeName") ?? "Unknown";
+            string requestedBy = HttpContext.Session.GetString("EmployeeId") ?? "Unknown";
             command.Parameters.Add("@RequestedBy", SqlDbType.NVarChar, 100).Value = requestedBy;
 
             command.Parameters.Add("@SpareDescription", SqlDbType.NVarChar, 250).Value = model.SpareDescription;
@@ -133,6 +151,93 @@ namespace TestingSpareManagement.Controllers
             TempData["SuccessMessage"] = "Material request deleted successfully.";
             return RedirectToAction(nameof(Index));
         }
+
+
+        // =====================================================
+        // POST: MaterialRequest/Approve
+        // =====================================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Approve(int id)
+        {
+            if (id <= 0)
+                return BadRequest();
+
+            using SqlConnection connection =
+                new SqlConnection(GetConnectionString());
+
+            string query = @"
+                UPDATE dbo.MaterialRequest
+                SET Status = 'Approved',
+                    AdminActions = 'Processed'
+                WHERE Id = @Id
+                  AND Status IN (
+                      'Pending',
+                      'Pending Admin Approval'
+                  );";
+
+            using SqlCommand command =
+                new SqlCommand(query, connection);
+
+            command.Parameters.Add("@Id", SqlDbType.Int).Value = id;
+
+            await connection.OpenAsync();
+
+            int rowsUpdated = await command.ExecuteNonQueryAsync();
+
+            if (rowsUpdated == 1)
+                TempData["SuccessMessage"] =
+                    "Material request approved successfully.";
+            else
+                TempData["ErrorMessage"] =
+                    "Request was not found or has already been processed.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        // =====================================================
+        // POST: MaterialRequest/Reject
+        // =====================================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reject(int id)
+        {
+            if (id <= 0)
+                return BadRequest();
+
+            using SqlConnection connection =
+                new SqlConnection(GetConnectionString());
+
+            string query = @"
+                UPDATE dbo.MaterialRequest
+                SET Status = 'Rejected',
+                    AdminActions = 'Processed'
+                WHERE Id = @Id
+                  AND Status IN (
+                      'Pending',
+                      'Pending Admin Approval'
+                  );";
+
+            using SqlCommand command =
+                new SqlCommand(query, connection);
+
+            command.Parameters.Add("@Id", SqlDbType.Int).Value = id;
+
+            await connection.OpenAsync();
+
+            int rowsUpdated = await command.ExecuteNonQueryAsync();
+
+            if (rowsUpdated == 1)
+                TempData["SuccessMessage"] =
+                    "Material request rejected successfully.";
+            else
+                TempData["ErrorMessage"] =
+                    "Request was not found or has already been processed.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
 
 
         // =====================================================
@@ -221,5 +326,46 @@ namespace TestingSpareManagement.Controllers
 
             return connectionString;
         }
+
+
+        private async Task<List<SelectListItem>> GetActiveProjectCodes()
+        {
+            var projects = new List<SelectListItem>();
+
+            using SqlConnection connection =
+                new SqlConnection(GetConnectionString());
+
+            string query = @"
+        SELECT ProjectCode
+        FROM dbo.ProjectMaster
+        WHERE IsActive = 1
+        ORDER BY ProjectCode;";
+
+            using SqlCommand command =
+                new SqlCommand(query, connection);
+
+            await connection.OpenAsync();
+
+            using SqlDataReader reader =
+                await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                string projectCode =
+                    reader["ProjectCode"]?.ToString() ?? "";
+
+                if (!string.IsNullOrWhiteSpace(projectCode))
+                {
+                    projects.Add(new SelectListItem
+                    {
+                        Value = projectCode,
+                        Text = projectCode
+                    });
+                }
+            }
+
+            return projects;
+        }
+
     }
 }

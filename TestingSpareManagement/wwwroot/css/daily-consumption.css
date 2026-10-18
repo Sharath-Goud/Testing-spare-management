@@ -681,3 +681,48 @@ main,
 .consumption-page-wrapper .history-table td:last-child {
     position: relative;
 }
+
+
+/* =====================================================
+   WRAP FULL ASSET KEY AND DRI NAME
+   ===================================================== */
+
+/* Asset Key - column 4 */
+.consumption-page-wrapper .history-table td.asset-key-cell {
+    width: 150px;
+    min-width: 150px;
+    max-width: 150px;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    line-height: 1.5;
+    vertical-align: top;
+    color: #7045d6;
+    font-weight: 700;
+}
+
+/* DRI Name & ID - column 8 */
+.consumption-page-wrapper .history-table td.dri-name-cell {
+    width: 165px;
+    min-width: 165px;
+    max-width: 165px;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    line-height: 1.5;
+    vertical-align: top;
+    color: #2563eb;
+    font-weight: 600;
+}
+
+/* Allow both column headers to wrap if necessary */
+.consumption-page-wrapper .history-table th:nth-child(4),
+.consumption-page-wrapper .history-table th:nth-child(8) {
+    white-space: normal !important;
+    line-height: 1.4;
+}
+
+/* Keep the other table columns unchanged */
+.consumption-page-wrapper .history-table td:not(.asset-key-cell):not(.dri-name-cell) {
+    white-space: nowrap;
+}
