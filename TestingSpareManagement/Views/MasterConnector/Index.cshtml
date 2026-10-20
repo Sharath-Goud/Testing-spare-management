@@ -11,11 +11,6 @@
 
 <div class="master-connector-page">
 
-
-    <!-- ===================================================== -->
-    <!-- PAGE HEADER -->
-    <!-- ===================================================== -->
-
     <div class="page-title-bar">
 
         <div>
@@ -53,13 +48,16 @@
         </div>
     }
 
+    @if (TempData["EmailWarning"] != null)
+    {
+        <div class="alert alert-warning" role="alert">
+            <strong>Email Notification:</strong>
+            @TempData["EmailWarning"]
+        </div>
+    }
 
     <div class="master-layout">
 
-
-        <!-- ================================================= -->
-        <!-- LEFT SIDE - ADD / MODIFY -->
-        <!-- ================================================= -->
 
         <div class="connector-form-card">
 
@@ -333,10 +331,6 @@
 
         </div>
 
-
-        <!-- ================================================= -->
-        <!-- RIGHT SIDE - REPORT -->
-        <!-- ================================================= -->
 
         <div class="connector-report-card">
 
@@ -714,10 +708,6 @@
             modal.classList.add("active");
             document.body.classList.add("connector-image-modal-open");
         }
-
-        // ==========================================
-        // CLOSE CONNECTOR IMAGE
-        // ==========================================
 
         function hideConnectorImage() {
             const modal = document.getElementById("connectorImageModal");

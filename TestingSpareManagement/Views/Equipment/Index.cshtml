@@ -10,9 +10,6 @@
 
 <div class="equipment-page-wrapper">
 
-    <!-- ========================================================= -->
-    <!-- LEFT PANEL: LINK SPARE / ADD REQUIREMENT                  -->
-    <!-- ========================================================= -->
     <div class="equipment-form-panel">
         <h5><i class="fa-solid fa-plus-circle"></i> Link Spare / Add Requirement</h5>
 
@@ -42,9 +39,64 @@
             </div>
 
             <div class="form-group">
-                <label>Test Item / Requirement Name</label>
-                <input asp-for="TestItemName" class="form-control-custom" placeholder="e.g. 180 Bend (453g)" />
-                <span asp-validation-for="TestItemName" class="text-danger small"></span>
+                <label for="TestItemName">
+                    <i class="fa-solid fa-microchip"></i>
+                    Test Item / Requirement Name
+                </label>
+
+                <select asp-for="TestItemName"
+                        id="TestItemName"
+                        class="form-control-custom">
+
+                    <option value="">-- Select Test Item / Requirement --</option>
+
+                    <!-- Bend / Twist Test Items -->
+                    <option value="180 Bend (453g)(TTF)">180 Bend (453g)(TTF)</option>
+                    <option value="180 Bend (225g)(TTF)">180 Bend (225g)(TTF)</option>
+                    <option value="Twist (to spec)">Twist (to spec)</option>
+
+                    <!-- OS -->
+                    <option value="C70">C70</option>
+                    <option value="OS-C70">OS-C70</option>
+                    <option value="OS-C70 - T1 Board / Connector C70">
+                        OS-C70 - T1 Board / Connector C70
+                    </option>
+
+                    <!-- ATE -->
+                    <option value="QT1">QT1</option>
+                    <option value="ATE-QT1">ATE-QT1</option>
+                    <option value="ATE-QT1 - DCR switch Board">
+                        ATE-QT1 - DCR switch Board
+                    </option>
+
+                    <option value="QT3">QT3</option>
+                    <option value="ATE-QT3">ATE-QT3</option>
+                    <option value="ATE-QT3 - HSIO lance Board">
+                        ATE-QT3 - HSIO lance Board
+                    </option>
+
+                    <!-- APP -->
+                    <option value="APP-C70">APP-C70</option>
+                    <option value="APP-C70 - TR_Board_A1.2轉接板">
+                        APP-C70 - TR_Board_A1.2轉接板
+                    </option>
+
+                    <!-- EUT -->
+                    <option value="EUT-C70">EUT-C70</option>
+                    <option value="EUT-C70 - Snoopy Board測試板8層板">
+                        EUT-C70 - Snoopy Board測試板8層板
+                    </option>
+
+                    <!-- FCT -->
+                    <option value="FCT-C70">FCT-C70</option>
+                    <option value="FCT-C70 - 6UP PCBA TypeC轉接板">
+                        FCT-C70 - 6UP PCBA TypeC轉接板
+                    </option>
+
+                </select>
+
+                <span asp-validation-for="TestItemName"
+                      class="text-danger small"></span>
             </div>
 
 
@@ -118,9 +170,6 @@
         </form>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- RIGHT PANEL: EQUIPMENT CONSUMABLES MATRIX                 -->
-    <!-- ========================================================= -->
     <div class="equipment-matrix-panel">
 
         <div class="matrix-header">
@@ -398,9 +447,6 @@
 </div>
 
 
-<!-- ========================================================= -->
-<!-- EDIT EQUIPMENT MODAL                                      -->
-<!-- ========================================================= -->
 <div class="modal fade" id="editEquipmentModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -507,9 +553,7 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        // =====================================================
-        // IMAGE PREVIEW
-        // =====================================================
+        
         function previewImage(input) {
             const preview = document.getElementById('previewImg');
             const placeholder = document.getElementById('previewPlaceholder');
@@ -533,9 +577,6 @@
             placeholder.style.display = 'flex';
         }
 
-        // =====================================================
-        // SEARCH
-        // =====================================================
         document.getElementById('matrixSearchInput').addEventListener('keyup', function () {
             const query = this.value.toLowerCase();
             const rows = document.querySelectorAll('#equipmentTable tbody tr');
@@ -546,9 +587,6 @@
             });
         });
 
-        // =====================================================
-        // EDIT - Open modal & fetch data
-        // =====================================================
         function openEditModal(id) {
             fetch('@Url.Action("Edit", "Equipment")/' + id)
                 .then(response => {
@@ -574,9 +612,6 @@
                 });
         }
 
-        // =====================================================
-        // DELETE
-        // =====================================================
         function deleteEquipment(id) {
             if (!confirm('Are you sure you want to delete this equipment?')) return;
 
@@ -603,9 +638,6 @@
             form.submit();
         }
 
-        // =====================================================
-        // EXPORT TO EXCEL (CSV - clean data, no buttons)
-        // =====================================================
         function exportToExcel() {
             const table = document.getElementById('equipmentTable');
             const dataRows = table.querySelectorAll('tbody tr');
@@ -649,9 +681,6 @@
             document.body.removeChild(link);
         }
 
-        // =====================================================
-        // EXPORT TO PDF (Clean - string concat to avoid Razor conflict)
-        // =====================================================
         function exportToPdf() {
             const table = document.getElementById('equipmentTable');
             const dataRows = table.querySelectorAll('tbody tr');
@@ -747,10 +776,6 @@
             modal.classList.add("active");
             document.body.classList.add("equipment-image-modal-open");
         }
-
-        // ==========================================
-        // CLOSE EQUIPMENT IMAGE
-        // ==========================================
 
         function hideEquipmentImage() {
             const modal = document.getElementById("equipmentImageModal");

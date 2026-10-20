@@ -22,9 +22,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // GET: Equipment/Index
-        // =====================================================
         [HttpGet]
         public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 25)
         {
@@ -44,10 +41,6 @@ namespace TestingSpareManagement.Controllers
             return View(model);
         }
 
-
-        // =====================================================
-        // POST: Equipment/Save
-        // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Save(EquipmentConsumableViewModel model)
@@ -103,9 +96,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // POST: Equipment/Update
-        // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(EquipmentConsumableViewModel model)
@@ -165,9 +155,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // GET: Equipment/Edit/5  (returns JSON for modal)
-        // =====================================================
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -192,9 +179,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // POST: Equipment/Delete
-        // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -218,10 +202,6 @@ namespace TestingSpareManagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
-        // =====================================================
-        // PRIVATE: GET BY ID
-        // =====================================================
         private async Task<EquipmentItem?> GetEquipmentById(int id)
         {
             string connectionString = GetConnectionString();
@@ -242,10 +222,6 @@ namespace TestingSpareManagement.Controllers
             return null;
         }
 
-
-        // =====================================================
-        // PRIVATE: GET PAGINATED
-        // =====================================================
         private async Task<(List<EquipmentItem> Records, int TotalRecords)>
             GetEquipments(int pageNumber, int pageSize)
         {
@@ -283,9 +259,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // PRIVATE: MAP SQL TO MODEL
-        // =====================================================
         private EquipmentItem MapEquipment(SqlDataReader reader)
         {
             return new EquipmentItem
@@ -309,10 +282,6 @@ namespace TestingSpareManagement.Controllers
             };
         }
 
-
-        // =====================================================
-        // PRIVATE: PHOTO UPLOAD
-        // =====================================================
         private async Task<string?> SavePhotoAsync(IFormFile photoFile)
         {
             const long maxSize = 5 * 1024 * 1024;
@@ -345,9 +314,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // PRIVATE: CONNECTION STRING
-        // =====================================================
         private string GetConnectionString()
         {
             string? connectionString = _configuration.GetConnectionString("DefaultConnection");
@@ -359,5 +325,103 @@ namespace TestingSpareManagement.Controllers
 
             return connectionString;
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> PurchaseHistory(int id)
+        {
+            if (id <= 0)
+                return BadRequest("Invalid equipment ID.");
+
+            try
+            {
+                // Get the selected equipment's actual project and item name.
+                var equipment = await GetEquipmentById(id);
+
+                if (equipment == null)
+                    return NotFound("Equipment item not found.");
+
+                var history = new List<object>();
+                string connectionString = GetConnectionString();
+
+                // Retrieve matching procurement history by year.
+                // Uses the existing PR/PO report stored procedure.
+                for (int year = 2000; year <= DateTime.Today.Year; year++)
+                {
+                    using SqlConnection connection =
+                        new SqlConnection(connectionString);
+
+                    using SqlCommand command =
+                        new SqlCommand("dbo.GetPrPoReport", connection);
+
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    command.Parameters.Add("@Year", SqlDbType.Int).Value = year;
+                    command.Parameters.Add("@PageNumber", SqlDbType.Int).Value = 1;
+                    command.Parameters.Add("@PageSize", SqlDbType.Int).Value = 10000;
+
+                    SqlParameter totalParam =
+                        command.Parameters.Add("@TotalRecords", SqlDbType.Int);
+
+                    totalParam.Direction = ParameterDirection.Output;
+
+                    await connection.OpenAsync();
+
+                    using SqlDataReader reader =
+                        await command.ExecuteReaderAsync();
+
+                    while (await reader.ReadAsync())
+                    {
+                        string projectCode =
+                            reader["ProjectCode"]?.ToString()?.Trim() ?? "";
+
+                        string assetTarget =
+                            reader["AssetTarget"]?.ToString()?.Trim() ?? "";
+
+                        // Both project and test item must match.
+                        if (!string.Equals(
+                                projectCode,
+                                equipment.ProjectCode?.Trim(),
+                                StringComparison.OrdinalIgnoreCase)
+                            ||
+                            !string.Equals(
+                                assetTarget,
+                                equipment.TestItemName?.Trim(),
+                                StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+
+                        DateTime requisitionDate =
+                            Convert.ToDateTime(reader["RequisitionDate"]);
+
+                        decimal totalCost =
+                            Convert.ToDecimal(reader["TotalCost"]);
+
+                        history.Add(new
+                        {
+                            date = requisitionDate.ToString("yyyy-MM-dd"),
+                            prNo = reader["PrNumber"]?.ToString() ?? "",
+                            quantity = Convert.ToInt32(reader["Quantity"]),
+                            totalCost = "₹" + totalCost.ToString("N2"),
+                            status = reader["PoStatus"]?.ToString() ?? ""
+                        });
+                    }
+                }
+
+                return Json(history);
+            }
+            catch (Exception ex)
+            {
+                // The actual exception will be available in the application log.
+                Console.Error.WriteLine(
+                    $"PurchaseHistory failed for equipment ID {id}: {ex}");
+
+                return StatusCode(
+                    500,
+                    new { message = "Unable to load purchase history." });
+            }
+        }
+
     }
 }

@@ -72,3 +72,4 @@ wwwroot\uploads\connectors\026d116e718b4a55967a9138b1e3c808.png
 wwwroot\uploads\connectors\63332f68e0984087ac5343b72333852f.png
 wwwroot\uploads\connectors\d4ed4958d2ec4b33b335fe4020de3193.png
 wwwroot\uploads\equipment\02b0e8e6654f494aa7495294f0261fc7.png
+wwwroot\uploads\equipment\ff84e52b38454c4aa3827adaeae470b2.png

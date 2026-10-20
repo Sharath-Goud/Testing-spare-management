@@ -6,7 +6,7 @@
 
 .prpo-page-wrapper {
     display: grid;
-    grid-template-columns: 420px minmax(0, 1fr);
+    grid-template-columns: 350px minmax(0, 1fr);
     align-items: start;
     gap: 10px;
     width: 100%;

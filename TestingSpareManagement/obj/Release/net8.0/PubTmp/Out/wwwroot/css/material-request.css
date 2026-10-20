@@ -1,11 +1,7 @@
 ﻿
-/* =========================================================
-   MATERIAL REQUEST - DAILY CONSUMPTION MATCHING DESIGN
-   ========================================================= */
-
 .material-request-page-wrapper {
     display: grid;
-    grid-template-columns: 420px minmax(0, 1fr);
+    grid-template-columns: 350px minmax(0, 1fr);
     align-items: start;
     gap: 10px;
     width: 100%;
@@ -14,10 +10,6 @@
     color: #1f2937;
     font-family: Arial, Helvetica, sans-serif;
 }
-
-    /* =========================================================
-   PANELS
-   ========================================================= */
 
     .material-request-page-wrapper .request-panel,
     .material-request-page-wrapper .queue-panel {
@@ -38,10 +30,6 @@
     .material-request-page-wrapper .queue-panel {
         overflow: hidden;
     }
-
-    /* =========================================================
-   HEADERS
-   ========================================================= */
 
     .material-request-page-wrapper .request-panel > h5,
     .material-request-page-wrapper .queue-header {
@@ -74,10 +62,6 @@
         line-height: 1.5;
     }
 
-    /* =========================================================
-   ALERTS
-   ========================================================= */
-
     .material-request-page-wrapper .alert {
         margin: 10px 12px;
         padding: 9px 12px;
@@ -98,10 +82,7 @@
         border: 1px solid #fecaca;
     }
 
-    /* =========================================================
-   FORM
-   ========================================================= */
-
+   
     .material-request-page-wrapper .request-panel form {
         height: auto;
         max-height: none;
@@ -167,10 +148,7 @@
         font-size: 10px;
     }
 
-    /* =========================================================
-   CALENDAR HEADER
-   ========================================================= */
-
+   
     .material-request-page-wrapper .calendar-header {
         display: flex;
         justify-content: space-between;
@@ -206,10 +184,7 @@
                 color: #ffffff;
             }
 
-    /* =========================================================
-   SUBMIT BUTTON
-   ========================================================= */
-
+ 
     .material-request-page-wrapper .btn-submit-request {
         display: block;
         width: 100%;
@@ -232,10 +207,7 @@
             background: #6d3fd0;
         }
 
-    /* =========================================================
-   REQUEST QUEUE TABLE
-   ========================================================= */
-
+  
     .material-request-page-wrapper .queue-table-container {
         width: 100%;
         overflow-x: auto;
@@ -284,10 +256,6 @@
             color: #7c3aed;
             font-weight: 700;
         }
-
-    /* =========================================================
-   PRIORITY BADGES
-   ========================================================= */
 
     .material-request-page-wrapper .priority-normal,
     .material-request-page-wrapper .priority-urgent {
@@ -482,4 +450,276 @@ main,
 .container,
 .container-fluid {
     overflow-y: visible;
+}
+
+
+/* ==========================================
+   MATERIAL REQUEST CALENDAR
+   ========================================== */
+
+.material-request-page-wrapper .calendar-widget {
+    width: 100%;
+    margin-top: 8px;
+    padding: 12px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.material-request-page-wrapper .cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+    .material-request-page-wrapper .cal-header span {
+        font-size: 14px;
+        font-weight: 700;
+        color: #374151;
+        text-align: center;
+    }
+
+    .material-request-page-wrapper .cal-header button {
+        padding: 6px 9px;
+        border: 1px solid #d8d0ff;
+        border-radius: 6px;
+        background: #f3f0ff;
+        color: #6d28d9;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+        .material-request-page-wrapper .cal-header button:hover {
+            background: #e9e2ff;
+        }
+
+.material-request-page-wrapper .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+    text-align: center;
+}
+
+.material-request-page-wrapper .cal-day-name {
+    padding: 6px 0;
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.material-request-page-wrapper .cal-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+    min-height: 34px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: #f9fafb;
+    color: #374151;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+    .material-request-page-wrapper .cal-cell:not(.empty):hover {
+        background: #ede9fe;
+        border-color: #c4b5fd;
+    }
+
+    .material-request-page-wrapper .cal-cell.selected {
+        background: #6d28d9;
+        border-color: #6d28d9;
+        color: #ffffff;
+        font-weight: 700;
+    }
+
+    .material-request-page-wrapper .cal-cell.today:not(.selected) {
+        border-color: #8b5cf6;
+        color: #6d28d9;
+        font-weight: 700;
+    }
+
+    .material-request-page-wrapper .cal-cell.empty {
+        background: transparent;
+        cursor: default;
+        pointer-events: none;
+    }
+
+.material-request-page-wrapper #requestDateInput {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+/* Admin approval actions */
+.admin-action-cell {
+    min-width: 125px;
+    vertical-align: middle;
+}
+
+.admin-action-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+    .admin-action-buttons form {
+        margin: 0;
+        width: 100%;
+    }
+
+.btn-admin-approve,
+.btn-admin-reject {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 88px;
+    padding: 5px 10px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-admin-approve {
+    color: #047857;
+    background: #ecfdf5;
+    border: 1px solid #10b981;
+}
+
+    .btn-admin-approve:hover {
+        color: #ffffff;
+        background: #059669;
+        box-shadow: 0 3px 8px rgba(5, 150, 105, 0.2);
+    }
+
+.btn-admin-reject {
+    color: #be123c;
+    background: #fff1f2;
+    border: 1px solid #fb7185;
+}
+
+    .btn-admin-reject:hover {
+        color: #ffffff;
+        background: #e11d48;
+        box-shadow: 0 3px 8px rgba(225, 29, 72, 0.2);
+    }
+
+.admin-action-completed {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+
+/* Project - Purple */
+.request-project {
+    color: #8000ff;
+    font-weight: 700;
+}
+
+/* Spare Description - Purple */
+.request-description {
+    color: #8000ff;
+    font-weight: 700;
+}
+
+/* Quantity - Green */
+.request-quantity {
+    color: #009b62;
+    font-weight: 700;
+}
+
+
+/* FIX: Display complete Admin Actions column and buttons */
+
+.material-request-page-wrapper .queue-panel {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.material-request-page-wrapper .queue-table-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    padding: 0 12px 12px;
+    box-sizing: border-box;
+    scrollbar-gutter: stable;
+}
+
+.material-request-page-wrapper .queue-table {
+    width: 100%;
+    min-width: 1350px;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+    /* Override the old 85px last-column restriction */
+    .material-request-page-wrapper .queue-table th:last-child,
+    .material-request-page-wrapper .queue-table td:last-child,
+    .material-request-page-wrapper .queue-table th.admin-actions-column,
+    .material-request-page-wrapper .queue-table td.admin-action-cell {
+        width: 135px !important;
+        min-width: 135px !important;
+        max-width: 135px !important;
+        box-sizing: border-box;
+        padding: 10px 12px !important;
+        white-space: normal !important;
+        overflow: visible !important;
+    }
+
+/* Keep both buttons fully visible */
+.material-request-page-wrapper .admin-action-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
+}
+
+    .material-request-page-wrapper .admin-action-buttons form {
+        display: block;
+        width: 100%;
+        margin: 0;
+    }
+
+.material-request-page-wrapper .btn-admin-approve,
+.material-request-page-wrapper .btn-admin-reject {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 30px;
+    padding: 6px 8px;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: visible;
+    font-size: 12px;
+}
+
+/* Ensure the table scrolls fully to the last column */
+.material-request-page-wrapper .queue-table th:last-child,
+.material-request-page-wrapper .queue-table td:last-child {
+    position: relative;
 }

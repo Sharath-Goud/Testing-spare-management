@@ -29,6 +29,267 @@
     <!-- Icons -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- AI Global Brand & Link Engine -->
+    <style>
+        .header-search {
+            cursor: text;
+        }
+
+        #aiGlobalSearch {
+            width: 190px;
+            min-width: 100px;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: inherit;
+        }
+
+        #aiProductModal, #aiProductModal * {
+            box-sizing: border-box;
+        }
+
+        #aiProductModal {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: rgba(15, 23, 42, .58);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+            #aiProductModal .ai-shell {
+                width: min(1150px, 97vw);
+                height: min(750px, 94vh);
+                display: flex;
+                overflow: hidden;
+                background: #fdfbf7;
+                border: 1px solid #e7dfd5;
+                border-radius: 15px;
+                box-shadow: 0 20px 55px rgba(0,0,0,.28);
+            }
+
+            #aiProductModal .ai-main {
+                flex: 2;
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                padding: 20px 25px;
+                background: #fff;
+                border-right: 1px solid #e7dfd5;
+            }
+
+            #aiProductModal .ai-heading {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                padding-bottom: 12px;
+                border-bottom: 1px solid #e5e7eb;
+                color: #10213d;
+                font-size: 17px;
+                font-weight: 800;
+            }
+
+            #aiProductModal .ai-close {
+                flex: 0 0 36px;
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                border: 1px solid #cbd5e1;
+                background: #f1f5f9;
+                cursor: pointer;
+                color: #334155;
+                font-size: 22px;
+            }
+
+            #aiProductModal .ai-chat {
+                flex: 1;
+                min-height: 0;
+                overflow: auto;
+                padding: 18px 0;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            #aiProductModal .ai-user-message {
+                align-self: flex-end;
+                max-width: 85%;
+                background: #f1f5f9;
+                padding: 10px 16px;
+                border-radius: 14px 14px 3px 14px;
+                color: #334155;
+                overflow-wrap: anywhere;
+            }
+
+            #aiProductModal .ai-answer {
+                align-self: flex-start;
+                width: min(100%, 650px);
+                background: #f8fafc;
+                border: 1px solid #dbe4ee;
+                border-radius: 0 14px 14px 14px;
+                padding: 17px;
+                color: #1e293b;
+                overflow-wrap: anywhere;
+            }
+
+            #aiProductModal .ai-analysis {
+                display: flex;
+                gap: 14px;
+                align-items: flex-start;
+                margin-bottom: 13px;
+            }
+
+            #aiProductModal .ai-cube {
+                width: 80px;
+                height: 80px;
+                flex: 0 0 80px;
+                display: grid;
+                place-items: center;
+                border: 1px solid #cbd5e1;
+                border-radius: 10px;
+                color: #0f766e;
+                font-size: 34px;
+            }
+
+            #aiProductModal .ai-teal {
+                color: #0f766e;
+                font-weight: 800;
+                margin: 0 0 7px;
+            }
+
+            #aiProductModal .ai-parameters {
+                background: #f1f5f9;
+                border-radius: 8px;
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+
+                #aiProductModal .ai-parameters ul {
+                    margin: 6px 0 0;
+                    padding-left: 20px;
+                    color: #475569;
+                    line-height: 1.55;
+                }
+
+            #aiProductModal .ai-reasoning {
+                background: #faf5ff;
+                border-left: 3px solid #7c3aed;
+                padding: 12px;
+                border-radius: 5px;
+                color: #475569;
+                line-height: 1.5;
+            }
+
+            #aiProductModal .ai-composer {
+                display: flex;
+                gap: 10px;
+                padding-top: 14px;
+                border-top: 1px solid #e5e7eb;
+            }
+
+                #aiProductModal .ai-composer input {
+                    flex: 1;
+                    min-width: 0;
+                    border: 1px solid #cbd5e1;
+                    border-radius: 24px;
+                    padding: 11px 17px;
+                    outline: none;
+                    background: white;
+                }
+
+            #aiProductModal .ai-send {
+                width: 42px;
+                height: 42px;
+                flex: 0 0 42px;
+                border: 0;
+                border-radius: 50%;
+                color: #fff;
+                background: #0f766e;
+                cursor: pointer;
+                font-size: 18px;
+            }
+
+            #aiProductModal .ai-side {
+                flex: 1;
+                min-width: 260px;
+                background: #fdfbf7;
+                padding: 18px;
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+                overflow: auto;
+            }
+
+            #aiProductModal .ai-side-card {
+                background: #fff;
+                border: 1px solid #e7dfd5;
+                border-radius: 10px;
+                padding: 14px;
+            }
+
+            #aiProductModal .ai-side-title {
+                display: block;
+                font-weight: 800;
+                color: #334155;
+                margin-bottom: 10px;
+            }
+
+            #aiProductModal .ai-reference-box {
+                background: #f8fafc;
+                border: 1px solid #e5e7eb;
+                border-radius: 6px;
+                padding: 10px;
+            }
+
+                #aiProductModal .ai-reference-box a {
+                    display: block;
+                    margin: 0 0 10px;
+                    color: #0f766e;
+                    font-weight: 700;
+                    overflow-wrap: anywhere;
+                }
+
+                    #aiProductModal .ai-reference-box a:last-child {
+                        margin-bottom: 0;
+                    }
+        @@media(max - width:720px) {
+            #aiProductModal .ai-shell
+
+        {
+            height: 95vh;
+            overflow: auto;
+            flex-direction: column;
+        }
+
+        #aiProductModal .ai-main {
+            min-height: 470px;
+            padding: 15px;
+            border-right: 0;
+        }
+
+        #aiProductModal .ai-side {
+            min-width: 0;
+            overflow: visible;
+        }
+
+        #aiGlobalSearch {
+            width: 125px;
+        }
+
+        #aiProductModal .ai-cube {
+            width: 55px;
+            height: 55px;
+            flex-basis: 55px;
+        }
+
+        }
+    </style>
+
 </head>
 
 <body>
@@ -41,10 +302,6 @@
         "Admin",
         StringComparison.OrdinalIgnoreCase);
     }
-
-    <!-- ========================================================= -->
-    <!-- TOP HEADER -->
-    <!-- ========================================================= -->
 
     <header class="app-header">
 
@@ -80,13 +337,13 @@
         <!-- Header Right Side -->
         <div class="header-right">
 
-            <div class="header-search">
-
+            <div class="header-search" title="Search a brand or part number with AI">
                 <i class="fa-solid fa-magnifying-glass"></i>
-
                 <input type="text"
-                       placeholder="Search..." />
-
+                       id="aiGlobalSearch"
+                       placeholder="Ask AI / search parts..."
+                       autocomplete="off"
+                       aria-label="Search a brand or part number" />
             </div>
 
 
@@ -133,17 +390,7 @@
 
     </header>
 
-
-    <!-- ========================================================= -->
-    <!-- APPLICATION BODY -->
-    <!-- ========================================================= -->
-
     <div class="app-wrapper">
-
-
-        <!-- ===================================================== -->
-        <!-- SIDEBAR -->
-        <!-- ===================================================== -->
 
         <aside id="appSidebar"
                class="app-sidebar">
@@ -166,26 +413,15 @@
 
             </div>
 
-
-            <!-- ================================================= -->
-            <!-- DASHBOARD -->
-            <!-- ================================================= -->
-
             <div class="sidebar-section">
 
                 <div class="sidebar-section-title">
                     OPERATIONS
                 </div>
 
-
-                <!-- ================================================= -->
-                <!-- REAL-TIME COMMAND CENTER  (UPDATED)                -->
-                <!-- ================================================= -->
-
                 <button class="sidebar-item
            @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard"
-                                                                                                                                               ? "active"
-                                                                                                                                               : "")"
+                                                ? "active" : "")"
                         type="button"
                         data-title="Real-Time Command Center"
                         onclick="window.location.href='@Url.Action("Index", "Dashboard")'">
@@ -201,14 +437,9 @@
                 </button>
 
 
-                <!-- ================================================= -->
-                <!-- MASTER CONNECTOR                                   -->
-                <!-- ================================================= -->
-
                 <button class="sidebar-item
            @(ViewContext.RouteData.Values["controller"]?.ToString() == "MasterConnector"
-                                                                                                                                               ? "active"
-                                                                                                                                               : "")"
+                                                ? "active" : "")"
                         type="button"
                         onclick="window.location.href='@Url.Action("Index", "MasterConnector")'">
 
@@ -222,15 +453,10 @@
 
                 </button>
 
-
-                <!-- ================================================= -->
-                <!-- DAILY CONSUMPTION                                  -->
-                <!-- ================================================= -->
-
                 <button class="sidebar-item
            @(ViewContext.RouteData.Values["controller"]?.ToString() == "Consumption"
-                                                                                                                                               ? "active"
-                                                                                                                                               : "")"
+                                                                                                                                                                       ? "active"
+                                                                                                                                                                       : "")"
                         type="button"
                         onclick="window.location.href='@Url.Action("DailyConsumption", "Consumption")'">
 
@@ -245,14 +471,10 @@
                 </button>
 
 
-                <!-- ================================================= -->
-                <!-- MATERIAL REQUEST                                   -->
-                <!-- ================================================= -->
-
                 <button class="sidebar-item
            @(ViewContext.RouteData.Values["controller"]?.ToString() == "MaterialRequest"
-                                                                                                                                               ? "active"
-                                                                                                                                               : "")"
+                                                                                                                                                                       ? "active"
+                                                                                                                                                                       : "")"
                         type="button"
                         onclick="window.location.href='@Url.Action("Index", "MaterialRequest")'">
 
@@ -293,8 +515,8 @@
                 @if (isAdmin)
                 {
                     <button class="sidebar-item
-                        @(ViewContext.RouteData.Values["controller"]?.ToString() == "Budget"
-                                        ? "active" : "")"
+                            @(ViewContext.RouteData.Values["controller"]?.ToString() == "Budget"
+                                                                    ? "active" : "")"
                         type="button"
                         onclick="window.location.href='@Url.Action("Index", "Budget")'">
 
@@ -314,8 +536,8 @@
 
                 <button class="sidebar-item
            @(ViewContext.RouteData.Values["controller"]?.ToString() == "Equipment"
-                                                                                                                                               ? "active"
-                                                                                                                                               : "")"
+                                                                                                                                                                       ? "active"
+                                                                                                                                                                       : "")"
                         type="button"
                         onclick="window.location.href='@Url.Action("Index", "Equipment")'">
 
@@ -336,9 +558,9 @@
                 @if (isAdmin)
                 {
                     <button class="sidebar-item admin-only
-                        @(ViewContext.RouteData.Values["controller"]?.ToString() == "PrPoTracker"
-                                                                                                                                                                           ? "active"
-                                                                                                                                                                           : "")"
+                            @(ViewContext.RouteData.Values["controller"]?.ToString() == "PrPoTracker"
+                                                                                                                                                                                                       ? "active"
+                                                                                                                                                                                                       : "")"
                         type="button"
                         onclick="window.location.href='@Url.Action("Index", "PrPoTracker")'">
 
@@ -351,7 +573,7 @@
                         </span>
 
                     </button>
-                }
+                                }
             </div>
 
 
@@ -363,14 +585,14 @@
                         USER
                     </div>
                 }
-                
+
 
                 @if (isAdmin)
                 {
                     <button class="sidebar-item admin-only
-                        @(ViewContext.RouteData.Values["controller"]?.ToString() == "Profile"
-                               ? "active"
-                                : "")"
+                            @(ViewContext.RouteData.Values["controller"]?.ToString() == "Profile"
+                                                           ? "active"
+                                                            : "")"
                         type="button"
                         onclick="window.location.href='@Url.Action("Index", "Profile")'">
 
@@ -383,7 +605,7 @@
                         </span>
 
                     </button>
-                }
+                                }
             </div>
 
 
@@ -759,6 +981,186 @@
             }
         );
 
+    </script>
+
+
+
+    <!-- AI Global Brand & Link Engine behavior -->
+    <script>
+        (function () {
+            "use strict";
+
+            const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, ch => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+            }[ch]));
+
+            function buildIntelligence(query) {
+                const safeQuery = escapeHtml(query);
+                const encoded = encodeURIComponent(query);
+                const q = query.toLowerCase();
+                let summary = `Global intelligence search for brand/part number <strong>"${safeQuery.toUpperCase()}"</strong>.`;
+                let manufacturer = "Not yet verified";
+                let category = "Industrial Automation & Spare Part";
+                let verification = "Manufacturer website and datasheet search links";
+                let reasoning = `Created targeted web-search links for "${safeQuery}". Open the references to verify the exact model, specification, and manufacturer.`;
+                let icon = "⬡";
+
+                if (q.includes("siemens")) {
+                    manufacturer = "Siemens AG";
+                    category = "Industrial Automation & SIMATIC Controllers";
+                    verification = "Official Siemens automation/support search";
+                    summary = `The search term <strong>"${safeQuery}"</strong> appears related to Siemens automation products. Confirm the exact model number in the official documentation.`;
+                    icon = "⚙";
+                } else if (q.includes("zebronics") || q.includes("scanner")) {
+                    manufacturer = q.includes("zebronics") ? "Zebronics (verify exact model)" : "To be identified from the part number";
+                    category = "Barcode Scanners / Peripherals (if applicable)";
+                    verification = "Manufacturer product/support search";
+                    summary = `Search results are prepared for <strong>"${safeQuery}"</strong>. Check the exact product model and interface before ordering.`;
+                    icon = "▦";
+                } else if (q.includes("java")) {
+                    category = "Software / Java platform (confirm whether this is a part or brand search)";
+                    verification = "Official Java website and technical documentation search";
+                    summary = `Global intelligence search for <strong>"${safeQuery}"</strong>. The term can refer to Java software; confirm the intended brand or component.`;
+                    icon = "◇";
+                }
+
+                const links = [
+                    ["Official brand website search", `https://www.google.com/search?q=${encoded}+official+manufacturer+website`],
+                    ["Technical datasheet (PDF) search", `https://www.google.com/search?q=${encoded}+datasheet+filetype%3Apdf`],
+                    ["Global spare parts / product catalog", `https://www.google.com/search?q=${encoded}+spare+parts+catalog`],
+                    ["Exact model and specifications", `https://www.google.com/search?q=${encoded}+model+specifications`]
+                ];
+
+                return { summary, manufacturer, category, verification, reasoning, icon, links };
+            }
+
+            function referenceLinks(links) {
+                return links.map(link =>
+                    `<a href="${link[1]}" target="_blank" rel="noopener noreferrer">• ${escapeHtml(link[0])} for "${escapeHtml(document.querySelector("#aiGlobalSearch")?.value.trim() || window.aiCurrentQuery || "")}"</a>`
+                ).join("");
+            }
+
+            function openAiModal(query) {
+                const existing = document.getElementById("aiProductModal");
+                if (existing) existing.remove();
+                window.aiCurrentQuery = query;
+
+                const data = buildIntelligence(query);
+                const modal = document.createElement("div");
+                modal.id = "aiProductModal";
+                modal.setAttribute("role", "dialog");
+                modal.setAttribute("aria-modal", "true");
+                modal.setAttribute("aria-label", "Gemini AI Global Brand and Link Engine");
+                modal.innerHTML = `
+                    <div class="ai-shell">
+                        <section class="ai-main">
+                            <div class="ai-heading">
+                                <span>✨ Gemini AI Global Brand &amp; Link Engine</span>
+                                <button type="button" class="ai-close" id="aiCloseModal" aria-label="Close">×</button>
+                            </div>
+                            <div class="ai-chat" id="aiChatScrollBody">
+                                <div class="ai-user-message">${escapeHtml(query)}</div>
+                                <div class="ai-answer">
+                                    <div class="ai-analysis">
+                                        <div class="ai-cube">${data.icon}</div>
+                                        <div>
+                                            <p class="ai-teal">🌐 Global Brand &amp; Model Analysis:</p>
+                                            <div>${data.summary}</div>
+                                        </div>
+                                    </div>
+                                    <div class="ai-parameters">
+                                        <strong>Technical Parameters:</strong>
+                                        <ul>
+                                            <li><strong>Target Brand / Part:</strong> ${escapeHtml(query.toUpperCase())}</li>
+                                            <li><strong>Manufacturer:</strong> ${escapeHtml(data.manufacturer)}</li>
+                                            <li><strong>Component Category:</strong> ${escapeHtml(data.category)}</li>
+                                            <li><strong>Verification:</strong> ${escapeHtml(data.verification)}</li>
+                                        </ul>
+                                    </div>
+                                    <div class="ai-reasoning">
+                                        <strong style="color:#7c3aed;display:block;margin-bottom:4px;">🧠 Deep Thinking &amp; Cross-Referencing:</strong>
+                                        ${data.reasoning}
+                                    </div>
+                                </div>
+                            </div>
+                            <form class="ai-composer" id="aiFollowUpForm">
+                                <input id="aiFollowUpInput" type="text" placeholder="Type another brand or part number..." autocomplete="off" aria-label="Search another brand or part number">
+                                <button class="ai-send" type="submit" aria-label="Search">➤</button>
+                            </form>
+                        </section>
+                        <aside class="ai-side">
+                            <div class="ai-side-card">
+                                <span class="ai-side-title">🔗 Official Brand Links &amp; Datasheets</span>
+                                <div class="ai-reference-box" id="aiReferenceBox">
+                                    ${data.links.map(link => `<a href="${link[1]}" target="_blank" rel="noopener noreferrer">• ${escapeHtml(link[0])} for "${escapeHtml(query)}"</a>`).join("")}
+                                </div>
+                            </div>
+                            <div class="ai-side-card">
+                                <span class="ai-side-title">▤ Live Industrial Bulletin</span>
+                                <p style="font-size:13px;color:#64748b;line-height:1.5;margin:0">Use the official manufacturer links to validate the exact part number, datasheet, availability, and compatibility before purchasing.</p>
+                            </div>
+                        </aside>
+                    </div>`;
+                document.body.appendChild(modal);
+
+                const close = () => modal.remove();
+                document.getElementById("aiCloseModal").addEventListener("click", close);
+                modal.addEventListener("click", event => { if (event.target === modal) close(); });
+
+                document.getElementById("aiFollowUpForm").addEventListener("submit", event => {
+                    event.preventDefault();
+                    const input = document.getElementById("aiFollowUpInput");
+                    const nextQuery = input.value.trim();
+                    if (!nextQuery) return;
+                    openAiModal(nextQuery);
+                    const nextInput = document.getElementById("aiFollowUpInput");
+                    if (nextInput) nextInput.focus();
+                });
+                document.addEventListener("keydown", function escapeHandler(event) {
+                    if (event.key === "Escape" && document.getElementById("aiProductModal")) {
+                        document.getElementById("aiProductModal").remove();
+                        document.removeEventListener("keydown", escapeHandler);
+                    }
+                });
+                document.getElementById("aiFollowUpInput").focus();
+            }
+
+            function submitSearch() {
+                const input = document.getElementById("aiGlobalSearch");
+                if (!input) return;
+                const query = input.value.trim();
+                if (!query) return;
+                input.value = "";
+
+                const lowerQuery = query.toLowerCase();
+                if (/\b(pr|po|purchase)\b/.test(lowerQuery)) {
+                    const prLink = Array.from(document.querySelectorAll("button, a"))
+                        .find(el => (el.innerText || "").includes("PR & PO Tracker"));
+                    if (prLink) {
+                        prLink.click();
+                        return;
+                    }
+                }
+                openAiModal(query);
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+                const input = document.getElementById("aiGlobalSearch");
+                if (!input) return;
+                input.addEventListener("keydown", event => {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                        submitSearch();
+                    }
+                });
+                const wrapper = input.closest(".header-search");
+                if (wrapper) {
+                    wrapper.addEventListener("click", event => {
+                        if (event.target !== input) input.focus();
+                    });
+                }
+            });
+        })();
     </script>
 
 
