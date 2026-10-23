@@ -1,23 +1,28 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Caching.Memory;
+using System.Data;
+using System.Net;
+using System.Net.Mail;
 using TestingSpareManagement.Models;
-using SqlDbType = System.Data.SqlDbType;
 using CommandType = System.Data.CommandType;
+using SqlDbType = System.Data.SqlDbType;
 
 namespace TestingSpareManagement.Controllers
 {
     public class DashboardController : Controller
     {
         private readonly IConfiguration _configuration;
-
-        public DashboardController(IConfiguration configuration)
+        private readonly IMemoryCache _memoryCache;
+        public DashboardController(
+            IConfiguration configuration,
+            IMemoryCache memoryCache)
         {
             _configuration = configuration;
+            _memoryCache = memoryCache;
         }
 
-        // =========================================================
-        // INDEX - MAIN DASHBOARD
-        // =========================================================
+
         [HttpGet]
         public async Task<IActionResult> Index(int? year)
         {
@@ -61,6 +66,9 @@ namespace TestingSpareManagement.Controllers
             // Equipment Consumables (for Stock-Out Alerts)
             model.EquipmentConsumables = await GetEquipmentConsumables();
 
+            model.LowStockAlerts = model.EquipmentConsumables
+                .Count(e => e.AvailableQty <= e.MinLimit);
+
             // Material Requests (for Pending Requisitions)
             model.MaterialRequests = await GetMaterialRequests();
 
@@ -70,12 +78,195 @@ namespace TestingSpareManagement.Controllers
             // PR/PO Logs
             model.PRPOTransactions = await GetPRPOTransactions(activeYear);
 
+            var missingAlerts = await GetMissingConsumptionShiftAlerts();
+
+            ViewBag.MissingConsumptionAlerts = missingAlerts;
+
+            if (missingAlerts.Any())
+            {
+                await SendMissingConsumptionAlertEmailAsync(missingAlerts);
+            }
+
             return View(model);
         }
 
-        // =========================================================
-        // GET DASHBOARD KPIs (Stored Procedure)
-        // =========================================================
+        private async Task SendMissingConsumptionAlertEmailAsync(
+    List<string> alerts)
+        {
+            if (alerts == null || alerts.Count == 0)
+                return;
+
+            // Prevent repeated emails for the same day's alert
+            // while the application remains running.
+            string cacheKey =
+                $"DailyConsumptionAlertEmail_{DateTime.Today:yyyyMMdd}";
+
+            if (_memoryCache.TryGetValue(cacheKey, out bool alreadySent)
+                && alreadySent)
+            {
+                return;
+            }
+
+
+            var smtpSettings = _configuration.GetSection("SmtpSettings");
+
+            string host = smtpSettings["Host"] ?? "";
+            string senderEmail = smtpSettings["SenderEmail"] ?? "";
+            string senderName =
+                smtpSettings["SenderName"] ?? "Testing Spare Management System";
+
+            if (!int.TryParse(smtpSettings["Port"], out int port) ||
+                port < 1 || port > 65535)
+            {
+                throw new InvalidOperationException(
+                    "SmtpSettings:Port is missing or invalid.");
+            }
+
+            bool enableSsl =
+                bool.TryParse(smtpSettings["EnableSsl"], out bool ssl)
+                && ssl;
+
+            if (string.IsNullOrWhiteSpace(host) ||
+                string.IsNullOrWhiteSpace(senderEmail))
+            {
+                throw new InvalidOperationException(
+                    "SMTP Host and SenderEmail must be configured.");
+            }
+
+
+            using var message = new MailMessage();
+
+            message.From = new MailAddress(senderEmail, senderName);
+
+            message.To.Add("Sharath_G@foxlink.com");
+            message.To.Add("Saibalaji_M@foxlink.com");
+            message.To.Add("Chandu_V@foxlink.com");
+            message.To.Add("Rajasekhar_M@Foxlink.com");
+            message.To.Add("Bharathkumar_M@foxlink.com");
+
+            message.Subject =
+                $"Action Required: Daily Consumption Missing - {DateTime.Today:dd MMM yyyy}";
+
+            string alertDetails = string.Join(
+                Environment.NewLine,
+                alerts.Select(a => "• " + a));
+
+            string dashboardUrl =
+                $"{Request.Scheme}://{Request.Host}" +
+                Url.Action("DailyConsumption", "Consumption");
+
+            message.IsBodyHtml = true;
+
+            message.Body = $@"
+                <html>
+                <body style='font-family:Arial,sans-serif;color:#333;line-height:1.6;'>
+                    <div style='max-width:650px;margin:auto;border:1px solid #ddd;
+                                border-radius:8px;overflow:hidden;'>
+                        <div style='background:#b91c1c;color:white;padding:18px;'>
+                            <h2 style='margin:0;'>Daily Consumption Alert</h2>
+                        </div>
+
+                        <div style='padding:22px;'>
+                            <p>Dear Team,</p>
+
+                            <p>
+                                This is an automated notification from the
+                                Testing Spare Management System.
+                            </p>
+
+                            <p>
+                                The system has detected that today's Daily Consumption
+                                entry is missing. Please review the details below and
+                                complete the required entry.
+                            </p>
+
+                            <p><strong>Date:</strong> {DateTime.Today:dd MMM yyyy}</p>
+
+                            <div style='background:#fff7ed;border-left:4px solid #ea580c;
+                                        padding:14px;margin:18px 0;'>
+                                <strong>Alert Details</strong>
+                                <pre style='white-space:pre-wrap;font-family:Arial,sans-serif;'>
+                                    {System.Net.WebUtility.HtmlEncode(alertDetails)}
+                                </pre>
+                            </div>
+
+                            <p>
+                                <a href='{System.Net.WebUtility.HtmlEncode(dashboardUrl)}'
+                                   style='background:#b91c1c;color:white;padding:12px 18px;
+                                          text-decoration:none;border-radius:5px;
+                                          display:inline-block;'>
+                                    Open Daily Consumption
+                                </a>
+                            </p>
+
+                            <p>Please take the necessary action at the earliest.</p>
+
+                            <p>
+                                Regards,<br/>
+                                <strong>Testing Spare Management System</strong>
+                            </p>
+                        </div>
+                    </div>
+                </body>
+                </html>";
+
+            using var smtp = new SmtpClient(host, port)
+            {
+                EnableSsl = enableSsl,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                Timeout = 30000
+            };
+
+            await smtp.SendMailAsync(message);
+
+            _memoryCache.Set(
+                cacheKey,
+                true,
+                new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpiration = DateTime.Today.AddDays(1)
+                });
+        }
+
+        private async Task<List<string>> GetMissingConsumptionShiftAlerts()
+        {
+            var alerts = new List<string>();
+
+            DateTime today = DateTime.Today;
+
+            string connectionString = GetConnectionString();
+
+            using SqlConnection connection =
+                new SqlConnection(connectionString);
+
+            await connection.OpenAsync();
+
+            using SqlCommand command = new SqlCommand(@"
+                SELECT COUNT(1)
+                FROM dbo.DailyConsumption
+                WHERE ConsumptionDate >= @Today
+                  AND ConsumptionDate < @Tomorrow
+                  AND IsActive = 1;", connection);
+
+            command.Parameters.Add("@Today", SqlDbType.Date).Value = today;
+            command.Parameters.Add("@Tomorrow", SqlDbType.Date).Value = today.AddDays(1);
+
+            int recordCount = Convert.ToInt32(
+                await command.ExecuteScalarAsync());
+
+            if (recordCount > 0)
+            {
+                return alerts;
+            }
+
+            alerts.Add(
+                $"Daily consumption record is missing for today " +
+                $"({today:dd MMM yyyy}). Please update Daily Consumption."
+            );
+
+            return alerts;
+        }
+
         private async Task<DashboardKPIModel> GetDashboardKPIs(int year)
         {
             var model = new DashboardKPIModel();
@@ -103,9 +294,6 @@ namespace TestingSpareManagement.Controllers
             return model;
         }
 
-        // =========================================================
-        // GET CURRENT MONTH BUDGET
-        // =========================================================
         private async Task<(decimal Allocated, decimal Expenses, string MonthName)> GetCurrentMonthBudget(int year)
         {
             decimal allocated = 0;
@@ -143,9 +331,6 @@ namespace TestingSpareManagement.Controllers
             return (allocated, expenses, monthName);
         }
 
-        // =========================================================
-        // GET YEARLY BUDGET TREND (Stored Procedure)
-        // =========================================================
         private async Task<List<YearlyBudgetTrendModel>> GetYearlyBudgetTrend()
         {
             var list = new List<YearlyBudgetTrendModel>();
@@ -172,9 +357,6 @@ namespace TestingSpareManagement.Controllers
             return list;
         }
 
-        // =========================================================
-        // GET ACTIVE PROJECTS STATUS
-        // =========================================================
         private async Task<List<ActiveProjectModel>> GetActiveProjectsStatus()
         {
             var list = new List<ActiveProjectModel>();
@@ -200,60 +382,113 @@ namespace TestingSpareManagement.Controllers
             return list;
         }
 
-        // =========================================================
-        // GET EQUIPMENT CONSUMABLES (For Stock-Out Alerts)
-        // =========================================================
+        //private async Task<List<EquipmentConsumableModel>> GetEquipmentConsumables()
+        //{
+        //    var list = new List<EquipmentConsumableModel>();
+        //    string conn = GetConnectionString();
+
+        //    using SqlConnection connection = new SqlConnection(conn);
+
+        //    string query = @"
+        //        SELECT 
+        //            ec.[Id],
+        //            ec.[ProjectCode],
+        //            ec.[TestItem],
+        //            ec.[AssignedEquipment],
+        //            ec.[StorageLocation],
+        //            ec.[AvailableQty],
+        //            ec.[MinLimit],
+        //            ec.[UnitPriceINR],
+        //            ec.[SpecCycles],
+        //            ec.[ImageUrl]
+        //        FROM [dbo].[EquipmentConsumables] ec
+        //        WHERE ec.[IsActive] = 1
+        //        ORDER BY ec.[ProjectCode], ec.[TestItem]";
+
+        //    using SqlCommand command = new SqlCommand(query, connection);
+
+        //    await connection.OpenAsync();
+        //    using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+        //    while (await reader.ReadAsync())
+        //    {
+        //        list.Add(new EquipmentConsumableModel
+        //        {
+        //            Id = Convert.ToInt32(reader["Id"]),
+        //            ProjectCode = reader["ProjectCode"]?.ToString() ?? "",
+        //            TestItem = reader["TestItem"]?.ToString() ?? "",
+        //            AssignedEquipment = reader["AssignedEquipment"]?.ToString() ?? "",
+        //            StorageLocation = reader["StorageLocation"]?.ToString() ?? "",
+        //            AvailableQty = reader["AvailableQty"] == DBNull.Value ? 0 : Convert.ToInt32(reader["AvailableQty"]),
+        //            MinLimit = reader["MinLimit"] == DBNull.Value ? 0 : Convert.ToInt32(reader["MinLimit"]),
+        //            UnitPriceINR = reader["UnitPriceINR"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["UnitPriceINR"]),
+        //            SpecCycles = reader["SpecCycles"]?.ToString() ?? "",
+        //            ImageUrl = reader["ImageUrl"]?.ToString() ?? ""
+        //        });
+        //    }
+
+        //    return list;
+        //}
+
+
         private async Task<List<EquipmentConsumableModel>> GetEquipmentConsumables()
         {
             var list = new List<EquipmentConsumableModel>();
+
             string conn = GetConnectionString();
 
             using SqlConnection connection = new SqlConnection(conn);
 
-            string query = @"
-                SELECT 
-                    ec.[Id],
-                    ec.[ProjectCode],
-                    ec.[TestItem],
-                    ec.[AssignedEquipment],
-                    ec.[StorageLocation],
-                    ec.[AvailableQty],
-                    ec.[MinLimit],
-                    ec.[UnitPriceINR],
-                    ec.[SpecCycles],
-                    ec.[ImageUrl]
-                FROM [dbo].[EquipmentConsumables] ec
-                WHERE ec.[IsActive] = 1
-                ORDER BY ec.[ProjectCode], ec.[TestItem]";
+            using SqlCommand command =
+                new SqlCommand("dbo.GetEquipmentReport", connection);
 
-            using SqlCommand command = new SqlCommand(query, connection);
+            command.CommandType = CommandType.StoredProcedure;
+
+            command.Parameters.Add("@PageNumber", SqlDbType.Int).Value = 1;
+            command.Parameters.Add("@PageSize", SqlDbType.Int).Value = 10000;
+
+            SqlParameter totalParam =
+                command.Parameters.Add("@TotalRecords", SqlDbType.Int);
+
+            totalParam.Direction = ParameterDirection.Output;
 
             await connection.OpenAsync();
-            using SqlDataReader reader = await command.ExecuteReaderAsync();
 
-            while (await reader.ReadAsync())
+            using (SqlDataReader reader = await command.ExecuteReaderAsync())
             {
-                list.Add(new EquipmentConsumableModel
+                while (await reader.ReadAsync())
                 {
-                    Id = Convert.ToInt32(reader["Id"]),
-                    ProjectCode = reader["ProjectCode"]?.ToString() ?? "",
-                    TestItem = reader["TestItem"]?.ToString() ?? "",
-                    AssignedEquipment = reader["AssignedEquipment"]?.ToString() ?? "",
-                    StorageLocation = reader["StorageLocation"]?.ToString() ?? "",
-                    AvailableQty = reader["AvailableQty"] == DBNull.Value ? 0 : Convert.ToInt32(reader["AvailableQty"]),
-                    MinLimit = reader["MinLimit"] == DBNull.Value ? 0 : Convert.ToInt32(reader["MinLimit"]),
-                    UnitPriceINR = reader["UnitPriceINR"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["UnitPriceINR"]),
-                    SpecCycles = reader["SpecCycles"]?.ToString() ?? "",
-                    ImageUrl = reader["ImageUrl"]?.ToString() ?? ""
-                });
+                    list.Add(new EquipmentConsumableModel
+                    {
+                        Id = Convert.ToInt32(reader["Id"]),
+                        ProjectCode = reader["ProjectCode"]?.ToString() ?? "",
+                        TestItem = reader["TestItemName"]?.ToString() ?? "",
+                        AssignedEquipment =
+                            reader["AssignedEquipment"]?.ToString() ?? "",
+                        AvailableQty =
+                            reader["AvailableQuantity"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(reader["AvailableQuantity"]),
+                        MinLimit =
+                            reader["AlertThreshold"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(reader["AlertThreshold"]),
+                        UnitPriceINR =
+                            reader["UnitPriceINR"] == DBNull.Value
+                                ? 0
+                                : Convert.ToDecimal(reader["UnitPriceINR"]),
+                        SpecCycles =
+                            reader["SpecCycles"] == DBNull.Value
+                                ? ""
+                                : reader["SpecCycles"].ToString() ?? ""
+                    });
+                }
             }
 
             return list;
         }
 
-        // =========================================================
-        // GET MATERIAL REQUESTS (For Pending Requisitions)
-        // =========================================================
+
         private async Task<List<MaterialRequestModel>> GetMaterialRequests()
         {
             var list = new List<MaterialRequestModel>();
@@ -306,9 +541,6 @@ namespace TestingSpareManagement.Controllers
             return list;
         }
 
-        // =========================================================
-        // GET CONSUMPTION LOGS (For Charts and Metrics)
-        // =========================================================
         private async Task<List<ConsumptionLogModel>> GetConsumptionLogs(int year)
         {
             var list = new List<ConsumptionLogModel>();
@@ -360,9 +592,6 @@ namespace TestingSpareManagement.Controllers
             return list;
         }
 
-        // =========================================================
-        // GET PR/PO TRANSACTIONS
-        // =========================================================
         private async Task<List<PRPOTransactionModel>> GetPRPOTransactions(int year)
         {
             var list = new List<PRPOTransactionModel>();
@@ -420,9 +649,6 @@ namespace TestingSpareManagement.Controllers
             return list;
         }
 
-        // =========================================================
-        // CONNECTION STRING
-        // =========================================================
         private string GetConnectionString()
         {
             string? cs = _configuration.GetConnectionString("DefaultConnection");

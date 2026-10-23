@@ -29,5 +29,6 @@
         public DateTime CreatedDate { get; set; }
 
         public string? StockStatus { get; set; }
+        public string? ProjectCode { get; set; }
     }
 }

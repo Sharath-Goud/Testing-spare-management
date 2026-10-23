@@ -5,9 +5,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TestingSpareManagement.Models
 {
-    // =====================================================
-    // VIEW MODEL (for form + table)
-    // =====================================================
     public class MaterialRequestViewModel
     {
         // Form Fields
@@ -62,14 +59,11 @@ namespace TestingSpareManagement.Models
         // Table Data
         public List<MaterialRequestItem> Requests { get; set; } = new List<MaterialRequestItem>();
 
-        public List<SelectListItem> ProjectCodes { get; set; }
-    = new List<SelectListItem>();
+        public List<SelectListItem> ProjectCodes { get; set; } = new List<SelectListItem>();
+        public List<string> TestingStations { get; set; } = new List<string>();
     }
 
 
-    // =====================================================
-    // DATABASE ENTITY (maps to MaterialRequest table)
-    // =====================================================
     public class MaterialRequestItem
     {
         public int Id { get; set; }

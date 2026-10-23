@@ -37,7 +37,7 @@ namespace TestingSpareManagement.Controllers
 
             var (records, totalRecords) = await GetEquipments(pageNumber, pageSize);
             model.Equipments = records;
-
+            model.TestingStations = await GetTestingStations();
             return View(model);
         }
 
@@ -49,6 +49,7 @@ namespace TestingSpareManagement.Controllers
             {
                 var (records, _) = await GetEquipments(1, 25);
                 model.Equipments = records;
+                model.TestingStations = await GetTestingStations();
                 return View("Index", model);
             }
 
@@ -61,6 +62,7 @@ namespace TestingSpareManagement.Controllers
                 {
                     var (records, _) = await GetEquipments(1, 25);
                     model.Equipments = records;
+                    model.TestingStations = await GetTestingStations();
                     return View("Index", model);
                 }
             }
@@ -148,7 +150,6 @@ namespace TestingSpareManagement.Controllers
                 HttpContext.Session.GetString("EmployeeName") ?? "System";
 
             await connection.OpenAsync();
-            await command.ExecuteNonQueryAsync();
 
             TempData["SuccessMessage"] = "Equipment updated successfully!";
             return RedirectToAction(nameof(Index));
@@ -423,5 +424,34 @@ namespace TestingSpareManagement.Controllers
             }
         }
 
+        private async Task<List<string>> GetTestingStations()
+        {
+            var stations = new List<string>();
+
+            using SqlConnection connection =
+                new SqlConnection(GetConnectionString());
+
+            const string query = @"
+        SELECT StationCode
+        FROM dbo.TestingStation
+        WHERE IsActive = 1
+        ORDER BY StationCode;";
+
+            using SqlCommand command = new SqlCommand(query, connection);
+
+            await connection.OpenAsync();
+
+            using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                string station = reader["StationCode"]?.ToString() ?? "";
+
+                if (!string.IsNullOrWhiteSpace(station))
+                    stations.Add(station);
+            }
+
+            return stations;
+        }
     }
 }

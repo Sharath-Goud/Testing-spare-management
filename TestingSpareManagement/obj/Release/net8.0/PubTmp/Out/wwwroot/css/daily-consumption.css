@@ -1,8 +1,4 @@
 ﻿
-/* =========================================================
-   DAILY CONSUMPTION - MASTER CONNECTOR MATCHING DESIGN
-   ========================================================= */
-
 .consumption-page-wrapper {
     width: 100%;
     padding: 4px;
@@ -11,20 +7,12 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
-/* =========================================================
-   MAIN TWO-COLUMN LAYOUT
-   ========================================================= */
-
 .consumption-page-wrapper {
     display: grid;
     grid-template-columns: 350px minmax(0, 1fr);
     gap: 10px;
     align-items: start;
 }
-
-    /* =========================================================
-   LEFT FORM AND RIGHT HISTORY CARDS
-   ========================================================= */
 
     .consumption-page-wrapper .entry-panel,
     .consumption-page-wrapper .history-panel {
@@ -36,10 +24,7 @@
         overflow: hidden;
     }
 
-        /* =========================================================
-   SECTION HEADERS
-   ========================================================= */
-
+      
         .consumption-page-wrapper .entry-panel > h5,
         .consumption-page-wrapper .history-header {
             display: flex;
@@ -76,10 +61,6 @@
             line-height: 1.5;
         }
 
-    /* =========================================================
-   SUCCESS AND ERROR MESSAGES
-   ========================================================= */
-
     .consumption-page-wrapper .alert {
         margin: 10px 12px;
         padding: 9px 12px;
@@ -99,10 +80,6 @@
         background: #fef2f2;
         border: 1px solid #fecaca;
     }
-
-    /* =========================================================
-   FORM
-   ========================================================= */
 
     .consumption-page-wrapper .entry-panel form {
         padding: 12px 14px 15px;
@@ -158,10 +135,6 @@
         color: #dc2626 !important;
         font-size: 10px;
     }
-
-    /* =========================================================
-   INTERACTIVE CALENDAR
-   ========================================================= */
 
     .consumption-page-wrapper .calendar-widget {
         padding: 8px;
@@ -248,10 +221,6 @@
             cursor: default;
         }
 
-    /* =========================================================
-   FORM BUTTONS
-   ========================================================= */
-
     .consumption-page-wrapper .btn-log-usage,
     .consumption-page-wrapper .btn-cancel {
         display: block;
@@ -285,10 +254,6 @@
         .consumption-page-wrapper .btn-cancel:hover {
             background: #475569;
         }
-
-    /* =========================================================
-   HISTORY HEADER ACTIONS
-   ========================================================= */
 
     .consumption-page-wrapper .header-actions {
         display: flex;
@@ -354,10 +319,6 @@
                 color: #ffffff;
             }
 
-    /* =========================================================
-   HISTORY TABLE
-   ========================================================= */
-
     .consumption-page-wrapper .table-container {
         width: 100%;
         overflow-x: auto;
@@ -411,10 +372,6 @@
             font-weight: 700;
         }
 
-    /* =========================================================
-   SHIFT BADGE
-   ========================================================= */
-
     .consumption-page-wrapper .badge-shift {
         display: inline-block;
         padding: 4px 7px;
@@ -426,10 +383,6 @@
         font-weight: 700;
     }
 
-    /* =========================================================
-   COST DISPLAY
-   ========================================================= */
-
     .consumption-page-wrapper .history-table td:nth-child(9) {
         min-width: 110px;
         line-height: 1.6;
@@ -439,10 +392,6 @@
             display: inline-block;
             white-space: nowrap;
         }
-
-    /* =========================================================
-   EDIT AND DELETE BUTTONS
-   ========================================================= */
 
     .consumption-page-wrapper .btn-matrix-edit,
     .consumption-page-wrapper .btn-matrix-del {
@@ -484,10 +433,6 @@
             color: #ffffff;
         }
 
-    /* =========================================================
-   EMPTY STATE
-   ========================================================= */
-
     .consumption-page-wrapper .empty-state {
         padding: 35px 15px;
         color: #94a3b8;
@@ -501,10 +446,6 @@
             color: #a78bfa;
             font-size: 24px;
         }
-
-    /* =========================================================
-   PAGINATION
-   ========================================================= */
 
     .consumption-page-wrapper .pagination-wrapper {
         display: flex;
@@ -539,10 +480,6 @@
             border-color: #6f42c1;
             color: #ffffff;
         }
-
-/* =========================================================
-   RESPONSIVE LAYOUT
-   ========================================================= */
 
 @media (min-width: 1600px) {
     .consumption-page-wrapper {
@@ -612,9 +549,6 @@
 }
 
 
-
-/* FIX: Allow the complete Daily Consumption form to scroll */
-
 html,
 body {
     height: auto;
@@ -682,12 +616,6 @@ main,
     position: relative;
 }
 
-
-/* =====================================================
-   WRAP FULL ASSET KEY AND DRI NAME
-   ===================================================== */
-
-/* Asset Key - column 4 */
 .consumption-page-wrapper .history-table td.asset-key-cell {
     width: 150px;
     min-width: 150px;
@@ -696,7 +624,8 @@ main,
     overflow-wrap: anywhere;
     word-break: normal;
     line-height: 1.5;
-    vertical-align: top;
+    vertical-align: middle !important;
+    text-align: left;
     color: #7045d6;
     font-weight: 700;
 }
@@ -725,4 +654,74 @@ main,
 /* Keep the other table columns unchanged */
 .consumption-page-wrapper .history-table td:not(.asset-key-cell):not(.dri-name-cell) {
     white-space: nowrap;
+}
+
+.spare-item-group select {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background-color: #fff;
+    color: #1f2937;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .spare-item-group select:focus {
+        border-color: #6366f1;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); 
+    }
+
+#consumptionTable th:nth-child(9),
+#consumptionTable td:nth-child(9) {
+    min-width: 150px;
+    width: 150px;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+#consumptionTable th:nth-child(9) {
+    text-align: center;
+    line-height: 1.4;
+    overflow-wrap: normal;
+    word-break: normal;
+}
+
+.consumption-page-wrapper #consumptionTable tbody td {
+    vertical-align: middle !important;
+}
+
+/* Spare Item: left aligned and vertically centered */
+.consumption-page-wrapper #consumptionTable td.asset-key-cell {
+    text-align: left !important;
+    vertical-align: middle !important;
+}
+
+/* Expenses heading and amounts aligned in the center */
+.consumption-page-wrapper #consumptionTable th:nth-child(9),
+.consumption-page-wrapper #consumptionTable td:nth-child(9) {
+    text-align: center;
+    vertical-align: middle !important;
+}
+
+.consumption-page-wrapper #consumptionTable td:nth-child(9) span {
+    display: block;
+    white-space: nowrap;
+}
+
+/* Actions heading and buttons aligned in the center */
+.consumption-page-wrapper #consumptionTable th:nth-child(10),
+.consumption-page-wrapper #consumptionTable td:nth-child(10) {
+    text-align: center;
+    vertical-align: middle !important;
+}
+
+.consumption-page-wrapper #consumptionTable td:nth-child(10) {
+    padding-left: 6px;
+    padding-right: 6px;
 }

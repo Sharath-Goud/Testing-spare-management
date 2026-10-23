@@ -1075,3 +1075,200 @@ body {
         gap: 10px;
     }
 }
+
+
+/* =========================================================
+   COMPACT RIGHT-SIDE CONSUMPTION ALERT POPUP
+========================================================= */
+
+.consumption-toast {
+    position: fixed !important;
+    top: 14px !important;
+    right: 14px !important;
+    /* Compact size like the second screenshot */
+    width: 360px !important;
+    max-width: calc(100vw - 28px) !important;
+    min-width: 0 !important;
+    max-height: calc(100vh - 28px);
+    overflow-y: auto;
+    z-index: 99999;
+    display: block;
+    box-sizing: border-box !important;
+    background: #ffffff;
+    color: #1e293b;
+    border: 1px solid #fecaca;
+    border-radius: 14px;
+    box-shadow: 0 12px 35px rgba(15, 23, 42, 0.18);
+    animation: consumptionToastEnter 0.3s ease-out;
+}
+
+/* Header */
+.consumption-toast-header {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 12px;
+    background: #fff7f7;
+    border-bottom: 1px solid #fee2e2;
+}
+
+.consumption-toast-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #dc2626;
+    color: #ffffff;
+    border-radius: 50%;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.consumption-toast-title {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+    .consumption-toast-title > span {
+        color: #991b1b;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.3px;
+    }
+
+    .consumption-toast-title small {
+        color: #64748b;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+/* Close button */
+.consumption-toast-close {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #64748b;
+    font-size: 23px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+    .consumption-toast-close:hover {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+/* Message content */
+.consumption-toast-body {
+    padding: 12px;
+}
+
+.consumption-toast-message {
+    margin: 0 0 12px;
+    color: #475569;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+/* Missing shift details */
+.consumption-toast-list {
+    margin: 0 0 12px;
+    padding: 9px 10px 9px 18px;
+    background: #fff7f7;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: #991b1b;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+    .consumption-toast-list li {
+        margin-bottom: 5px;
+    }
+
+        .consumption-toast-list li:last-child {
+            margin-bottom: 0;
+        }
+
+/* Update button */
+.consumption-toast-action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: 8px;
+    background: #b91c1c;
+    color: #ffffff !important;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-decoration: none !important;
+    box-sizing: border-box;
+    transition: background 0.2s ease;
+}
+
+    .consumption-toast-action:hover {
+        background: #991b1b;
+    }
+
+/* Footer */
+.consumption-toast-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: #fff7f7;
+    border-top: 1px solid #fee2e2;
+    color: #991b1b;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.consumption-toast-dot {
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #dc2626;
+}
+
+/* Entrance animation */
+@keyframes consumptionToastEnter {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Smaller screens */
+@media (max-width: 480px) {
+    .consumption-toast {
+        top: 10px !important;
+        right: 10px !important;
+        width: calc(100vw - 20px) !important;
+        max-width: calc(100vw - 20px) !important;
+        max-height: calc(100vh - 20px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .consumption-toast {
+        animation: none;
+    }
+}

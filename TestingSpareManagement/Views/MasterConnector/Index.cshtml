@@ -101,39 +101,43 @@
                        asp-for="PageSize" />
 
 
-                <!-- Station -->
-
-                <div class="form-group">
-
-                    <label>
-                        Testing Station Profile
+               <div class="form-group">
+                    <label for="Connector_StationProfile">
+                        Testing Station
                     </label>
 
                     <select asp-for="Connector.StationProfile"
+                            asp-items="ViewBag.TestingStations"
                             class="form-control">
 
-                        <option value="">
-                            Select Station
-                        </option>
-
-                        <option value="OS">OS</option>
-                        <option value="ATE">ATE</option>
-                        <option value="APP">APP</option>
-                        <option value="EUT">EUT</option>
-                        <option value="FCT">FCT</option>
+                        <option value="">Select Station</option>
 
                     </select>
 
                     <span asp-validation-for="Connector.StationProfile"
                           class="validation-message">
                     </span>
+                </div>
 
+                
+                <!-- PROJECT -->
+                <div class="form-group">
+                    <label for="Connector_ProjectCode">Project</label>
+
+                    <select asp-for="Connector.ProjectCode"
+                            asp-items="Model.Projects"
+                            class="form-control">
+                        <option value="">Select Project</option>
+                    </select>
+
+                    <span asp-validation-for="Connector.ProjectCode"
+                          class="validation-message"></span>
                 </div>
 
 
                 <!-- Connector Code -->
 
-                <div class="form-group">
+                @* <div class="form-group">
 
                     <label>
                         Connector Code Type
@@ -147,20 +151,18 @@
                           class="validation-message">
                     </span>
 
-                </div>
+                </div> *@
 
-
-                <!-- Description -->
 
                 <div class="form-group">
 
                     <label>
-                        Description / Part No
+                        Spare Item
                     </label>
 
                     <input asp-for="Connector.DescriptionPartNo"
                            class="form-control"
-                           placeholder="e.g. Snoopy Board / 103PP-09940IA" />
+                           placeholder="Enter the spare Item" />
 
                     <span asp-validation-for="Connector.DescriptionPartNo"
                           class="validation-message">
@@ -240,10 +242,11 @@
                     </label>
 
                     <input asp-for="Connector.BaseStock"
-                           type="number"
-                           min="0"
-                           class="form-control"
-                           placeholder="Initial stock count" />
+                       type="number"
+                       min="0"
+                       value="@(Model.Connector.Id > 0 ? Model.Connector.BaseStock.ToString() : "")"
+                       class="form-control"
+                       placeholder="Initial stock count" />
 
                 </div>
 
@@ -257,10 +260,11 @@
                     </label>
 
                     <input asp-for="Connector.AlertThreshold"
-                           type="number"
-                           min="0"
-                           class="form-control"
-                           placeholder="Minimum stock" />
+                       type="number"
+                       min="0"
+                       value="@(Model.Connector.Id > 0 ? Model.Connector.AlertThreshold.ToString() : "")"
+                       class="form-control"
+                       placeholder="Minimum stock" />
 
                 </div>
 
@@ -274,11 +278,13 @@
                     </label>
 
                     <input asp-for="Connector.UnitCostINR"
-                           type="number"
-                           step="0.01"
-                           min="0"
-                           class="form-control"
-                           placeholder="Value in Indian Rupees" />
+                       type="number"
+                       id="unitCostINR"
+                       step="0.01"
+                       min="0"
+                       value="@(Model.Connector.Id > 0 ? Model.Connector.UnitCostINR.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) : "")"
+                       class="form-control"
+                       placeholder="Value in Indian Rupees" />
 
                 </div>
 
@@ -292,11 +298,13 @@
                     </label>
 
                     <input asp-for="Connector.UnitCostCNY"
-                           type="number"
-                           step="0.01"
-                           min="0"
-                           class="form-control"
-                           placeholder="Value in Chinese Yuan" />
+                        id="unitCostCNY"
+                       type="number"
+                       step="0.01"
+                       min="0"
+                       value="@(Model.Connector.Id > 0 && Model.Connector.UnitCostCNY.HasValue ? Model.Connector.UnitCostCNY.Value.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) : "")"
+                       class="form-control"
+                       placeholder="Value in Chinese Yuan" />
 
                 </div>
 
@@ -365,9 +373,9 @@
                         <tr>
 
                             <th>PHOTO</th>
-                            <th>ASSET KEY</th>
+                            <th>SPARE ITEM</th>
                             <th>STATION</th>
-                            <th>DESCRIPTION / PART NO</th>
+                            <th>PROJECT</th>
                             <th>LIFE CYCLE</th>
                             <th>AVAILABLE STOCK</th>
                             <th>ALERT MIN</th>
@@ -409,44 +417,35 @@
                                         }
                             </td>
 
-
-                            <!-- ASSET KEY -->
-
                             <td>
-
-                                <strong class="asset-key">
-                                    @item.StationProfile-@item.ConnectorCodeType
-                                </strong>
-
+                                <button type="button"
+                                        class="connector-history-link"
+                                        data-id="@item.Id"
+                                        data-name="@item.DescriptionPartNo"
+                                        data-project="@item.ProjectCode"
+                                        data-station="@item.StationProfile"
+                                        data-photo="@item.PhotoPath"
+                                        data-lifecycle="@item.LifeCycleLimit"
+                                        data-stock="@item.BaseStock"
+                                        data-alert="@item.AlertThreshold"
+                                        data-price="@item.UnitCostINR.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
+                                        onclick="openConnectorPurchaseHistory(this)">
+                                    @item.DescriptionPartNo
+                                </button>
                             </td>
-
-
-                            <!-- STATION -->
-
+                            
                             <td>
                                 @item.StationProfile
                             </td>
 
-
-                            <!-- DESCRIPTION -->
-
                             <td>
-
-                                <strong>
-                                    @item.DescriptionPartNo
-                                </strong>
-
+                                <strong class="asset-key">@item.ProjectCode</strong>
                             </td>
-
-
-                            <!-- LIFE CYCLE -->
+                          
 
                             <td>
                                 @item.LifeCycleLimit
                             </td>
-
-
-                            <!-- STOCK -->
 
                             <td>
 
@@ -461,15 +460,9 @@
 
                                     </td>
 
-
-                                    <!-- ALERT -->
-
                                     <td>
                                         @item.AlertThreshold
                                     </td>
-
-
-                                    <!-- COST -->
 
                                     <td>
 
@@ -485,9 +478,6 @@
                                         }
 
                                     </td>
-
-
-                                    <!-- STATUS -->
 
                                     <td>
 
@@ -506,7 +496,6 @@
 
                                     </td>
                                     
-                                    <!-- ACTIONS -->
                                     <td>
                                         <div class="action-buttons">
 
@@ -611,6 +600,96 @@
             }
 
         </div>
+        
+<!-- MASTER CONNECTOR PURCHASE HISTORY MODAL -->
+<div id="connectorPurchaseHistoryModal"
+     class="purchase-history-modal"
+     aria-hidden="true">
+
+    <div class="purchase-history-dialog"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="connectorHistoryTitle">
+
+        <div class="purchase-history-header">
+            <h3 id="connectorHistoryTitle">
+                📦 <span id="mcHistoryTitle">Purchase History</span>
+            </h3>
+
+            <button type="button"
+                    class="purchase-history-close"
+                    onclick="closeConnectorPurchaseHistory()"
+                    aria-label="Close">
+                &times;
+            </button>
+        </div>
+
+        <div class="purchase-history-content">
+
+            <section class="purchase-history-details">
+
+                <div class="history-product-card">
+                    <div class="history-product-photo">
+                        <img id="mcHistoryPhoto"
+                             src=""
+                             alt="Connector photo"
+                             hidden />
+                        <span id="mcHistoryPhotoPlaceholder">No Image</span>
+                    </div>
+
+                    <div class="history-product-info">
+                        <span class="history-eyebrow">MASTER CONNECTOR</span>
+                        <h4 id="mcHistoryName">—</h4>
+                    </div>
+                </div>
+
+                <div class="history-specifications">
+                    <h4>📊 Technical Specifications &amp; Parameters:</h4>
+                    <ul>
+                        <li><strong>Testing Station:</strong> <span id="mcHistoryStation">—</span></li>
+                        <li><strong>Project Code:</strong> <span id="mcHistoryProject">—</span></li>
+                        <li><strong>Life Cycle Limit:</strong> <span id="mcHistoryLifecycle">—</span></li>
+                        <li><strong>Unit Cost:</strong> <span id="mcHistoryPrice">—</span></li>
+                        <li><strong>Available Stock:</strong> <span id="mcHistoryStock">—</span></li>
+                        <li><strong>Alert Threshold:</strong> <span id="mcHistoryAlert">—</span></li>
+                    </ul>
+                </div>
+
+                <div class="history-tracking-note">
+                    <h4>💡 Deep Tracking Note:</h4>
+                    <p>Previous purchase records associated with this connector are displayed on the right.</p>
+                </div>
+
+            </section>
+
+            <section class="purchase-history-records">
+                <h4>📋 Previous Purchase Records</h4>
+
+                <div class="history-table-wrapper">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>DATE</th>
+                                <th>PR NO</th>
+                                <th>QTY</th>
+                                <th>TOTAL COST</th>
+                                <th>STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mcPurchaseHistoryRows">
+                            <tr>
+                                <td colspan="5" class="history-message">
+                                    Select an item to load purchase history.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</div>
 
     </div>
 
@@ -708,7 +787,7 @@
             modal.classList.add("active");
             document.body.classList.add("connector-image-modal-open");
         }
-
+            
         function hideConnectorImage() {
             const modal = document.getElementById("connectorImageModal");
             const largeImage = document.getElementById("connectorImageLarge");
@@ -737,5 +816,240 @@
                 hideConnectorImage();
             }
         });
+
+        
+ // =====================================================
+ // AUTOMATIC INR TO RMB (CNY) CONVERSION
+ // Uses the latest available exchange rate
+ // =====================================================
+ document.addEventListener("DOMContentLoaded", async function () {
+
+     const inrInput = document.getElementById("unitCostINR");
+     const cnyInput = document.getElementById("unitCostCNY");
+
+     if (!inrInput || !cnyInput) {
+         return;
+     }
+
+     let conversionRate = null;
+
+     async function loadExchangeRate() {
+         try {
+             const response = await fetch(
+                 "https://open.er-api.com/v6/latest/INR",
+                 { cache: "no-store" }
+             );
+
+             if (!response.ok) {
+                 throw new Error("Exchange rate request failed.");
+             }
+
+             const data = await response.json();
+
+             if (
+                 data.result !== "success" ||
+                 !data.rates ||
+                 !Number.isFinite(data.rates.CNY) ||
+                 data.rates.CNY <= 0
+             ) {
+                 throw new Error("Invalid INR to CNY rate.");
+             }
+
+             conversionRate = data.rates.CNY;
+
+             // Calculate immediately using the retrieved rate.
+             convertINRtoCNY();
+
+             console.log(
+                 "INR to CNY rate:",
+                 conversionRate,
+                 "Rate date:",
+                 data.time_last_update_utc || "Not provided"
+             );
+
+         } catch (error) {
+             console.error("Unable to retrieve exchange rate:", error);
+             alert(
+                 "Unable to retrieve the latest INR to CNY exchange rate. " +
+                 "Please try again before saving."
+             );
+         }
+     }
+
+     function convertINRtoCNY() {
+
+         if (conversionRate === null) {
+             return;
+         }
+
+         const inrValue = Number(inrInput.value);
+
+         if (
+             inrInput.value.trim() === "" ||
+             !Number.isFinite(inrValue) ||
+             inrValue < 0
+         ) {
+             cnyInput.value = "";
+             return;
+         }
+
+         cnyInput.value = (inrValue * conversionRate).toFixed(2);
+
+         cnyInput.dispatchEvent(
+             new Event("input", { bubbles: true })
+         );
+
+         cnyInput.dispatchEvent(
+             new Event("change", { bubbles: true })
+         );
+     }
+
+     inrInput.addEventListener("input", convertINRtoCNY);
+
+     // Fetch the latest available rate when the page opens.
+     await loadExchangeRate();
+ });
+
+ 
+async function openConnectorPurchaseHistory(button) {
+    const modal = document.getElementById("connectorPurchaseHistoryModal");
+    const rows = document.getElementById("mcPurchaseHistoryRows");
+    const photo = document.getElementById("mcHistoryPhoto");
+    const placeholder = document.getElementById("mcHistoryPhotoPlaceholder");
+
+    const name = button.dataset.name || "Purchase History";
+
+    document.getElementById("mcHistoryTitle").textContent = name;
+    document.getElementById("mcHistoryName").textContent = name;
+    document.getElementById("mcHistoryStation").textContent = button.dataset.station || "—";
+    document.getElementById("mcHistoryProject").textContent = button.dataset.project || "—";
+    document.getElementById("mcHistoryLifecycle").textContent = button.dataset.lifecycle || "—";
+    document.getElementById("mcHistoryPrice").textContent = "₹" + (button.dataset.price || "0.00");
+    document.getElementById("mcHistoryStock").textContent = (button.dataset.stock || "0") + " Pcs";
+    document.getElementById("mcHistoryAlert").textContent = (button.dataset.alert || "0") + " Pcs";
+
+    photo.onerror = () => {
+        photo.hidden = true;
+        photo.removeAttribute("src");
+        placeholder.hidden = false;
+    };
+
+    if (button.dataset.photo) {
+        photo.src = button.dataset.photo;
+        photo.hidden = false;
+        placeholder.hidden = true;
+    } else {
+        photo.hidden = true;
+        photo.removeAttribute("src");
+        placeholder.hidden = false;
+    }
+
+    modal.classList.add("active");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("purchase-history-open");
+
+    rows.replaceChildren();
+
+    const loadingRow = document.createElement("tr");
+    const loadingCell = document.createElement("td");
+    loadingCell.colSpan = 5;
+    loadingCell.className = "history-message";
+    loadingCell.textContent = "Loading purchase history...";
+    loadingRow.appendChild(loadingCell);
+    rows.appendChild(loadingRow);
+
+    try {
+        const response = await fetch(
+            '@Url.Action("PurchaseHistory", "MasterConnector")?id=' +
+            encodeURIComponent(button.dataset.id),
+            { headers: { "Accept": "application/json" } }
+        );
+
+        if (!response.ok) {
+            throw new Error("Unable to retrieve purchase history.");
+        }
+
+        const records = await response.json();
+
+        // Do not populate a modal that has already been closed.
+        if (!modal.classList.contains("active")) return;
+
+        rows.replaceChildren();
+
+        if (!Array.isArray(records) || records.length === 0) {
+            showConnectorHistoryMessage(rows, "No previous purchase records found.");
+            return;
+        }
+
+        records.forEach(record => {
+            const tr = document.createElement("tr");
+
+            [
+                record.date,
+                record.prNo,
+                record.quantity,
+                record.totalCost,
+                record.status
+            ].forEach(value => {
+                const td = document.createElement("td");
+                td.textContent = value ?? "—";
+                tr.appendChild(td);
+            });
+
+            rows.appendChild(tr);
+        });
+    } catch (error) {
+        console.error("Connector purchase history error:", error);
+        rows.replaceChildren();
+        showConnectorHistoryMessage(
+            rows,
+            "Purchase history could not be loaded. Please check the server endpoint."
+        );
+    }
+}
+
+
+function showConnectorHistoryMessage(tbody, message) {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+
+    td.colSpan = 5;
+    td.className = "history-message";
+    td.innerHTML = `
+        <div class="history-empty-state">
+            <div class="history-empty-icon">📋</div>
+            <div class="history-empty-title">No Purchase Records</div>
+            <div class="history-empty-description"></div>
+        </div>
+    `;
+
+    td.querySelector(".history-empty-description").textContent = message;
+
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+}
+
+
+function closeConnectorPurchaseHistory() {
+    const modal = document.getElementById("connectorPurchaseHistoryModal");
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("purchase-history-open");
+}
+
+document.getElementById("connectorPurchaseHistoryModal")
+    .addEventListener("click", function (event) {
+        if (event.target === this) {
+            closeConnectorPurchaseHistory();
+        }
+    });
+
+document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+        closeConnectorPurchaseHistory();
+    }
+});
+
+
     </script>
 }

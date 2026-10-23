@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TestingSpareManagement")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+17069bd7d2d66c06a9049f5bcc66d97c2c000ccf")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+faf5c38aab796a8a86fcfc807aa7ea69f4419b3c")]
 [assembly: System.Reflection.AssemblyProductAttribute("TestingSpareManagement")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TestingSpareManagement")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

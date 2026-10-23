@@ -23,10 +23,6 @@ namespace TestingSpareManagement.Controllers
             _environment = environment;
         }
 
-
-        // =========================================================
-        // INDEX
-        // =========================================================
         [HttpGet]
         public async Task<IActionResult> Index(
             int pageNumber = 1,
@@ -58,14 +54,11 @@ namespace TestingSpareManagement.Controllers
                     pageSize = pageSize
                 });
             }
-
+            await LoadProjects(model);
+            await LoadTestingStations();
             return View(model);
         }
 
-
-        // =========================================================
-        // SAVE NEW CONNECTOR
-        // =========================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Save(MasterConnectorViewModel model)
@@ -101,8 +94,16 @@ namespace TestingSpareManagement.Controllers
             command.Parameters.Add("@StationProfile", SqlDbType.NVarChar, 100).Value =
                 model.Connector.StationProfile.Trim();
 
+            command.Parameters.Add("@ProjectCode", SqlDbType.NVarChar, 100).Value =
+                string.IsNullOrWhiteSpace(model.Connector.ProjectCode)
+                    ? DBNull.Value
+                    : model.Connector.ProjectCode.Trim();
+
+
             command.Parameters.Add("@ConnectorCodeType", SqlDbType.NVarChar, 100).Value =
-                model.Connector.ConnectorCodeType.Trim();
+    string.IsNullOrWhiteSpace(model.Connector.ConnectorCodeType)
+        ? string.Empty
+        : model.Connector.ConnectorCodeType.Trim();
 
             command.Parameters.Add("@DescriptionPartNo", SqlDbType.NVarChar, 250).Value =
                 model.Connector.DescriptionPartNo.Trim();
@@ -139,10 +140,6 @@ namespace TestingSpareManagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
-        // =========================================================
-        // EDIT
-        // =========================================================
         [HttpGet]
         public async Task<IActionResult> Edit(
             int id,
@@ -169,14 +166,10 @@ namespace TestingSpareManagement.Controllers
             model.PageSize = pageSize;
 
             await LoadConnectorReport(model);
-
+            await LoadProjects(model);
             return View("Index", model);
         }
 
-
-        // =========================================================
-        // UPDATE
-        // =========================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(MasterConnectorViewModel model)
@@ -219,8 +212,17 @@ namespace TestingSpareManagement.Controllers
             command.Parameters.Add("@StationProfile", SqlDbType.NVarChar, 100).Value =
                 model.Connector.StationProfile.Trim();
 
+
+            command.Parameters.Add("@ProjectCode", SqlDbType.NVarChar, 100).Value =
+                string.IsNullOrWhiteSpace(model.Connector.ProjectCode)
+                    ? DBNull.Value
+                    : model.Connector.ProjectCode.Trim();
+
+
             command.Parameters.Add("@ConnectorCodeType", SqlDbType.NVarChar, 100).Value =
-                model.Connector.ConnectorCodeType.Trim();
+    string.IsNullOrWhiteSpace(model.Connector.ConnectorCodeType)
+        ? string.Empty
+        : model.Connector.ConnectorCodeType.Trim();
 
             command.Parameters.Add("@DescriptionPartNo", SqlDbType.NVarChar, 250).Value =
                 model.Connector.DescriptionPartNo.Trim();
@@ -261,10 +263,6 @@ namespace TestingSpareManagement.Controllers
             });
         }
 
-
-        // =========================================================
-        // DELETE
-        // =========================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -293,10 +291,6 @@ namespace TestingSpareManagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
-        // =========================================================
-        // GET PAGINATED MASTER CONNECTORS
-        // =========================================================
         private async Task<(List<MasterConnector> Connectors, int TotalRecords)>
             GetMasterConnectors(int pageNumber, int pageSize)
         {
@@ -335,10 +329,6 @@ namespace TestingSpareManagement.Controllers
             return (list, totalRecords);
         }
 
-
-        // =========================================================
-        // GET BY ID
-        // =========================================================
         private async Task<MasterConnector?> GetMasterConnectorById(int id)
         {
             string connectionString = GetConnectionString();
@@ -363,9 +353,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =========================================================
-        // MAP SQL DATA
-        // =========================================================
         private MasterConnector MapConnector(SqlDataReader reader)
         {
             return new MasterConnector
@@ -373,6 +360,9 @@ namespace TestingSpareManagement.Controllers
                 Id = Convert.ToInt32(reader["Id"]),
 
                 StationProfile = reader["StationProfile"]?.ToString() ?? "",
+                ProjectCode = reader["ProjectCode"] == DBNull.Value
+                    ? ""
+                    : reader["ProjectCode"].ToString() ?? "",
 
                 ConnectorCodeType = reader["ConnectorCodeType"]?.ToString() ?? "",
 
@@ -415,9 +405,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =========================================================
-        // VALIDATION
-        // =========================================================
         private void ValidateConnector(MasterConnectorViewModel model)
         {
             if (model.Connector == null)
@@ -429,8 +416,8 @@ namespace TestingSpareManagement.Controllers
             if (string.IsNullOrWhiteSpace(model.Connector.StationProfile))
                 ModelState.AddModelError("Connector.StationProfile", "Testing Station Profile is required.");
 
-            if (string.IsNullOrWhiteSpace(model.Connector.ConnectorCodeType))
-                ModelState.AddModelError("Connector.ConnectorCodeType", "Connector Code Type is required.");
+            //if (string.IsNullOrWhiteSpace(model.Connector.ConnectorCodeType))
+            //    ModelState.AddModelError("Connector.ConnectorCodeType", "Connector Code Type is required.");
 
             if (string.IsNullOrWhiteSpace(model.Connector.DescriptionPartNo))
                 ModelState.AddModelError("Connector.DescriptionPartNo", "Description / Part No is required.");
@@ -449,9 +436,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =========================================================
-        // PHOTO
-        // =========================================================
         private async Task<string?> SavePhotoAsync(IFormFile photoFile)
         {
             const long maxSize = 5 * 1024 * 1024;
@@ -487,10 +471,6 @@ namespace TestingSpareManagement.Controllers
             return $"/uploads/connectors/{fileName}";
         }
 
-
-        // =========================================================
-        // CONNECTION STRING
-        // =========================================================
         private string GetConnectionString()
         {
             string? connectionString = _configuration.GetConnectionString("DefaultConnection");
@@ -503,10 +483,6 @@ namespace TestingSpareManagement.Controllers
             return connectionString;
         }
 
-
-        // =========================================================
-        // LOAD PAGINATED REPORT INTO VIEWMODEL
-        // =========================================================
         private async Task LoadConnectorReport(MasterConnectorViewModel model)
         {
             int pageNumber = model.CurrentPage < 1 ? 1 : model.CurrentPage;
@@ -534,6 +510,168 @@ namespace TestingSpareManagement.Controllers
                 model.Connectors = result.Connectors;
                 model.TotalRecords = result.TotalRecords;
             }
+        }
+
+
+        private async Task LoadProjects(MasterConnectorViewModel model)
+        {
+            model.Projects = new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+
+            string connectionString = GetConnectionString();
+
+            using SqlConnection connection = new SqlConnection(connectionString);
+
+            using SqlCommand command = new SqlCommand(@"
+            SELECT ProjectCode
+            FROM dbo.ProjectMaster
+            WHERE IsActive = 1
+            ORDER BY ProjectCode;", connection);
+
+            await connection.OpenAsync();
+
+            using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                string projectCode = reader["ProjectCode"]?.ToString() ?? "";
+
+                if (!string.IsNullOrWhiteSpace(projectCode))
+                {
+                    model.Projects.Add(
+                        new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+                        {
+                            Value = projectCode,
+                            Text = projectCode
+                        });
+                }
+            }
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> PurchaseHistory(int id)
+        {
+            if (id <= 0)
+                return BadRequest("Invalid connector ID.");
+
+            try
+            {
+                var connector = await GetMasterConnectorById(id);
+
+                if (connector == null)
+                    return NotFound("Connector not found.");
+
+                var history = new List<object>();
+                string connectionString = GetConnectionString();
+
+                for (int year = 2000; year <= DateTime.Today.Year; year++)
+                {
+                    using SqlConnection connection = new SqlConnection(connectionString);
+
+                    using SqlCommand command =
+                        new SqlCommand("dbo.GetPrPoReport", connection);
+
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    command.Parameters.Add("@Year", SqlDbType.Int).Value = year;
+                    command.Parameters.Add("@PageNumber", SqlDbType.Int).Value = 1;
+                    command.Parameters.Add("@PageSize", SqlDbType.Int).Value = 10000;
+
+                    SqlParameter totalParam =
+                        command.Parameters.Add("@TotalRecords", SqlDbType.Int);
+
+                    totalParam.Direction = ParameterDirection.Output;
+
+                    await connection.OpenAsync();
+
+                    using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+                    while (await reader.ReadAsync())
+                    {
+                        string projectCode =
+                            reader["ProjectCode"]?.ToString()?.Trim() ?? "";
+
+                        string assetTarget =
+                            reader["AssetTarget"]?.ToString()?.Trim() ?? "";
+
+                        if (!string.Equals(
+                                projectCode,
+                                connector.ProjectCode?.Trim(),
+                                StringComparison.OrdinalIgnoreCase)
+                            ||
+                            !string.Equals(
+                                assetTarget,
+                                connector.DescriptionPartNo?.Trim(),
+                                StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+
+                        history.Add(new
+                        {
+                            date = Convert.ToDateTime(reader["RequisitionDate"])
+                                .ToString("yyyy-MM-dd"),
+
+                            prNo = reader["PrNumber"]?.ToString() ?? "",
+
+                            quantity = reader["Quantity"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(reader["Quantity"]),
+
+                            totalCost = "₹" +
+                                Convert.ToDecimal(reader["TotalCost"]).ToString("N2"),
+
+                            status = reader["PoStatus"]?.ToString() ?? ""
+                        });
+                    }
+                }
+
+                return Json(history);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(
+                    $"Master Connector PurchaseHistory failed for ID {id}: {ex}");
+
+                return StatusCode(
+                    500,
+                    new { message = "Unable to load connector purchase history." });
+            }
+        }
+
+        private async Task LoadTestingStations()
+        {
+            var stations = new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+
+            string connectionString = GetConnectionString();
+
+            using SqlConnection connection = new SqlConnection(connectionString);
+
+            using SqlCommand command = new SqlCommand(@"
+        SELECT StationCode
+        FROM dbo.TestingStation
+        WHERE IsActive = 1
+        ORDER BY StationCode;", connection);
+
+            await connection.OpenAsync();
+
+            using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                string stationCode = reader["StationCode"]?.ToString() ?? "";
+
+                if (!string.IsNullOrWhiteSpace(stationCode))
+                {
+                    stations.Add(new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+                    {
+                        Value = stationCode,
+                        Text = stationCode
+                    });
+                }
+            }
+
+            ViewBag.TestingStations = stations;
         }
     }
 }

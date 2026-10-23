@@ -296,7 +296,8 @@
 
 
     @{
-        var userRole = Context.Session.GetString("Role") ?? "Employee";
+        var userRole = Context.Session.GetString("Role")?.Trim() ?? "";
+
         var isAdmin = string.Equals(
         userRole,
         "Admin",
@@ -486,12 +487,9 @@
                         Material Request
                     </span>
 
-                    <span id="layoutReqBadge"
-                          class="sidebar-badge">
 
-                        1
+                    @await Component.InvokeAsync("PendingMaterialRequests")
 
-                    </span>
 
                 </button>
 

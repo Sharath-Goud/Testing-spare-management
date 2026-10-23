@@ -59,11 +59,11 @@
             <div class="form-group">
                 <label>
                     <i class="fa-solid fa-folder"></i>
-                    Assigned Project Code
+                    Project
                 </label>
 
                 <select asp-for="ProjectCode" class="form-control-custom">
-                    <option value="">-- Select Project Code --</option>
+                    <option value="">-- Select Project --</option>
 
                     @foreach (var proj in Model.ProjectCodes)
                     {
@@ -77,84 +77,53 @@
 
 
 
-            <!-- Spare Details / Connector Details -->
-            <div class="form-group">
-                <label>
+            <div class="form-group spare-item-group">
+                <label for="SpareDetails">
                     <i class="fa-solid fa-microchip"></i>
-                    Spare / Connector Details
+                    Spare Item
                 </label>
 
                 <select asp-for="SpareDetails"
                         id="SpareDetails"
-                        class="form-control-custom">
+                        class="form-control-custom"
+                        required>
 
-                    <option value="">-- Select Spare / Test Item Asset --</option>
+                    <option value="">-- Select Spare Item --</option>
 
-                    <!-- Bend / Twist Test Items -->
-                    <option value="180 Bend (453g)(TTF)">180 Bend (453g)(TTF)</option>
-                    <option value="180 Bend (225g)(TTF)">180 Bend (225g)(TTF)</option>
-                    <option value="Twist (to spec)">Twist (to spec)</option>
-
-                    <!-- OS -->
-                    <option value="C70">C70</option>
-                    <option value="OS-C70">OS-C70</option>
-                    <option value="OS-C70 - T1 Board / Connector C70">
-                        OS-C70 - T1 Board / Connector C70
-                    </option>
-
-                    <!-- ATE -->
-                    <option value="QT1">QT1</option>
-                    <option value="ATE-QT1">ATE-QT1</option>
-                    <option value="ATE-QT1 - DCR switch Board">
-                        ATE-QT1 - DCR switch Board
-                    </option>
-
-                    <option value="QT3">QT3</option>
-                    <option value="ATE-QT3">ATE-QT3</option>
-                    <option value="ATE-QT3 - HSIO lance Board">
-                        ATE-QT3 - HSIO lance Board
-                    </option>
-
-                    <!-- APP -->
-                    <option value="APP-C70">APP-C70</option>
-                    <option value="APP-C70 - TR_Board_A1.2轉接板">
-                        APP-C70 - TR_Board_A1.2轉接板
-                    </option>
-
-                    <!-- EUT -->
-                    <option value="EUT-C70">EUT-C70</option>
-                    <option value="EUT-C70 - Snoopy Board測試板8層板">
-                        EUT-C70 - Snoopy Board測試板8層板
-                    </option>
-
-                    <!-- FCT -->
-                    <option value="FCT-C70">FCT-C70</option>
-                    <option value="FCT-C70 - 6UP PCBA TypeC轉接板">
-                        FCT-C70 - 6UP PCBA TypeC轉接板
-                    </option>
-
+                    @if (ViewBag.AssetTargets != null)
+                    {
+                        foreach (string item in ViewBag.AssetTargets)
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    }
                 </select>
 
                 <span asp-validation-for="SpareDetails"
                       class="text-danger small"></span>
             </div>
 
-
-            <!-- Equipment Station from DB -->
+            <!-- Equipment Station from TestingStation table -->
             <div class="form-group">
-                <label>Select Test Equipment Station</label>
-                <select asp-for="EquipmentStation" class="form-control-custom">
-                    @foreach (var st in Model.EquipmentStations)
-                    {
-                        <option value="@st">@st</option>
-                    }
+                <label for="EquipmentStation">Testing Station</label>
+
+                <select asp-for="EquipmentStation"
+                        asp-items="@(new Microsoft.AspNetCore.Mvc.Rendering.SelectList(Model.EquipmentStations))"
+                        class="form-control-custom">
+
+                    <option value="">-- Select Station --</option>
+
                 </select>
+
+                <span asp-validation-for="EquipmentStation"
+                      class="text-danger">
+                </span>
             </div>
 
             <!-- Quantity Used -->
             <div class="form-group">
                 <label>Quantity Used (Pieces)</label>
-                <input asp-for="QuantityUsed" type="number" class="form-control-custom" placeholder="e.g. 5" min="1" />
+                <input asp-for="QuantityUsed" type="number" class="form-control-custom" placeholder="e.g. 5" min="1" value="" />
                 <span asp-validation-for="QuantityUsed" class="text-danger small"></span>
             </div>
 
@@ -262,9 +231,9 @@
                 <thead>
                     <tr>
                         <th>DATE</th>
+                        <th>SPARE ITEM</th>
                         <th>SHIFT</th>
                         <th>PROJECT</th>
-                        <th>ASSET KEY</th>
                         <th>STATION</th>
                         <th>CONSUMED QTY</th>
                         <th>LINE</th>
@@ -280,11 +249,11 @@
                         {
                             <tr data-id="@item.Id">
                                 <td>@item.ConsumptionDate.ToString("yyyy-MM-dd")</td>
-                                <td><span class="badge badge-shift">@item.WorkingShift</span></td>
-                                <td style="color:#7e22ce; font-weight:bold;">@item.ProjectCode</td>
                                 <td class="asset-key-cell">
                                     @item.SpareDetails
                                 </td>
+                                <td><span class="badge badge-shift">@item.WorkingShift</span></td>
+                                <td style="color:#7e22ce; font-weight:bold;">@item.ProjectCode</td>
                                 <td>@item.EquipmentStation</td>
                                 <td><strong>@item.QuantityUsed</strong></td>
                                 <td>@item.LineTarget</td>
@@ -354,9 +323,6 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        // =====================================================
-        // INTERACTIVE CALENDAR
-        // =====================================================
         let calYear = @Model.SelectedDate.Year;
         let calMonth = @Model.SelectedDate.Month - 1;
 
@@ -402,9 +368,6 @@
             renderCalendar();
         }
 
-        // =====================================================
-        // AUTO-FILL DRI FROM SESSION
-        // =====================================================
         document.addEventListener('DOMContentLoaded', function () {
             renderCalendar();
 
@@ -420,9 +383,6 @@
             }
         });
 
-        // =====================================================
-        // EDIT CONSUMPTION
-        // =====================================================
         function editConsumption(id) {
             fetch('@Url.Action("GetItemForEdit", "Consumption")?id=' + id)
                 .then(r => r.json())
@@ -463,9 +423,6 @@
             renderCalendar();
         }
 
-        // =====================================================
-        // DELETE CONSUMPTION
-        // =====================================================
         function deleteConsumption(id) {
             if (!confirm('Delete this consumption entry?')) return;
 
@@ -492,17 +449,11 @@
             form.submit();
         }
 
-        // =====================================================
-        // APPLY DATE FILTER
-        // =====================================================
         function applyDateFilter() {
             const val = document.getElementById('dateFilter').value;
             window.location.href = '@Url.Action("DailyConsumption", "Consumption")?filterDate=' + val;
         }
 
-        // =====================================================
-        // EXPORT EXCEL (CSV)
-        // =====================================================
         function exportConsumptionExcel() {
             const table = document.getElementById('consumptionTable');
             const rows = table.querySelectorAll('tr');
@@ -529,9 +480,6 @@
             document.body.removeChild(link);
         }
 
-        // =====================================================
-        // EXPORT PDF (string concat + escaped closing tags)
-        // =====================================================
         function exportConsumptionPdf() {
             const table = document.getElementById('consumptionTable').cloneNode(true);
 
@@ -575,9 +523,6 @@
             }, 300);
         }
 
-        // =====================================================
-        // AUTOCOMPLETE FOR SPARE DETAILS
-        // =====================================================
         document.addEventListener('DOMContentLoaded', function () {
             const input = document.querySelector('[name="SpareDetails"]');
             if (input) {

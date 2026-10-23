@@ -11,9 +11,6 @@
 
 <div class="prpo-page-wrapper">
 
-    <!-- ========================================================= -->
-    <!-- LEFT PANEL: ADD / MODIFY PR/PO RECORD                     -->
-    <!-- ========================================================= -->
     <div class="prpo-form-panel">
         <h5><i class="fa-solid fa-cart-shopping"></i> Add / Modify PR/PO Record</h5>
 
@@ -31,6 +28,8 @@
         }
 
         <form asp-controller="PrPoTracker" asp-action="Save" method="post" id="prpoForm">
+            <input type="hidden" id="editRecordId" name="id" value="" />
+            <input type="hidden" id="isEditMode" value="false" />
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="ActiveYear" value="@activeYear" />
 
@@ -74,7 +73,7 @@
             <!-- PROJECT CODE -->
             <div class="form-group">
                 <label for="projectDropdown">
-                    <i class="fa-solid fa-folder"></i> Target Project Code
+                    <i class="fa-solid fa-folder"></i> Project
                 </label>
 
                 <select id="projectDropdown" class="form-control-custom">
@@ -181,67 +180,33 @@
                 <span asp-validation-for="BuyerName" class="text-danger small"></span>
             </div>
 
+
             <!-- Target Spare / Test Item Asset -->
             <div class="form-group">
                 <label for="AssetTarget">
                     <i class="fa-solid fa-microchip"></i>
-                    Target Spare / Test Item Asset (Type First 2 Letters)
+                    Spare Item
                 </label>
 
                 <select asp-for="AssetTarget"
                         id="AssetTarget"
-                        class="form-control-custom">
+                        class="form-control-custom"
+                        required>
+                    <option value="">-- Select Spare Item --</option>
 
-                    <option value="">-- Select Spare / Test Item Asset --</option>
-
-                    <!-- Bend / Twist Test Items -->
-                    <option value="180 Bend (453g)(TTF)">180 Bend (453g)(TTF)</option>
-                    <option value="180 Bend (225g)(TTF)">180 Bend (225g)(TTF)</option>
-                    <option value="Twist (to spec)">Twist (to spec)</option>
-
-                    <!-- OS -->
-                    <option value="C70">C70</option>
-                    <option value="OS-C70">OS-C70</option>
-                    <option value="OS-C70 - T1 Board / Connector C70">
-                        OS-C70 - T1 Board / Connector C70
-                    </option>
-
-                    <!-- ATE -->
-                    <option value="QT1">QT1</option>
-                    <option value="ATE-QT1">ATE-QT1</option>
-                    <option value="ATE-QT1 - DCR switch Board">
-                        ATE-QT1 - DCR switch Board
-                    </option>
-
-                    <option value="QT3">QT3</option>
-                    <option value="ATE-QT3">ATE-QT3</option>
-                    <option value="ATE-QT3 - HSIO lance Board">
-                        ATE-QT3 - HSIO lance Board
-                    </option>
-
-                    <!-- APP -->
-                    <option value="APP-C70">APP-C70</option>
-                    <option value="APP-C70 - TR_Board_A1.2轉接板">
-                        APP-C70 - TR_Board_A1.2轉接板
-                    </option>
-
-                    <!-- EUT -->
-                    <option value="EUT-C70">EUT-C70</option>
-                    <option value="EUT-C70 - Snoopy Board測試板8層板">
-                        EUT-C70 - Snoopy Board測試板8層板
-                    </option>
-
-                    <!-- FCT -->
-                    <option value="FCT-C70">FCT-C70</option>
-                    <option value="FCT-C70 - 6UP PCBA TypeC轉接板">
-                        FCT-C70 - 6UP PCBA TypeC轉接板
-                    </option>
-
+                    @if (ViewBag.AssetTargets != null)
+                    {
+                        foreach (string description in ViewBag.AssetTargets)
+                        {
+                            <option value="@description">@description</option>
+                        }
+                    }
                 </select>
 
                 <span asp-validation-for="AssetTarget"
                       class="text-danger small"></span>
             </div>
+
 
             <!-- Quantity -->
             <div class="form-group">
@@ -331,7 +296,11 @@
 
             <!-- Buttons -->
             <button type="submit" class="btn-log-prpo">Log Procurement Row</button>
-            <button type="reset" class="btn-cancel-prpo" onclick="resetTax()">Cancel Modification</button>
+            <button type="reset"
+                    class="btn-cancel-prpo"
+                    onclick="cancelEditMode()">
+                Cancel Modification
+            </button>
         </form>
     </div>
 
@@ -428,12 +397,12 @@
                 <thead>
                     <tr>
                         <th>DATE</th>
+                        <th>SPARE ITEM</th>
                         <th>PR NUMBER</th>
                         <th>PO STATUS</th>
                         <th>PROJECT</th>
                         <th>ORIGIN</th>
                         <th>BUYER</th>
-                        <th>ASSET TARGET</th>
                         <th>QTY</th>
                         <th>UNIT PRICE</th>
                         <th>TOTAL COST</th>
@@ -454,6 +423,11 @@
                                 data-month="@item.RequisitionDate.Month"
                                 data-status="@item.PoStatus">
                                 <td>@item.RequisitionDate.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    <span class="spare-item-name">
+                                        @item.AssetTarget
+                                    </span>
+                                </td>
                                 <td><strong>@item.PrNumber</strong></td>
                                 <td>
                                     @{
@@ -470,7 +444,6 @@
                                 <td>@item.ProjectCode</td>
                                 <td>@item.PurchaseOriginRegion</td>
                                 <td>@item.BuyerName</td>
-                                <td>@item.AssetTarget</td>
                                 <td>@item.Quantity</td>
                                 <td>&#8377;@item.UnitPrice.ToString("N2")</td>
                                 <td>
@@ -490,8 +463,18 @@
                                 <td>@item.ShipmentTrackingNo</td>
                                 <td>@(item.DeliveryDate?.ToString("yyyy-MM-dd") ?? "-")</td>
                                 <td>@item.Remarks</td>
-                                <td>
-                                    <button type="button" class="btn-prpo-del" onclick="deleteRecord(@item.Id)">
+                                <td class="prpo-action-buttons">
+                                    <button type="button"
+                                            class="btn-prpo-edit"
+                                            onclick="editRecord(@item.Id)"
+                                            title="Edit PR/PO record">
+                                        <i class="fa-solid fa-pen"></i> Edit
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn-prpo-del"
+                                            onclick="deleteRecord(@item.Id)"
+                                            title="Delete PR/PO record">
                                         <i class="fa-solid fa-trash"></i> Del
                                     </button>
                                 </td>
@@ -523,13 +506,11 @@
         var ACTIVE_YEAR = @activeYear;
         var PRPO_INDEX_URL = '@Url.Action("Index", "PrPoTracker")';
         var PRPO_DELETE_URL = '@Url.Action("Delete", "PrPoTracker")';
+        var PRPO_EDIT_URL = '@Url.Action("GetEditRecord", "PrPoTracker")';
+        var PRPO_UPDATE_URL = '@Url.Action("Update", "PrPoTracker")';
+        var PRPO_SAVE_URL = '@Url.Action("Save", "PrPoTracker")';
 
-        console.log('✅ PR/PO Tracker loaded. Year:', ACTIVE_YEAR);
-
-
-        // =====================================================
-        // HELPER: Dropdown + New Input Pattern
-        // =====================================================
+        
         function setupDropdownWithNew(dropdownId, newInputId, finalValueId, onChangeCallback) {
             var dropdown = document.getElementById(dropdownId);
             var newInput = document.getElementById(newInputId);
@@ -680,6 +661,189 @@
             applyFilters();
         }
 
+
+        async function editRecord(id) {
+            const form = document.getElementById("prpoForm");
+
+            if (!form) {
+                alert("PR/PO form was not found.");
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    PRPO_EDIT_URL + "?id=" + encodeURIComponent(id),
+                    {
+                        method: "GET",
+                        headers: { "Accept": "application/json" }
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error("Unable to load record. HTTP " + response.status);
+                }
+
+                const result = await response.json();
+
+                if (!result.success || !result.data) {
+                    throw new Error(result.message || "Record data was not returned.");
+                }
+
+                const d = result.data;
+
+                // Enter edit mode: update the existing row, not insert a new row.
+                form.action = PRPO_UPDATE_URL;
+                document.getElementById("editRecordId").value = d.id;
+                document.getElementById("isEditMode").value = "true";
+
+                // Set ordinary form fields.
+                document.getElementById("RequisitionDate").value =
+                    d.requisitionDate || "";
+
+                document.getElementById("projectFinalValue").value =
+                    d.projectCode || "";
+
+                document.querySelector('[name="PrNumber"]').value =
+                    d.prNumber || "";
+
+                document.getElementById("poStatusFinalValue").value =
+                    d.poStatus || "";
+
+                document.getElementById("originFinalValue").value =
+                    d.purchaseOriginRegion || "";
+
+                document.getElementById("buyerFinalValue").value =
+                    d.buyerName || "";
+
+                document.getElementById("AssetTarget").value =
+                    d.assetTarget || "";
+
+                document.querySelector('[name="Quantity"]').value =
+                    d.quantity ?? "";
+
+                document.querySelector('[name="UnitPrice"]').value =
+                    d.unitPrice ?? "";
+
+                document.getElementById("taxPercentInput").value =
+                    d.taxPercent ?? 0;
+
+                document.querySelector('[name="ShipmentTrackingNo"]').value =
+                    d.shipmentTrackingNo || "";
+
+                document.querySelector('[name="DeliveryDate"]').value =
+                    d.deliveryDate || "";
+
+                document.getElementById("shipmentStatusFinalValue").value =
+                    d.shipmentStatus || "";
+
+                document.querySelector('[name="Remarks"]').value =
+                    d.remarks || "";
+
+                // Set each dropdown and its matching hidden field.
+                setEditDropdown(
+                    "projectDropdown", "projectNewInput",
+                    "projectFinalValue", d.projectCode
+                );
+
+                setEditDropdown(
+                    "poStatusDropdown", "poStatusNewInput",
+                    "poStatusFinalValue", d.poStatus
+                );
+
+                setEditDropdown(
+                    "originDropdown", "originNewInput",
+                    "originFinalValue", d.purchaseOriginRegion
+                );
+
+                setEditDropdown(
+                    "buyerDropdown", "buyerNewInput",
+                    "buyerFinalValue", d.buyerName
+                );
+
+                setEditDropdown(
+                    "shipmentStatusDropdown", "shipmentStatusNewInput",
+                    "shipmentStatusFinalValue", d.shipmentStatus
+                );
+
+                // Refresh tax and totals after setting the origin, quantity and price.
+                calculateTax();
+
+                // Change the submit button text.
+                const submitButton = form.querySelector('button[type="submit"]');
+                if (submitButton) {
+                    submitButton.textContent = "UPDATE PROCUREMENT ROW";
+                }
+
+                // Change the cancel button to exit edit mode.
+                const cancelButton = form.querySelector('button[type="reset"]');
+                if (cancelButton) {
+                    cancelButton.textContent = "CANCEL MODIFICATION";
+                }
+
+                form.scrollIntoView({ behavior: "smooth", block: "start" });
+
+            } catch (error) {
+                console.error("Edit record error:", error);
+                alert("Unable to load this record into the form.\n" + error.message);
+            }
+        }
+
+        function setEditDropdown(dropdownId, newInputId, finalValueId, value) {
+            const dropdown = document.getElementById(dropdownId);
+            const newInput = document.getElementById(newInputId);
+            const finalValue = document.getElementById(finalValueId);
+
+            if (!dropdown || !newInput || !finalValue) return;
+
+            const wanted = (value || "").trim();
+
+            // Find an existing option without selecting the special "__NEW__" option.
+            const matchingOption = Array.from(dropdown.options).find(
+                option => option.value === wanted && option.value !== "__NEW__"
+            );
+
+            if (matchingOption) {
+                dropdown.value = matchingOption.value;
+                newInput.value = "";
+                newInput.style.display = "none";
+                finalValue.value = matchingOption.value;
+            } else if (wanted) {
+                // Preserve values that are no longer in the master dropdown.
+                dropdown.value = "__NEW__";
+                newInput.value = wanted;
+                newInput.style.display = "block";
+                finalValue.value = wanted;
+            } else {
+                dropdown.value = "";
+                newInput.value = "";
+                newInput.style.display = "none";
+                finalValue.value = "";
+            }
+        }
+
+        window.editRecord = editRecord;
+
+        function cancelEditMode() {
+            const form = document.getElementById("prpoForm");
+
+            if (!form) return;
+
+            form.action = PRPO_SAVE_URL;
+            document.getElementById("editRecordId").value = "";
+            document.getElementById("isEditMode").value = "false";
+
+            const submitButton = form.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.textContent = "LOG PROCUREMENT ROW";
+            }
+
+            // Reset the tax display after the form reset completes.
+            setTimeout(function () {
+                resetTax();
+            }, 0);
+        }
+
+        window.cancelEditMode = cancelEditMode;
 
         // =====================================================
         // DELETE RECORD

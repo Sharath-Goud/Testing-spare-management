@@ -25,9 +25,6 @@ namespace TestingSpareManagement.Controllers
             _configuration = configuration;
         }
 
-        // =====================================================
-        // GET: Consumption/DailyConsumption
-        // =====================================================
         [HttpGet]
         public async Task<IActionResult> DailyConsumption(
             int pageNumber = 1,
@@ -67,6 +64,7 @@ namespace TestingSpareManagement.Controllers
             // Load dropdown data
             model.ProjectCodes = await GetProjectCodes();
             model.EquipmentStations = await GetEquipmentStations();
+            ViewBag.AssetTargets = await GetMasterConnectorDescriptions();
             //model.DriEngineers = await GetDriEngineers();
             model.LineTargets = await GetLineTargets();
 
@@ -74,9 +72,53 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // POST: Consumption/LogUsage
-        // =====================================================
+        private async Task<List<string>> GetMasterConnectorDescriptions()
+        {
+            var descriptions = new List<string>();
+
+            using SqlConnection connection =
+                new SqlConnection(GetConnectionString());
+
+            const string query = @"
+        SELECT SpareItem
+        FROM
+        (
+            SELECT DISTINCT
+                LTRIM(RTRIM(DescriptionPartNo)) AS SpareItem
+            FROM dbo.MasterConnector
+            WHERE IsActive = 1
+              AND DescriptionPartNo IS NOT NULL
+              AND LTRIM(RTRIM(DescriptionPartNo)) <> ''
+
+            UNION
+
+            SELECT DISTINCT
+                LTRIM(RTRIM(TestItemName)) AS SpareItem
+            FROM dbo.EquipmentConsumable
+            WHERE IsActive = 1
+              AND TestItemName IS NOT NULL
+              AND LTRIM(RTRIM(TestItemName)) <> ''
+        ) AS SpareItems
+        ORDER BY SpareItem;";
+
+            using SqlCommand command = new SqlCommand(query, connection);
+
+            await connection.OpenAsync();
+
+            using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                string item = reader["SpareItem"]?.ToString()?.Trim() ?? "";
+
+                if (!string.IsNullOrWhiteSpace(item))
+                    descriptions.Add(item);
+            }
+
+            return descriptions;
+        }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LogUsage(DailyConsumptionViewModel model)
@@ -124,9 +166,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // POST: Consumption/Update
-        // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(int id, DailyConsumptionViewModel model)
@@ -172,9 +211,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // POST: Consumption/Delete
-        // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -199,9 +235,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // GET: Consumption/GetItemForEdit
-        // =====================================================
         [HttpGet]
         public async Task<IActionResult> GetItemForEdit(int id)
         {
@@ -214,10 +247,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // GET: Consumption/ExportExcel
-        // ✅ Server-side Excel export using ClosedXML
-        // =====================================================
         [HttpGet]
         public async Task<IActionResult> ExportExcel(string? filterDate = null)
         {
@@ -327,10 +356,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // GET: Consumption/ExportPdf
-        // ✅ Server-side PDF export using QuestPDF
-        // =====================================================
         [HttpGet]
         public async Task<IActionResult> ExportPdf(string? filterDate = null)
         {
@@ -478,19 +503,15 @@ namespace TestingSpareManagement.Controllers
                 if (result != null && result != DBNull.Value)
                     return Convert.ToDecimal(result);
 
-                // ✅ FALLBACK: Default unit cost when item not found in master
-                return 1500.00m;  // ₹1500 default per piece
+                return 1500.00m;  
             }
             catch
             {
-                return 1500.00m;  // Even on error, return default
+                return 1500.00m;  
             }
         }
 
 
-        // =====================================================
-        // PRIVATE: GET DISTINCT DATES FOR FILTER
-        // =====================================================
         private async Task<List<string>> GetDistinctConsumptionDates()
         {
             var dates = new List<string>();
@@ -524,10 +545,10 @@ namespace TestingSpareManagement.Controllers
             using SqlConnection connection = new SqlConnection(connectionString);
 
             string query = @"
-        SELECT ProjectCode
-        FROM dbo.ProjectMaster
-        WHERE IsActive = 1
-        ORDER BY ProjectCode;";
+                SELECT ProjectCode
+                FROM dbo.ProjectMaster
+                WHERE IsActive = 1
+                ORDER BY ProjectCode;";
 
             using SqlCommand command = new SqlCommand(query, connection);
 
@@ -552,18 +573,31 @@ namespace TestingSpareManagement.Controllers
         private async Task<List<string>> GetEquipmentStations()
         {
             var list = new List<string>();
+
             string connectionString = GetConnectionString();
-            try
+
+            using SqlConnection connection = new SqlConnection(connectionString);
+
+            using SqlCommand command = new SqlCommand(@"
+        SELECT StationCode
+        FROM dbo.TestingStation
+        WHERE IsActive = 1
+        ORDER BY StationCode;", connection);
+
+            await connection.OpenAsync();
+
+            using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
             {
-                using SqlConnection connection = new SqlConnection(connectionString);
-                using SqlCommand command = new SqlCommand(
-                    "SELECT StationCode FROM TestingStation ORDER BY StationCode", connection);
-                await connection.OpenAsync();
-                using SqlDataReader reader = await command.ExecuteReaderAsync();
-                while (await reader.ReadAsync())
-                    list.Add(reader["StationCode"].ToString() ?? "");
+                string station = reader["StationCode"]?.ToString() ?? "";
+
+                if (!string.IsNullOrWhiteSpace(station))
+                {
+                    list.Add(station);
+                }
             }
-            catch { }
+
             return list;
         }
 
@@ -598,15 +632,11 @@ namespace TestingSpareManagement.Controllers
 
         private Task<List<string>> GetLineTargets()
         {
-            // ✅ Hardcoded — ProductionLines table doesn't exist in DB
             var list = new List<string> { "Line-01", "Line-02", "Line-03" };
             return Task.FromResult(list);
         }
 
 
-        // =====================================================
-        // PRIVATE: GET SINGLE CONSUMPTION BY ID
-        // =====================================================
         private async Task<DailyConsumptionItem?> GetConsumptionById(int id)
         {
             string connectionString = GetConnectionString();
@@ -627,9 +657,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // PRIVATE: RELOAD VIEWMODEL DATA
-        // =====================================================
         private async Task ReloadViewModelData(DailyConsumptionViewModel model)
         {
             var (records, totalRecords) = await GetDailyConsumptions(1, 25, null);
@@ -643,9 +670,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // PRIVATE: GET PAGINATED RECORDS
-        // =====================================================
         private async Task<(List<DailyConsumptionItem> Records, int TotalRecords)>
             GetDailyConsumptions(int pageNumber, int pageSize, string? filterDate = null)
         {
@@ -687,9 +711,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // PRIVATE: MAP SQL READER TO MODEL
-        // =====================================================
         private DailyConsumptionItem MapConsumption(SqlDataReader reader)
         {
             decimal? unitCostINR = reader["UnitCostINR"] == DBNull.Value
@@ -736,9 +757,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // PRIVATE: CONNECTION STRING
-        // =====================================================
         private string GetConnectionString()
         {
             string? connectionString = _configuration.GetConnectionString("DefaultConnection");

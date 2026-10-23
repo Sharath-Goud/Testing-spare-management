@@ -3,11 +3,6 @@
     width: 100%;
 }
 
-
-/* =========================================================
-   PAGE HEADER
-   ========================================================= */
-
 .page-title-bar {
     display: flex;
     justify-content: space-between;
@@ -43,11 +38,6 @@
     font-size: 12px;
 }
 
-
-/* =========================================================
-   SUCCESS
-   ========================================================= */
-
 .success-message {
     background: #ecfdf5;
     border: 1px solid #a7f3d0;
@@ -58,11 +48,6 @@
     font-size: 13px;
 }
 
-
-/* =========================================================
-   MAIN TWO COLUMN LAYOUT
-   ========================================================= */
-
 .master-layout {
     display: grid;
     grid-template-columns: 350px minmax(0, 1fr);
@@ -70,10 +55,6 @@
     align-items: start;
 }
 
-
-/* =========================================================
-   CARDS
-   ========================================================= */
 
 .connector-form-card,
 .connector-report-card {
@@ -83,11 +64,6 @@
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
     overflow: hidden;
 }
-
-
-/* =========================================================
-   SECTION TITLE
-   ========================================================= */
 
 .section-title {
     display: flex;
@@ -117,11 +93,6 @@
         color: #9ca3af;
         font-size: 10px;
     }
-
-
-/* =========================================================
-   FORM
-   ========================================================= */
 
 .connector-form-card form {
     padding: 12px 14px 15px;
@@ -162,11 +133,6 @@
         box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
     }
 
-
-/* =========================================================
-   IMAGE PREVIEW
-   ========================================================= */
-
 .image-preview {
     height: 105px;
     border: 2px dashed #cbd5e1;
@@ -187,11 +153,6 @@
         object-fit: contain;
         border-radius: 5px;
     }
-
-
-/* =========================================================
-   BUTTONS
-   ========================================================= */
 
 .save-button,
 .cancel-button {
@@ -226,11 +187,6 @@
     .cancel-button:hover {
         background: #475569;
     }
-
-
-/* =========================================================
-   REPORT
-   ========================================================= */
 
 .report-wrapper {
     width: 100%;
@@ -277,11 +233,6 @@
         background: #fafbff;
     }
 
-
-/* =========================================================
-   PHOTO
-   ========================================================= */
-
 .connector-photo,
 .photo-placeholder {
     width: 72px;
@@ -301,11 +252,6 @@
     font-size: 9px;
 }
 
-
-/* =========================================================
-   ASSET
-   ========================================================= */
-
 .asset-key {
     color: #7c3aed;
     font-weight: 700;
@@ -321,11 +267,6 @@
     color: #dc2626;
 }
 
-
-/* =========================================================
-   COST
-   ========================================================= */
-
 .cost-inr {
     color: #059669;
     font-weight: 700;
@@ -337,11 +278,6 @@
     margin-top: 3px;
     font-weight: 600;
 }
-
-
-/* =========================================================
-   STATUS
-   ========================================================= */
 
 .status-safe,
 .status-danger {
@@ -786,3 +722,336 @@ body.connector-image-modal-open {
             background: #e5e1ff;
             color: #5546ff;
         }
+
+
+.connector-history-link {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #2563eb !important;
+    font: inherit;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+    .connector-history-link:hover {
+        color: #1d4ed8 !important;
+        text-decoration: underline;
+    }
+
+
+
+/* ==========================================
+   MASTER CONNECTOR PURCHASE HISTORY MODAL
+   Match Equipment Consumables popup layout
+========================================== */
+
+#connectorPurchaseHistoryModal.purchase-history-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999990;
+    width: 100%;
+    height: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+    background: rgba(15, 23, 42, 0.58);
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+}
+
+    #connectorPurchaseHistoryModal.purchase-history-modal.active {
+        display: flex !important;
+    }
+
+
+#connectorPurchaseHistoryModal .purchase-history-dialog {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 85%;
+    max-width: 1250px;
+    height: 82vh;
+    max-height: 780px;
+    margin: auto;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #dce3ec;
+    border-radius: 19px;
+    box-shadow: 0 15px 50px rgba(15, 23, 42, 0.24);
+    box-sizing: border-box;
+}
+
+
+#connectorPurchaseHistoryModal .purchase-history-header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    min-height: 76px;
+    padding: 15px 28px;
+    background: #f5f8fc;
+    border-bottom: 1px solid #dce3ec;
+    box-sizing: border-box;
+}
+
+    #connectorPurchaseHistoryModal .purchase-history-header h3 {
+        margin: 0;
+        color: #17365d;
+        font-size: 22px;
+        font-weight: 800;
+        overflow-wrap: anywhere;
+    }
+
+#connectorPurchaseHistoryModal .purchase-history-close {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: #edf2fa;
+    color: #17365d;
+    font-size: 30px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.10);
+}
+
+    #connectorPurchaseHistoryModal .purchase-history-close:hover {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+#connectorPurchaseHistoryModal .purchase-history-content {
+    display: grid;
+    grid-template-columns: minmax(0, 44%) minmax(0, 56%);
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+#connectorPurchaseHistoryModal .purchase-history-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+    min-height: 0;
+    padding: 28px;
+    overflow-y: auto;
+    border-right: 1px solid #dce3ec;
+    box-sizing: border-box;
+}
+
+#connectorPurchaseHistoryModal .history-product-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-width: 0;
+    padding: 18px;
+    background: #f7f9fc;
+    border: 1px solid #dce3ec;
+    border-radius: 14px;
+    box-sizing: border-box;
+}
+
+#connectorPurchaseHistoryModal .history-product-photo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 100px;
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #dce3ec;
+    border-radius: 12px;
+}
+
+    #connectorPurchaseHistoryModal .history-product-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+        #connectorPurchaseHistoryModal .history-product-photo img[hidden] {
+            display: none !important;
+        }
+
+    #connectorPurchaseHistoryModal .history-product-photo span {
+        color: #64748b;
+        font-size: 12px;
+    }
+
+#connectorPurchaseHistoryModal .history-product-info {
+    min-width: 0;
+}
+
+#connectorPurchaseHistoryModal .history-eyebrow {
+    display: block;
+    margin-bottom: 7px;
+    color: #718096;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+#connectorPurchaseHistoryModal .history-product-info h4 {
+    margin: 0;
+    color: #172b4d;
+    font-size: 20px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+#connectorPurchaseHistoryModal .history-specifications {
+    padding: 20px;
+    background: #f0fdf4;
+    border: 1px solid #a7f3c0;
+    border-radius: 14px;
+    color: #166534;
+}
+
+    #connectorPurchaseHistoryModal .history-specifications h4 {
+        margin: 0 0 14px;
+        font-size: 16px;
+        font-weight: 800;
+    }
+
+    #connectorPurchaseHistoryModal .history-specifications ul {
+        margin: 0;
+        padding-left: 22px;
+    }
+
+    #connectorPurchaseHistoryModal .history-specifications li {
+        margin: 0 0 12px;
+        font-size: 14px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+#connectorPurchaseHistoryModal .history-tracking-note {
+    padding: 18px 20px;
+    background: #fff1f2;
+    border: 1px solid #fecaca;
+    border-radius: 14px;
+    color: #b91c1c;
+}
+
+    #connectorPurchaseHistoryModal .history-tracking-note h4 {
+        margin: 0 0 12px;
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    #connectorPurchaseHistoryModal .history-tracking-note p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+#connectorPurchaseHistoryModal .purchase-history-records {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    padding: 28px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+    #connectorPurchaseHistoryModal .purchase-history-records > h4 {
+        flex: 0 0 auto;
+        margin: 0 0 16px;
+        color: #374151;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+#connectorPurchaseHistoryModal .history-table-wrapper {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    border: 1px solid #d7e2f0;
+    border-radius: 12px;
+}
+
+#connectorPurchaseHistoryModal .history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+    #connectorPurchaseHistoryModal .history-table thead {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #eef3f9;
+    }
+
+    #connectorPurchaseHistoryModal .history-table th {
+        padding: 13px 10px;
+        color: #334155;
+        font-size: 11px;
+        font-weight: 800;
+        text-align: left;
+        border-bottom: 1px solid #d7e2f0;
+        white-space: nowrap;
+    }
+
+    #connectorPurchaseHistoryModal .history-table td {
+        padding: 12px 10px;
+        color: #475569;
+        border-bottom: 1px solid #e5edf5;
+        vertical-align: middle;
+    }
+
+    #connectorPurchaseHistoryModal .history-table tbody tr:hover {
+        background: #f8fbff;
+    }
+
+#connectorPurchaseHistoryModal .history-message {
+    padding: 22px !important;
+    color: #718096 !important;
+    text-align: center;
+    white-space: normal !important;
+}
+
+body.purchase-history-open {
+    overflow: hidden;
+}
+
+@media (max-width: 850px) {
+    #connectorPurchaseHistoryModal .purchase-history-dialog {
+        height: 96vh;
+        max-height: 96vh;
+    }
+
+    #connectorPurchaseHistoryModal .purchase-history-content {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto minmax(250px, 1fr);
+        overflow-y: auto;
+    }
+
+    #connectorPurchaseHistoryModal .purchase-history-details {
+        padding: 16px;
+        border-right: none;
+        border-bottom: 1px solid #dce3ec;
+    }
+
+    #connectorPurchaseHistoryModal .purchase-history-records {
+        min-height: 300px;
+        padding: 16px;
+    }
+
+    #connectorPurchaseHistoryModal .purchase-history-header {
+        min-height: 64px;
+        padding: 12px 16px;
+    }
+
+        #connectorPurchaseHistoryModal .purchase-history-header h3 {
+            font-size: 18px;
+        }
+}

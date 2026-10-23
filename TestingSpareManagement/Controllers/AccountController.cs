@@ -15,19 +15,11 @@ namespace TestingSpareManagement.Controllers
             _context = context;
         }
 
-        // =========================================================
-        // REGISTER - GET
-        // =========================================================
-
         [HttpGet]
         public IActionResult Register()
         {
             return View();
         }
-
-        // =========================================================
-        // REGISTER - POST
-        // =========================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -76,20 +68,11 @@ namespace TestingSpareManagement.Controllers
             return RedirectToAction(nameof(Login));
         }
 
-        // =========================================================
-        // LOGIN - GET
-        // =========================================================
-
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
-
-        // =========================================================
-        // LOGIN - POST
-        // =========================================================
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -157,12 +140,16 @@ namespace TestingSpareManagement.Controllers
                     employeeName = reader["FullName"].ToString() ?? "";
                     storedPassword = reader["PasswordHash"].ToString() ?? "";
                     role = reader["Role"] == DBNull.Value
-                        ? ""
-                        : reader["Role"].ToString()?.Trim() ?? "";
+                    ? ""
+                    : reader["Role"].ToString()?.Trim() ?? "";
+
+                    role = role.Equals("Admin", StringComparison.OrdinalIgnoreCase)
+                        ? "Admin"
+                        : role.Equals("Employee", StringComparison.OrdinalIgnoreCase)
+                            ? "Employee"
+                            : "";
                 }
 
-                // Existing database values appear to be plain-text passwords.
-                // This comparison matches that current storage format.
                 if (!string.Equals(
                         password, storedPassword, StringComparison.Ordinal))
                 {
@@ -211,10 +198,6 @@ namespace TestingSpareManagement.Controllers
             }
         }
 
-
-        // =========================================================
-        // LOGOUT
-        // =========================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]

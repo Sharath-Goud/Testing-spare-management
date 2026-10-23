@@ -1,9 +1,4 @@
 ﻿
-/* =========================================================
-   PR & PO TRACKER
-   Design aligned with Equipment Consumables
-   ========================================================= */
-
 .prpo-page-wrapper {
     display: grid;
     grid-template-columns: 350px minmax(0, 1fr);
@@ -19,10 +14,6 @@
     color: #1f2937;
     font-family: Arial, Helvetica, sans-serif;
 }
-
-    /* =========================================================
-   PANELS
-   ========================================================= */
 
     .prpo-page-wrapper .prpo-form-panel,
     .prpo-page-wrapper .prpo-ledger-panel {
@@ -43,10 +34,6 @@
     .prpo-page-wrapper .prpo-ledger-panel {
         overflow: hidden;
     }
-
-    /* =========================================================
-   HEADERS
-   ========================================================= */
 
     .prpo-page-wrapper .prpo-form-panel > h5,
     .prpo-page-wrapper .prpo-ledger-header {
@@ -84,10 +71,6 @@
         line-height: 1.5;
     }
 
-    /* =========================================================
-   ALERTS
-   ========================================================= */
-
     .prpo-page-wrapper .alert {
         margin: 10px 12px;
         padding: 9px 12px !important;
@@ -107,10 +90,6 @@
         background: #fef2f2;
         border: 1px solid #fecaca;
     }
-
-    /* =========================================================
-   FORM
-   ========================================================= */
 
     .prpo-page-wrapper .prpo-form-panel form {
         height: auto !important;
@@ -172,10 +151,6 @@
         color: #dc2626 !important;
         font-size: 10px;
     }
-
-    /* =========================================================
-   CALENDAR
-   ========================================================= */
 
     .prpo-page-wrapper .calendar-header {
         display: flex;
@@ -258,10 +233,6 @@
             font-weight: 700;
         }
 
-    /* =========================================================
-   TAX SUMMARY
-   ========================================================= */
-
     .prpo-page-wrapper .tax-summary-box {
         margin: 5px 0 12px;
         padding: 11px 12px;
@@ -301,10 +272,6 @@
         font-weight: 700;
     }
 
-    /* =========================================================
-   SAVE AND CANCEL BUTTONS
-   ========================================================= */
-
     .prpo-page-wrapper .btn-log-prpo,
     .prpo-page-wrapper .btn-cancel-prpo {
         display: block;
@@ -339,10 +306,6 @@
         .prpo-page-wrapper .btn-cancel-prpo:hover {
             background: #475569;
         }
-
-    /* =========================================================
-   LEDGER HEADER ACTIONS
-   ========================================================= */
 
     .prpo-page-wrapper .prpo-ledger-actions {
         display: flex;
@@ -414,10 +377,6 @@
                 color: #ffffff;
             }
 
-    /* =========================================================
-   FILTER PANEL
-   ========================================================= */
-
     .prpo-page-wrapper .prpo-filter-panel {
         padding: 10px;
         border-bottom: 1px solid #edf0f4;
@@ -468,10 +427,6 @@
             color: #ffffff;
         }
 
-    /* =========================================================
-   PROCUREMENT TABLE
-   ========================================================= */
-
     .prpo-page-wrapper .prpo-table-container {
         width: 100%;
         overflow-x: auto;
@@ -519,10 +474,6 @@
         .prpo-page-wrapper .prpo-table td strong {
             font-weight: 700;
         }
-
-    /* =========================================================
-   PR / PO STATUS BADGES
-   ========================================================= */
 
     .prpo-page-wrapper .badge-status {
         display: inline-flex;
@@ -574,10 +525,6 @@
         color: #1d4ed8;
     }
 
-    /* =========================================================
-   DELETE ACTION
-   ========================================================= */
-
     .prpo-page-wrapper .prpo-table th:last-child,
     .prpo-page-wrapper .prpo-table td:last-child {
         min-width: 85px;
@@ -611,10 +558,6 @@
             color: #ffffff;
         }
 
-    /* =========================================================
-   EMPTY STATE
-   ========================================================= */
-
     .prpo-page-wrapper .prpo-empty {
         padding: 35px 15px;
         color: #94a3b8;
@@ -628,10 +571,6 @@
             color: #a78bfa;
             font-size: 24px;
         }
-
-/* =========================================================
-   RESPONSIVE LAYOUT
-   ========================================================= */
 
 @media (min-width: 1600px) {
     .prpo-page-wrapper {
@@ -690,4 +629,34 @@
         .prpo-page-wrapper .calendar-grid {
             gap: 3px;
         }
+}
+
+.prpo-action-buttons {
+    white-space: nowrap;
+    min-width: 145px;
+}
+
+.btn-prpo-edit {
+    background: #eef2ff;
+    color: #4338ca;
+    border: 1px solid #c7d2fe;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-right: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+    .btn-prpo-edit:hover {
+        background: #4338ca;
+        color: #ffffff;
+    }
+
+/* Spare Item name in PR/PO report */
+.prpo-table .spare-item-name {
+    color: #873cff;
+    font-weight: 700;
+    font-size: 13px;
+    display: inline-block;
+    line-height: 1.5;
 }

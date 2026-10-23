@@ -2,7 +2,12 @@
 @{
     ViewData["Title"] = "Real-Time Command Center";
     var activeYear = Model.ActiveYear;
+
+    var missingConsumptionAlerts =
+        ViewBag.MissingConsumptionAlerts as List<string>
+        ?? new List<string>();
 }
+
 
 <div class="dashboard-page-wrapper" id="mainApp">
 
@@ -16,6 +21,8 @@
             LIVE SYSTEM ONLINE
         </span>
     </div>
+
+
 
     <!-- KPI CARDS -->
     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px;">
@@ -226,6 +233,57 @@
         </div>
 
     </div>
+
+
+    @if (missingConsumptionAlerts.Any())
+    {
+        <div id="consumptionAlertPopup"
+             class="consumption-toast"
+             role="alert"
+             aria-live="assertive">
+
+            <div class="consumption-toast-header">
+                <div class="consumption-toast-icon">!</div>
+
+                <div class="consumption-toast-title">
+                    <span>CONSUMPTION ALERT</span>
+                    <small>Action required</small>
+                </div>
+
+                <button type="button"
+                        class="consumption-toast-close"
+                        aria-label="Close notification"
+                        onclick="closeConsumptionAlert()">
+                    &times;
+                </button>
+            </div>
+
+            <div class="consumption-toast-body">
+                <p class="consumption-toast-message">
+                    Daily consumption entry is missing for the following shift(s).
+                </p>
+
+                <ul class="consumption-toast-list">
+                    @foreach (var alert in missingConsumptionAlerts)
+                    {
+                        <li>@alert</li>
+                    }
+                </ul>
+
+                <a href="@Url.Action("DailyConsumption", "Consumption")"
+                   class="consumption-toast-action">
+                    Update Daily Consumption
+                    <span aria-hidden="true">&rarr;</span>
+                </a>
+            </div>
+
+            <div class="consumption-toast-footer">
+                <span class="consumption-toast-dot"></span>
+                Shift compliance requires attention
+            </div>
+        </div>
+    }
+
 
 </div>
 
@@ -520,5 +578,21 @@
             }
         });
 
+
+        function closeConsumptionAlert() {
+            const popup = document.getElementById('consumptionAlertPopup');
+
+            if (popup) {
+                popup.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+                popup.style.opacity = '0';
+                popup.style.transform = 'translateX(35px)';
+
+                setTimeout(() => {
+                    popup.remove();
+                }, 200);
+            }
+        }
+
     </script>
 }
+

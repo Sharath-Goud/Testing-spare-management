@@ -48,7 +48,8 @@ namespace TestingSpareManagement.Controllers
 
             // Load active projects from ProjectMaster
             model.ProjectCodes = await GetActiveProjectCodes();
-
+            ViewBag.SpareDescriptions = await GetMasterConnectorDescriptions();
+            model.TestingStations = await GetTestingStations();
             // Select A246f by default if it is active
             model.ProjectCode =
                 model.ProjectCodes.FirstOrDefault(p =>
@@ -82,9 +83,55 @@ namespace TestingSpareManagement.Controllers
 
 
 
-        // =====================================================
-        // POST: MaterialRequest/Submit
-        // =====================================================
+        private async Task<List<string>> GetMasterConnectorDescriptions()
+        {
+            var descriptions = new List<string>();
+
+            using SqlConnection connection =
+                new SqlConnection(GetConnectionString());
+
+            const string query = @"
+        SELECT SpareItem
+        FROM
+        (
+            SELECT DISTINCT
+                LTRIM(RTRIM(DescriptionPartNo)) AS SpareItem
+            FROM dbo.MasterConnector
+            WHERE IsActive = 1
+              AND DescriptionPartNo IS NOT NULL
+              AND LTRIM(RTRIM(DescriptionPartNo)) <> ''
+
+            UNION
+
+            SELECT DISTINCT
+                LTRIM(RTRIM(TestItemName)) AS SpareItem
+            FROM dbo.EquipmentConsumable
+            WHERE IsActive = 1
+              AND TestItemName IS NOT NULL
+              AND LTRIM(RTRIM(TestItemName)) <> ''
+        ) AS SpareItems
+        ORDER BY SpareItem;";
+
+            using SqlCommand command = new SqlCommand(query, connection);
+
+            await connection.OpenAsync();
+
+            using SqlDataReader reader =
+                await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                string item = reader["SpareItem"]?.ToString()?.Trim() ?? "";
+
+                if (!string.IsNullOrWhiteSpace(item))
+                    descriptions.Add(item);
+            }
+
+            return descriptions;
+        }
+
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Submit(MaterialRequestViewModel model)
@@ -96,6 +143,7 @@ namespace TestingSpareManagement.Controllers
                 model.Requests = records;
                 model.TotalRecords = totalRecords;
                 model.ProjectCodes = await GetActiveProjectCodes();
+                ViewBag.SpareDescriptions = await GetMasterConnectorDescriptions();
                 return View("Index", model);
             }
 
@@ -153,9 +201,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // POST: MaterialRequest/Delete
-        // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -181,9 +226,8 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // POST: MaterialRequest/Approve
-        // =====================================================
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Approve(int id)
@@ -194,39 +238,190 @@ namespace TestingSpareManagement.Controllers
             using SqlConnection connection =
                 new SqlConnection(GetConnectionString());
 
-            string query = @"
-                UPDATE dbo.MaterialRequest
-                SET Status = 'Approved',
-                    AdminActions = 'Processed'
-                WHERE Id = @Id
-                  AND Status IN (
-                      'Pending',
-                      'Pending Admin Approval'
-                  );";
-
-            using SqlCommand command =
-                new SqlCommand(query, connection);
-
-            command.Parameters.Add("@Id", SqlDbType.Int).Value = id;
-
             await connection.OpenAsync();
 
-            int rowsUpdated = await command.ExecuteNonQueryAsync();
+            using SqlTransaction transaction = connection.BeginTransaction();
 
-            if (rowsUpdated == 1)
+            try
+            {
+                // STEP 1: Approve the Material Request.
+                string updateQuery = @"
+            UPDATE dbo.MaterialRequest
+            SET Status = 'Approved',
+                AdminActions = 'Processed'
+            WHERE Id = @Id
+              AND (
+                    Status IN ('Pending', 'Pending Admin Approval')
+                    OR Status IS NULL
+                    OR LTRIM(RTRIM(Status)) = ''
+                  );";
+
+                using (SqlCommand updateCommand =
+                    new SqlCommand(updateQuery, connection, transaction))
+                {
+                    updateCommand.Parameters.Add("@Id", SqlDbType.Int).Value = id;
+
+                    int rowsUpdated =
+                        await updateCommand.ExecuteNonQueryAsync();
+
+                    if (rowsUpdated != 1)
+                    {
+                        await transaction.RollbackAsync();
+
+                        TempData["ErrorMessage"] =
+                            "Request was not found or has already been processed.";
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+
+                // STEP 2: Insert the approved request into the PR/PO ledger.
+                string insertQuery = @"
+            INSERT INTO dbo.PrPoTracker
+            (
+                MaterialRequestId,
+                ReqId,
+                RequestedBy,
+                SpareDescription,
+                PartNumber,
+                Brand,
+                TargetMachine,
+                PriorityLevel,
+                Justification,
+                RequisitionDate,
+                ProjectCode,
+                PrNumber,
+                PoStatus,
+                PurchaseOriginRegion,
+                BuyerName,
+                AssetTarget,
+                Quantity,
+                UnitPrice,
+                Subtotal,
+                TaxPercent,
+                TaxAmount,
+                TotalCost,
+                ShipmentTrackingNo,
+                DeliveryDate,
+                ShipmentStatus,
+                Remarks,
+                IsActive,
+                CreatedBy,
+                CreatedDate
+            )
+            SELECT
+                mr.Id,
+                mr.ReqId,
+                mr.RequestedBy,
+                mr.SpareDescription,
+                mr.PartNumber,
+                mr.Brand,
+                mr.TargetMachine,
+                mr.PriorityLevel,
+                mr.Justification,
+                mr.RequestDate,
+                mr.ProjectCode,
+                mr.ReqId,
+                'PR ISSUED',
+                'India Purchase_IN',
+                'Pending Assignment',
+                mr.SpareDescription,
+                mr.RequestedQuantity,
+                0,
+                0,
+                0,
+                0,
+                0,
+                NULL,
+                NULL,
+                NULL,
+                mr.Justification,
+                1,
+                mr.RequestedBy,
+                GETDATE()
+            FROM dbo.MaterialRequest AS mr
+            WHERE mr.Id = @Id
+              AND mr.Status = 'Approved'
+              AND NOT EXISTS
+              (
+                  SELECT 1
+                  FROM dbo.PrPoTracker AS p
+                  WHERE p.MaterialRequestId = mr.Id
+              );";
+
+                using (SqlCommand insertCommand =
+                    new SqlCommand(insertQuery, connection, transaction))
+                {
+                    insertCommand.Parameters.Add("@Id", SqlDbType.Int).Value = id;
+
+                    int rowsInserted =
+                        await insertCommand.ExecuteNonQueryAsync();
+
+                    if (rowsInserted != 1)
+                    {
+                        throw new InvalidOperationException(
+                            "The request could not be added to the PR/PO ledger, " +
+                            "or a ledger record already exists for this request.");
+                    }
+                }
+
+                // STEP 3: Save both database changes together.
+                await transaction.CommitAsync();
+
                 TempData["SuccessMessage"] =
-                    "Material request approved successfully.";
-            else
+                    "Material request approved and added to the PR/PO ledger successfully.";
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    await transaction.RollbackAsync();
+                }
+                catch (Exception rollbackEx)
+                {
+                    _logger.LogError(
+                        rollbackEx,
+                        "Rollback failed for Material Request {RequestId}.",
+                        id);
+                }
+
+                _logger.LogError(
+                    ex,
+                    "Failed to approve Material Request {RequestId} or insert its PR/PO record.",
+                    id);
+
                 TempData["ErrorMessage"] =
-                    "Request was not found or has already been processed.";
+                    "Approval could not be completed. Please check the application log.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            // STEP 4: Keep your existing approval email notification.
+            try
+            {
+                await SendDecisionEmailAsync(id, "Approved");
+
+                TempData["EmailSuccessMessage"] =
+                    "Approval notification email sent to Saibalaji_M@foxlink.com.";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Request {RequestId} was approved, but the approval email failed.",
+                    id);
+
+                TempData["EmailWarning"] =
+                    "The request was approved, but the email notification could not be sent.";
+            }
 
             return RedirectToAction(nameof(Index));
         }
 
 
-        // =====================================================
-        // POST: MaterialRequest/Reject
-        // =====================================================
+
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reject(int id)
@@ -238,39 +433,282 @@ namespace TestingSpareManagement.Controllers
                 new SqlConnection(GetConnectionString());
 
             string query = @"
-                UPDATE dbo.MaterialRequest
-                SET Status = 'Rejected',
-                    AdminActions = 'Processed'
-                WHERE Id = @Id
-                  AND Status IN (
-                      'Pending',
-                      'Pending Admin Approval'
-                  );";
+        UPDATE dbo.MaterialRequest
+        SET Status = 'Rejected',
+            AdminActions = 'Processed'
+        WHERE Id = @Id
+          AND (
+              Status IN ('Pending', 'Pending Admin Approval')
+              OR Status IS NULL
+              OR LTRIM(RTRIM(Status)) = ''
+          );";
 
-            using SqlCommand command =
-                new SqlCommand(query, connection);
-
+            using SqlCommand command = new SqlCommand(query, connection);
             command.Parameters.Add("@Id", SqlDbType.Int).Value = id;
 
             await connection.OpenAsync();
-
             int rowsUpdated = await command.ExecuteNonQueryAsync();
 
-            if (rowsUpdated == 1)
-                TempData["SuccessMessage"] =
-                    "Material request rejected successfully.";
-            else
+            if (rowsUpdated != 1)
+            {
                 TempData["ErrorMessage"] =
                     "Request was not found or has already been processed.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            TempData["SuccessMessage"] =
+                "Material request rejected successfully.";
+
+            try
+            {
+                await SendDecisionEmailAsync(id, "Rejected");
+                TempData["EmailSuccessMessage"] =
+                    "Rejection notification email sent to Saibalaji_M@foxlink.com.";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "Request {RequestId} was rejected, but the rejection email failed.", id);
+
+                TempData["EmailWarning"] =
+                    "The request was rejected, but the email notification could not be sent.";
+            }
 
             return RedirectToAction(nameof(Index));
         }
 
 
+        private async Task SendDecisionEmailAsync(int id, string decision)
+        {
+            // Get the latest saved request details from the database.
+            string reqId;
+            DateTime requestDate;
+            string projectCode;
+            string requestedBy;
+            string spareDescription;
+            string partNumber;
+            string brand;
+            string targetMachine;
+            int requestedQuantity;
+            string priorityLevel;
+            string justification;
 
-        // =====================================================
-        // PRIVATE: GET PAGINATED RECORDS
-        // =====================================================
+            using (SqlConnection connection =
+                new SqlConnection(GetConnectionString()))
+            {
+                const string query = @"
+            SELECT
+                ReqId,
+                RequestDate,
+                ProjectCode,
+                RequestedBy,
+                SpareDescription,
+                PartNumber,
+                Brand,
+                TargetMachine,
+                RequestedQuantity,
+                PriorityLevel,
+                Justification
+            FROM dbo.MaterialRequest
+            WHERE Id = @Id;";
+
+                using SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.Add("@Id", SqlDbType.Int).Value = id;
+
+                await connection.OpenAsync();
+
+                using SqlDataReader reader =
+                    await command.ExecuteReaderAsync();
+
+                if (!await reader.ReadAsync())
+                {
+                    throw new InvalidOperationException(
+                        $"Material request {id} could not be found for email notification.");
+                }
+
+                reqId = Convert.ToString(reader["ReqId"]) ?? id.ToString();
+                requestDate = Convert.ToDateTime(reader["RequestDate"]);
+                projectCode = Convert.ToString(reader["ProjectCode"]) ?? "";
+                requestedBy = Convert.ToString(reader["RequestedBy"]) ?? "";
+                spareDescription = Convert.ToString(reader["SpareDescription"]) ?? "";
+                partNumber = reader["PartNumber"] == DBNull.Value
+                    ? "N/A" : Convert.ToString(reader["PartNumber"]) ?? "N/A";
+                brand = reader["Brand"] == DBNull.Value
+                    ? "N/A" : Convert.ToString(reader["Brand"]) ?? "N/A";
+                targetMachine = Convert.ToString(reader["TargetMachine"]) ?? "";
+                requestedQuantity = Convert.ToInt32(reader["RequestedQuantity"]);
+                priorityLevel = Convert.ToString(reader["PriorityLevel"]) ?? "";
+                justification = reader["Justification"] == DBNull.Value
+                    ? "N/A" : Convert.ToString(reader["Justification"]) ?? "N/A";
+            }
+
+            // Use the existing SMTP settings from appsettings.json.
+            var smtpSection = _configuration.GetSection("SmtpSettings");
+
+            string host = smtpSection["Host"]
+                ?? throw new InvalidOperationException("SMTP Host is missing.");
+
+            int port = int.TryParse(smtpSection["Port"], out int smtpPort)
+                ? smtpPort : 25;
+
+            bool enableSsl = bool.TryParse(
+                smtpSection["EnableSsl"], out bool ssl) && ssl;
+
+            string senderEmail = smtpSection["SenderEmail"]
+                ?? throw new InvalidOperationException("SMTP SenderEmail is missing.");
+
+            string senderName = smtpSection["SenderName"]
+                ?? "Testing Spare Management System";
+
+            string username = smtpSection["Username"] ?? "";
+            string password = smtpSection["Password"] ?? "";
+
+            const string recipient = "Saibalaji_M@foxlink.com";
+
+            string Safe(string? value) =>
+                System.Net.WebUtility.HtmlEncode(
+                    string.IsNullOrWhiteSpace(value) ? "N/A" : value);
+
+            bool approved = string.Equals(
+                decision, "Approved", StringComparison.OrdinalIgnoreCase);
+
+            string subject =
+                $"Material Request {decision} | {reqId} | {projectCode}";
+
+            string heading = approved
+                ? "Material Request Approved"
+                : "Material Request Rejected";
+
+            string messageText = approved
+                ? "The material request listed below has been reviewed and approved by the administrator."
+                : "The material request listed below has been reviewed and rejected by the administrator.";
+
+            string statusColor = approved ? "#15803d" : "#b91c1c";
+            string statusBackground = approved ? "#dcfce7" : "#fee2e2";
+
+            string htmlBody = $@"
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset='UTF-8'>
+                    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                </head>
+                <body style='margin:0;padding:0;background:#f1f5f9;
+                             font-family:Arial,Helvetica,sans-serif;color:#243247;'>
+                  <table role='presentation' width='100%' cellspacing='0' cellpadding='0'
+                         style='background:#f1f5f9;padding:24px 10px;'>
+                    <tr><td align='center'>
+                      <table role='presentation' width='100%' cellspacing='0' cellpadding='0'
+                             style='max-width:680px;background:#ffffff;
+                                    border:1px solid #dbe4ee;border-radius:10px;'>
+                        <tr>
+                          <td style='background:#123456;padding:25px 28px;color:#ffffff;'>
+                            <div style='font-size:22px;font-weight:bold;'>
+                              Testing Spare Management System
+                            </div>
+                            <div style='font-size:12px;letter-spacing:1px;
+                                        color:#dbeafe;padding-top:8px;'>
+                              MATERIAL REQUEST DECISION NOTIFICATION
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style='padding:26px 28px 12px;'>
+                            <span style='display:inline-block;background:{statusBackground};
+                                         color:{statusColor};padding:8px 12px;
+                                         border-radius:5px;font-size:13px;font-weight:bold;'>
+                              {Safe(decision.ToUpperInvariant())}
+                            </span>
+                            <h2 style='margin:16px 0 8px;color:#123456;font-size:22px;'>
+                              {Safe(heading)}
+                            </h2>
+                            <p style='font-size:14px;line-height:1.7;color:#526176;'>
+                              Dear Balaji,<br><br>
+                              {Safe(messageText)}
+                              Please find the request details below for your records.
+                            </p>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style='padding:10px 28px 28px;'>
+                            <table role='presentation' width='100%' cellspacing='0'
+                                   cellpadding='0'
+                                   style='border-collapse:collapse;font-size:14px;'>
+                              {EmailRow("Request ID", Safe(reqId))}
+                              {EmailRow("Request Date", Safe(requestDate.ToString("dd MMM yyyy")))}
+                              {EmailRow("Project Code", Safe(projectCode))}
+                              {EmailRow("Requested By", Safe(requestedBy))}
+                              {EmailRow("Spare Description", Safe(spareDescription))}
+                              {EmailRow("Part Number", Safe(partNumber))}
+                              {EmailRow("Brand / Manufacturer", Safe(brand))}
+                              {EmailRow("Target Machine", Safe(targetMachine))}
+                              {EmailRow("Requested Quantity", Safe(requestedQuantity.ToString("N0") + " Pcs/Sets"))}
+                              {EmailRow("Priority", Safe(priorityLevel))}
+                              {EmailRow("Decision", Safe(decision))}
+                              {EmailRow("Justification", Safe(justification))}
+                            </table>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style='padding:18px 28px;background:#f8fafc;
+                                     color:#64748b;font-size:12px;line-height:1.7;'>
+                            This is an automated notification from the Testing Spare
+                            Management System. Please do not reply directly to this email.
+                          </td>
+                        </tr>
+                      </table>
+                    </td></tr>
+                  </table>
+                </body>
+                </html>";
+
+            using var message = new MailMessage
+            {
+                From = new MailAddress(senderEmail, senderName),
+                Subject = subject,
+                Body = htmlBody,
+                IsBodyHtml = true,
+                BodyEncoding = Encoding.UTF8,
+                SubjectEncoding = Encoding.UTF8
+            };
+
+            message.To.Add(recipient);
+
+            using var smtp = new SmtpClient(host, port)
+            {
+                EnableSsl = enableSsl,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                Timeout = 30000
+            };
+
+            if (!string.IsNullOrWhiteSpace(username))
+            {
+                smtp.UseDefaultCredentials = false;
+                smtp.Credentials = new NetworkCredential(username, password);
+            }
+
+            await smtp.SendMailAsync(message);
+        }
+
+        private static string EmailRow(string label, string value)
+        {
+            return $@"
+        <tr>
+            <td style='width:38%;padding:11px;background:#f8fafc;
+                       border-bottom:1px solid #e2e8f0;color:#64748b;
+                       vertical-align:top;'>
+                {label}
+            </td>
+            <td style='padding:11px;border-bottom:1px solid #e2e8f0;
+                       color:#243247;'>
+                {value}
+            </td>
+        </tr>";
+        }
+
+
+
         private async Task<(List<MaterialRequestItem> Records, int TotalRecords)>
             GetMaterialRequests(int pageNumber, int pageSize)
         {
@@ -310,9 +748,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // PRIVATE: MAP SQL READER TO MODEL
-        // =====================================================
         private MaterialRequestItem MapMaterialRequest(SqlDataReader reader)
         {
             return new MaterialRequestItem
@@ -340,9 +775,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // PRIVATE: CONNECTION STRING
-        // =====================================================
         private string GetConnectionString()
         {
             string? connectionString = _configuration.GetConnectionString("DefaultConnection");
@@ -681,5 +1113,36 @@ namespace TestingSpareManagement.Controllers
             await smtp.SendMailAsync(message);
         }
 
+        private async Task<List<string>> GetTestingStations()
+        {
+            var stations = new List<string>();
+
+            using SqlConnection connection =
+                new SqlConnection(GetConnectionString());
+
+            const string query = @"
+        SELECT StationCode
+        FROM dbo.TestingStation
+        WHERE IsActive = 1
+        ORDER BY StationCode;";
+
+            using SqlCommand command = new SqlCommand(query, connection);
+
+            await connection.OpenAsync();
+
+            using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                string station = reader["StationCode"]?.ToString() ?? "";
+
+                if (!string.IsNullOrWhiteSpace(station))
+                {
+                    stations.Add(station);
+                }
+            }
+
+            return stations;
+        }
     }
 }
