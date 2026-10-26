@@ -15,6 +15,10 @@ namespace TestingSpareManagement.Models
         [Required]
         public string TestItemName { get; set; } = string.Empty;
 
+        public string? PartNumber { get; set; }
+
+        public string? BrandManufacturer { get; set; }
+
         [Required]
         public string TargetStation { get; set; } = string.Empty;
 
@@ -47,24 +51,42 @@ namespace TestingSpareManagement.Models
     public class EquipmentItem
     {
         public int Id { get; set; }
+
         public string? PhotoPath { get; set; }
+
         public string ProjectCode { get; set; } = string.Empty;
+
         public string TestItemName { get; set; } = string.Empty;
+
+        public string? PartNumber { get; set; }
+
+        public string? BrandManufacturer { get; set; }
+
         public string AssignedEquipment { get; set; } = string.Empty;
+
         public string StorageLocation { get; set; } = string.Empty;
+
         public int AvailableQuantity { get; set; }
+
         public int AlertThreshold { get; set; }
+
         public decimal UnitPriceINR { get; set; }
+
         public decimal UnitPriceRMB { get; set; }
+
         public int SpecCycles { get; set; }
 
         public string Status =>
             AvailableQuantity <= AlertThreshold ? "LOW STOCK" : "SAFE";
 
         public bool IsActive { get; set; }
+
         public string? CreatedBy { get; set; }
+
         public DateTime CreatedDate { get; set; }
+
         public string? ModifiedBy { get; set; }
+
         public DateTime? ModifiedDate { get; set; }
     }
 }

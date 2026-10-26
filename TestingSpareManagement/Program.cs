@@ -2,6 +2,7 @@
 using QuestPDF.Drawing;
 using QuestPDF.Infrastructure;
 using TestingSpareManagement.Data;
+using TestingSpareManagement.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddMemoryCache();
+builder.Services.AddHostedService<LowStockEmailBackgroundService>();
 
 // Add Session
 builder.Services.AddSession(options =>

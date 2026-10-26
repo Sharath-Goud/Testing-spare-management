@@ -725,3 +725,42 @@ main,
     padding-left: 6px;
     padding-right: 6px;
 }
+
+.consumption-page-wrapper #consumptionTable th {
+    width: 110px !important;
+    min-width: 110px !important;
+    text-align: center !important;
+}
+
+.consumption-page-wrapper #consumptionTable td.actions-cell {
+    width: 110px !important;
+    min-width: 110px !important;
+    padding: 12px 5px !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+/* Force buttons into a vertical column */
+.consumption-page-wrapper #consumptionTable .actions-buttons {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+}
+
+    /* Consistent Edit and Delete button sizes */
+    .consumption-page-wrapper #consumptionTable .actions-buttons .btn-matrix-edit,
+    .consumption-page-wrapper #consumptionTable .actions-buttons .btn-matrix-del {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 65px !important;
+        min-width: 65px !important;
+        margin: 0 !important;
+        padding: 7px 5px !important;
+        box-sizing: border-box !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+    }

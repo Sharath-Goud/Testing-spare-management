@@ -276,15 +276,19 @@
                                         <span style="color: #999;">-</span>
                                     }
                                 </td>
-                                <td>
-                                    <button type="button" class="btn-matrix-edit"
-                                            onclick="editConsumption(@item.Id)">
-                                        <i class="fa-solid fa-pen"></i> Edit
-                                    </button>
-                                    <button type="button" class="btn-matrix-del"
-                                            onclick="deleteConsumption(@item.Id)">
-                                        <i class="fa-solid fa-trash"></i> Del
-                                    </button>
+                                <td class="actions-cell">
+                                    <div class="actions-buttons">
+                                        <button type="button" class="btn-matrix-edit"
+                                                onclick="editConsumption(@item.Id)">
+                                            <i class="fa-solid fa-pen"></i> Edit
+                                        </button>
+
+                                        <button type="button" class="btn-matrix-del"
+                                                onclick="deleteConsumption(@item.Id)">
+                                            <i class="fa-solid fa-trash"></i> Del
+                                        </button>
+                                    </div>
+
                                 </td>
                             </tr>
                         }

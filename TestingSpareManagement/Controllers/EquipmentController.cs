@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System.Net;
+using System.Net.Mail;
 using TestingSpareManagement.Models;
-
-using SqlDbType = System.Data.SqlDbType;
 using CommandType = System.Data.CommandType;
 using ParameterDirection = System.Data.ParameterDirection;
+using SqlDbType = System.Data.SqlDbType;
 
 namespace TestingSpareManagement.Controllers
 {
@@ -12,13 +13,16 @@ namespace TestingSpareManagement.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _environment;
+        private readonly ILogger<EquipmentController> _logger;
 
         public EquipmentController(
             IConfiguration configuration,
-            IWebHostEnvironment environment)
+            IWebHostEnvironment environment,
+            ILogger<EquipmentController> logger)
         {
             _configuration = configuration;
             _environment = environment;
+            _logger = logger;
         }
 
 
@@ -75,6 +79,15 @@ namespace TestingSpareManagement.Controllers
 
             command.Parameters.Add("@ProjectCode", SqlDbType.NVarChar, 50).Value = model.ProjectCode;
             command.Parameters.Add("@TestItemName", SqlDbType.NVarChar, 250).Value = model.TestItemName;
+            command.Parameters.Add("@PartNumber", SqlDbType.NVarChar, 100).Value =
+                string.IsNullOrWhiteSpace(model.PartNumber)
+                    ? DBNull.Value
+                    : model.PartNumber.Trim();
+
+            command.Parameters.Add("@BrandManufacturer", SqlDbType.NVarChar, 200).Value =
+                string.IsNullOrWhiteSpace(model.BrandManufacturer)
+                    ? DBNull.Value
+                    : model.BrandManufacturer.Trim();
             command.Parameters.Add("@AssignedEquipment", SqlDbType.NVarChar, 50).Value = model.TargetStation;
             command.Parameters.Add("@StorageLocation", SqlDbType.NVarChar, 100).Value = model.StorageLocation;
             command.Parameters.Add("@AvailableQuantity", SqlDbType.Int).Value = model.AvailableQuantity;
@@ -93,65 +106,196 @@ namespace TestingSpareManagement.Controllers
             await connection.OpenAsync();
             await command.ExecuteNonQueryAsync();
 
-            TempData["SuccessMessage"] = "Equipment consumable saved successfully!";
+            // Send email only when stock reaches or falls below the threshold.
+            if (model.AvailableQuantity <= model.AlertThresholdMin)
+            {
+                _logger.LogInformation(
+                    "Low-stock condition detected for {ItemName}. Quantity={Quantity}, Threshold={Threshold}",
+                    model.TestItemName,
+                    model.AvailableQuantity,
+                    model.AlertThresholdMin);
+
+                bool emailSent = await SendLowStockEmailAsync(
+                    model.ProjectCode,
+                    model.TestItemName,
+                    model.TargetStation,
+                    model.StorageLocation,
+                    model.AvailableQuantity,
+                    model.AlertThresholdMin);
+
+                if (!emailSent)
+                {
+                    _logger.LogError(
+                        "LOW-STOCK EMAIL FAILED for {ItemName}. Check the SMTP exception in application logs.",
+                        model.TestItemName);
+
+                    TempData["ErrorMessage"] =
+                        "Equipment saved, but the low-stock email failed. Check application logs.";
+                }
+                else
+                {
+                    _logger.LogInformation(
+                        "Low-stock email accepted by the configured SMTP server for {ItemName}.",
+                        model.TestItemName);
+                }
+            }
+            else
+            {
+                _logger.LogInformation(
+                    "Email not sent because stock is above the threshold. Item={ItemName}, Quantity={Quantity}, Threshold={Threshold}",
+                    model.TestItemName,
+                    model.AvailableQuantity,
+                    model.AlertThresholdMin);
+            }
+
+            if (TempData["ErrorMessage"] == null)
+            {
+                TempData["SuccessMessage"] = "Equipment consumable saved successfully!";
+            }
             return RedirectToAction(nameof(Index));
         }
 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(EquipmentConsumableViewModel model)
+        public async Task<IActionResult> Update(EquipmentConsumableViewModel model, IFormFile? Photo)
         {
-            if (model.Id <= 0)
-            {
-                TempData["ErrorMessage"] = "Invalid equipment ID.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            if (string.IsNullOrWhiteSpace(model.TestItemName) ||
-                string.IsNullOrWhiteSpace(model.ProjectCode) ||
-                string.IsNullOrWhiteSpace(model.StorageLocation))
-            {
-                TempData["ErrorMessage"] = "Required fields missing.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            // Photo upload (optional - only if new file uploaded)
             string? photoPath = null;
-            if (model.PhotoFile != null && model.PhotoFile.Length > 0)
+
+            try
             {
-                photoPath = await SavePhotoAsync(model.PhotoFile);
+                // Validate the submitted model
+                if (!ModelState.IsValid)
+                {
+                    TempData["ErrorMessage"] =
+                        "Please check the entered values. Some fields are invalid.";
+
+                    return RedirectToAction(nameof(Index));
+                }
+
+                // Save a new photo only when the user uploads one
+                if (Photo != null && Photo.Length > 0)
+                {
+                    photoPath = await SavePhotoAsync(Photo);
+
+                    if (photoPath == null)
+                    {
+                        TempData["ErrorMessage"] = "Unable to upload the photo.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+
+                using (SqlConnection connection = new SqlConnection(GetConnectionString()))
+                using (SqlCommand command = new SqlCommand("dbo.UpdateEquipment", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    command.Parameters.Add("@Id", SqlDbType.Int).Value = model.Id;
+
+                    command.Parameters.Add("@ProjectCode", SqlDbType.NVarChar, 50)
+                        .Value = model.ProjectCode ?? string.Empty;
+
+                    command.Parameters.Add("@TestItemName", SqlDbType.NVarChar, 250)
+                        .Value = model.TestItemName ?? string.Empty;
+
+                    command.Parameters.Add("@PartNumber", SqlDbType.NVarChar, 100)
+                        .Value = string.IsNullOrWhiteSpace(model.PartNumber)
+                            ? DBNull.Value
+                            : model.PartNumber.Trim();
+
+                    command.Parameters.Add("@BrandManufacturer", SqlDbType.NVarChar, 200)
+                        .Value = string.IsNullOrWhiteSpace(model.BrandManufacturer)
+                            ? DBNull.Value
+                            : model.BrandManufacturer.Trim();
+
+                    command.Parameters.Add("@AssignedEquipment", SqlDbType.NVarChar, 50)
+                        .Value = string.IsNullOrWhiteSpace(model.TargetStation)
+                            ? DBNull.Value
+                            : model.TargetStation;
+
+                    command.Parameters.Add("@StorageLocation", SqlDbType.NVarChar, 100)
+                        .Value = string.IsNullOrWhiteSpace(model.StorageLocation)
+                            ? DBNull.Value
+                            : model.StorageLocation;
+
+                    command.Parameters.Add("@AvailableQuantity", SqlDbType.Int)
+                        .Value = model.AvailableQuantity;
+
+                    command.Parameters.Add("@AlertThreshold", SqlDbType.Int)
+                        .Value = model.AlertThresholdMin;
+
+                    SqlParameter priceParameter =
+                        command.Parameters.Add("@UnitPriceINR", SqlDbType.Decimal);
+
+                    priceParameter.Precision = 18;
+                    priceParameter.Scale = 2;
+                    priceParameter.Value = model.UnitPriceINR;
+
+                    command.Parameters.Add("@SpecCycles", SqlDbType.Int)
+                        .Value = model.SpecCyclesLimit.HasValue
+                            ? model.SpecCyclesLimit.Value
+                            : DBNull.Value;
+
+                    command.Parameters.Add("@PhotoPath", SqlDbType.NVarChar, 500)
+                        .Value = photoPath == null
+                            ? DBNull.Value
+                            : photoPath;
+
+                    command.Parameters.Add("@ModifiedBy", SqlDbType.NVarChar, 100)
+                        .Value = HttpContext.Session.GetString("EmployeeName") ?? "System";
+
+                    await connection.OpenAsync();
+
+                    await command.ExecuteNonQueryAsync();
+                }
+
+                if (model.AvailableQuantity <= model.AlertThresholdMin)
+                {
+                    _logger.LogInformation(
+                        "Low-stock condition detected during update. Item={ItemName}, Quantity={Quantity}, Threshold={Threshold}",
+                        model.TestItemName,
+                        model.AvailableQuantity,
+                        model.AlertThresholdMin);
+
+                    bool emailSent = await SendLowStockEmailAsync(
+                        model.ProjectCode,
+                        model.TestItemName,
+                        model.TargetStation,
+                        model.StorageLocation,
+                        model.AvailableQuantity,
+                        model.AlertThresholdMin);
+
+                    if (!emailSent)
+                    {
+                        _logger.LogError(
+                            "LOW-STOCK EMAIL FAILED after updating {ItemName}.",
+                            model.TestItemName);
+
+                        TempData["ErrorMessage"] =
+                            "Equipment updated, but the low-stock email failed. Check application logs.";
+                    }
+                    else
+                    {
+                        _logger.LogInformation(
+                            "Low-stock email accepted by SMTP for updated item {ItemName}.",
+                            model.TestItemName);
+                    }
+                }
+
+                if (TempData["ErrorMessage"] == null)
+                {
+                    TempData["SuccessMessage"] = "Equipment updated successfully!";
+                }
+            }
+            catch (SqlException ex)
+            {
+                TempData["ErrorMessage"] = $"Database error: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error updating equipment: {ex.Message}";
             }
 
-            string connectionString = GetConnectionString();
-
-            using SqlConnection connection = new SqlConnection(connectionString);
-            using SqlCommand command = new SqlCommand("dbo.UpdateEquipment", connection);
-            command.CommandType = CommandType.StoredProcedure;
-
-            command.Parameters.Add("@Id", SqlDbType.Int).Value = model.Id;
-            command.Parameters.Add("@ProjectCode", SqlDbType.NVarChar, 50).Value = model.ProjectCode;
-            command.Parameters.Add("@TestItemName", SqlDbType.NVarChar, 250).Value = model.TestItemName;
-            command.Parameters.Add("@AssignedEquipment", SqlDbType.NVarChar, 50).Value = model.TargetStation;
-            command.Parameters.Add("@StorageLocation", SqlDbType.NVarChar, 100).Value = model.StorageLocation;
-            command.Parameters.Add("@AvailableQuantity", SqlDbType.Int).Value = model.AvailableQuantity;
-            command.Parameters.Add("@AlertThreshold", SqlDbType.Int).Value = model.AlertThresholdMin;
-
-            var priceParam = command.Parameters.Add("@UnitPriceINR", SqlDbType.Decimal);
-            priceParam.Precision = 18;
-            priceParam.Scale = 2;
-            priceParam.Value = model.UnitPriceINR;
-
-            command.Parameters.Add("@SpecCycles", SqlDbType.Int).Value = model.SpecCyclesLimit ?? 0;
-            command.Parameters.Add("@PhotoPath", SqlDbType.NVarChar, 500).Value =
-                (object?)photoPath ?? DBNull.Value;
-
-            command.Parameters.Add("@ModifiedBy", SqlDbType.NVarChar, 100).Value =
-                HttpContext.Session.GetString("EmployeeName") ?? "System";
-
-            await connection.OpenAsync();
-
-            TempData["SuccessMessage"] = "Equipment updated successfully!";
             return RedirectToAction(nameof(Index));
         }
 
@@ -169,6 +313,8 @@ namespace TestingSpareManagement.Controllers
                 id = item.Id,
                 projectCode = item.ProjectCode,
                 testItemName = item.TestItemName,
+                partNumber = item.PartNumber,
+                brandManufacturer = item.BrandManufacturer,
                 assignedEquipment = item.AssignedEquipment,
                 storageLocation = item.StorageLocation,
                 availableQuantity = item.AvailableQuantity,
@@ -267,6 +413,13 @@ namespace TestingSpareManagement.Controllers
                 Id = Convert.ToInt32(reader["Id"]),
                 ProjectCode = reader["ProjectCode"]?.ToString() ?? "",
                 TestItemName = reader["TestItemName"]?.ToString() ?? "",
+                PartNumber = reader["PartNumber"] == DBNull.Value
+                    ? null
+                    : reader["PartNumber"].ToString(),
+
+                                BrandManufacturer = reader["BrandManufacturer"] == DBNull.Value
+                    ? null
+                    : reader["BrandManufacturer"].ToString(),
                 AssignedEquipment = reader["AssignedEquipment"]?.ToString() ?? "",
                 StorageLocation = reader["StorageLocation"]?.ToString() ?? "",
                 AvailableQuantity = Convert.ToInt32(reader["AvailableQuantity"]),
@@ -452,6 +605,207 @@ namespace TestingSpareManagement.Controllers
             }
 
             return stations;
+        }
+
+        private async Task<bool> SendLowStockEmailAsync(
+            string projectCode,
+            string itemName,
+            string station,
+            string storageLocation,
+            int availableQuantity,
+            int alertThreshold)
+        {
+
+            _logger.LogInformation(
+                "SendLowStockEmailAsync CALLED. Item={ItemName}, Available={AvailableQuantity}, Threshold={AlertThreshold}",
+                itemName,
+                availableQuantity,
+                alertThreshold);
+
+            // Send only when stock reaches or falls below the threshold.
+            if (availableQuantity > alertThreshold)
+            {
+                _logger.LogInformation(
+                    "Low-stock email not required for {ItemName}. " +
+                    "Available quantity: {AvailableQuantity}; Threshold: {Threshold}",
+                    itemName, availableQuantity, alertThreshold);
+
+                return true;
+            }
+
+            try
+            {
+                string host = _configuration["SmtpSettings:Host"] ?? "";
+                int port = _configuration.GetValue<int>("SmtpSettings:Port");
+                bool enableSsl = _configuration.GetValue<bool>(
+                    "SmtpSettings:EnableSsl");
+
+                string fromEmail =
+                    _configuration["SmtpSettings:SenderEmail"] ?? "";
+
+                string senderName =
+                    _configuration["SmtpSettings:SenderName"]
+                    ?? "Testing Spare Management System";
+
+                string username =
+                    _configuration["SmtpSettings:Username"] ?? "";
+
+                string password =
+                    _configuration["SmtpSettings:Password"] ?? "";
+
+                string[] recipients =
+                    _configuration
+                        .GetSection("SmtpSettings:Recipients")
+                        .Get<string[]>()
+                    ?? Array.Empty<string>();
+
+                if (string.IsNullOrWhiteSpace(host) ||
+                    string.IsNullOrWhiteSpace(fromEmail) ||
+                    port <= 0)
+                {
+                    _logger.LogError(
+                        "Low-stock email failed: SMTP configuration is incomplete.");
+
+                    return false;
+                }
+
+                using var mail = new MailMessage();
+
+                mail.From = new MailAddress(fromEmail, senderName);
+
+                foreach (string recipient in recipients)
+                {
+                    if (!string.IsNullOrWhiteSpace(recipient))
+                    {
+                        mail.To.Add(recipient.Trim());
+                    }
+                }
+
+                if (mail.To.Count == 0)
+                {
+                    _logger.LogError(
+                    "Low-stock email failed: No valid recipients configured.");
+
+                    return false;
+
+                }
+
+                mail.Subject = $"LOW STOCK ALERT - {itemName}";
+                mail.IsBodyHtml = true;
+
+                mail.Body = $@"
+                    <html>
+                    <body style='font-family:Arial,sans-serif;color:#333;'>
+                        <div style='max-width:650px;margin:auto;
+                                    border:1px solid #ddd;border-radius:8px;padding:20px;'>
+
+                            <h2 style='color:#dc2626;'>LOW STOCK ALERT</h2>
+
+                            <p>Available stock has reached or fallen below
+                               the configured alert threshold.</p>
+
+                            <table style='width:100%;border-collapse:collapse;'>
+                                <tr>
+                                    <td style='padding:8px;border:1px solid #ddd;'>
+                                        Project Code
+                                    </td>
+                                    <td style='padding:8px;border:1px solid #ddd;'>
+                                        {WebUtility.HtmlEncode(projectCode)}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style='padding:8px;border:1px solid #ddd;'>
+                                        Spare Item
+                                    </td>
+                                    <td style='padding:8px;border:1px solid #ddd;'>
+                                        {WebUtility.HtmlEncode(itemName)}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style='padding:8px;border:1px solid #ddd;'>
+                                        Testing Station
+                                    </td>
+                                    <td style='padding:8px;border:1px solid #ddd;'>
+                                        {WebUtility.HtmlEncode(station)}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style='padding:8px;border:1px solid #ddd;'>
+                                        Storage Location
+                                    </td>
+                                    <td style='padding:8px;border:1px solid #ddd;'>
+                                        {WebUtility.HtmlEncode(storageLocation)}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style='padding:8px;border:1px solid #ddd;'>
+                                        Available Quantity
+                                    </td>
+                                    <td style='padding:8px;border:1px solid #ddd;
+                                               color:#dc2626;font-weight:bold;'>
+                                        {availableQuantity}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style='padding:8px;border:1px solid #ddd;'>
+                                        Alert Threshold
+                                    </td>
+                                    <td style='padding:8px;border:1px solid #ddd;'>
+                                        {alertThreshold}
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p>Please review the stock and arrange replenishment.</p>
+
+                            <p style='font-size:12px;color:#777;'>
+                                Automated notification from TestingSpareManagement.
+                            </p>
+                        </div>
+                    </body>
+                    </html>";
+
+                using var smtp = new SmtpClient(host, port)
+                {
+                    EnableSsl = enableSsl,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    Timeout = 20000
+                };
+
+                // Use these credentials when your SMTP server requires authentication.
+                if (!string.IsNullOrWhiteSpace(username))
+                {
+                    smtp.UseDefaultCredentials = false;
+                    smtp.Credentials = new NetworkCredential(username, password);
+                }
+
+                await smtp.SendMailAsync(mail);
+
+                _logger.LogInformation(
+                    "Low-stock email accepted by SMTP for {ItemName}. " +
+                    "Available quantity: {AvailableQuantity}; Threshold: {Threshold}; " +
+                    "Recipients: {Recipients}",
+                    itemName,
+                    availableQuantity,
+                    alertThreshold,
+                    string.Join(", ", recipients));
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Low-stock email failed for item {ItemName}.",
+                    itemName);
+
+                return false;
+            }
         }
     }
 }

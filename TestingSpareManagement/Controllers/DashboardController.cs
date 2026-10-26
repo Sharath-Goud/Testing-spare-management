@@ -84,7 +84,20 @@ namespace TestingSpareManagement.Controllers
 
             if (missingAlerts.Any())
             {
-                await SendMissingConsumptionAlertEmailAsync(missingAlerts);
+                try
+                {
+                    await SendMissingConsumptionAlertEmailAsync(missingAlerts);
+                }
+                catch (Exception ex)
+                {
+                    // Keep the dashboard working even if email delivery fails.
+                    Console.Error.WriteLine(
+                        $"Daily Consumption alert email failed: {ex}");
+
+                    ViewBag.EmailWarning =
+                        "The dashboard loaded, but the alert email could not be sent. " +
+                        "Please contact IT to verify the SMTP server connection.";
+                }
             }
 
             return View(model);
@@ -228,41 +241,114 @@ namespace TestingSpareManagement.Controllers
                 });
         }
 
+        //private async Task<List<string>> GetMissingConsumptionShiftAlerts()
+        //{
+        //    var alerts = new List<string>();
+
+        //    DateTime today = DateTime.Today;
+
+        //    string connectionString = GetConnectionString();
+
+        //    using SqlConnection connection =
+        //        new SqlConnection(connectionString);
+
+        //    await connection.OpenAsync();
+
+        //    using SqlCommand command = new SqlCommand(@"
+        //        SELECT COUNT(1)
+        //        FROM dbo.DailyConsumption
+        //        WHERE ConsumptionDate >= @Today
+        //          AND ConsumptionDate < @Tomorrow
+        //          AND IsActive = 1;", connection);
+
+        //    command.Parameters.Add("@Today", SqlDbType.Date).Value = today;
+        //    command.Parameters.Add("@Tomorrow", SqlDbType.Date).Value = today.AddDays(1);
+
+        //    int recordCount = Convert.ToInt32(
+        //        await command.ExecuteScalarAsync());
+
+        //    if (recordCount > 0)
+        //    {
+        //        return alerts;
+        //    }
+
+        //    alerts.Add(
+        //        $"Daily consumption record is missing for today " +
+        //        $"({today:dd MMM yyyy}). Please update Daily Consumption."
+        //    );
+
+        //    return alerts;
+        //}
+
         private async Task<List<string>> GetMissingConsumptionShiftAlerts()
         {
             var alerts = new List<string>();
 
-            DateTime today = DateTime.Today;
+            DateTime now = DateTime.Now;
+            DateTime today = now.Date;
+            TimeSpan currentTime = now.TimeOfDay;
 
             string connectionString = GetConnectionString();
 
-            using SqlConnection connection =
-                new SqlConnection(connectionString);
-
+            using SqlConnection connection = new SqlConnection(connectionString);
             await connection.OpenAsync();
 
-            using SqlCommand command = new SqlCommand(@"
-                SELECT COUNT(1)
-                FROM dbo.DailyConsumption
-                WHERE ConsumptionDate >= @Today
-                  AND ConsumptionDate < @Tomorrow
-                  AND IsActive = 1;", connection);
+            // Exact shift names used by the Daily Consumption form.
+            const string dayShift = "Shift-A (Day Shift)";
+            const string nightShift = "Shift-B (Night Shift)";
 
-            command.Parameters.Add("@Today", SqlDbType.Date).Value = today;
-            command.Parameters.Add("@Tomorrow", SqlDbType.Date).Value = today.AddDays(1);
-
-            int recordCount = Convert.ToInt32(
-                await command.ExecuteScalarAsync());
-
-            if (recordCount > 0)
+            if (currentTime >= new TimeSpan(18, 0, 0))
             {
-                return alerts;
+                using SqlCommand dayCommand = new SqlCommand(@"
+            SELECT COUNT(1)
+            FROM dbo.DailyConsumption
+            WHERE ConsumptionDate >= @ShiftDate
+              AND ConsumptionDate < @NextDate
+              AND WorkingShift = @WorkingShift
+              AND IsActive = 1;", connection);
+
+                dayCommand.Parameters.Add("@ShiftDate", SqlDbType.Date).Value = today;
+                dayCommand.Parameters.Add("@NextDate", SqlDbType.Date).Value = today.AddDays(1);
+                dayCommand.Parameters.Add("@WorkingShift", SqlDbType.NVarChar, 100).Value = dayShift;
+
+                int dayCount = Convert.ToInt32(await dayCommand.ExecuteScalarAsync());
+
+                if (dayCount == 0)
+                {
+                    alerts.Add(
+                        $"DAY SHIFT DATA NOT ENTERED: Daily Consumption data for " +
+                        $"{today:dd MMM yyyy} has not been entered for the Day Shift " +
+                        "(8:00 AM–6:00 PM).");
+                }
             }
 
-            alerts.Add(
-                $"Daily consumption record is missing for today " +
-                $"({today:dd MMM yyyy}). Please update Daily Consumption."
-            );
+            if (currentTime >= new TimeSpan(6, 0, 0) &&
+                currentTime < new TimeSpan(18, 0, 0))
+            {
+                DateTime nightShiftDate = today.AddDays(-1);
+
+                using SqlCommand nightCommand = new SqlCommand(@"
+            SELECT COUNT(1)
+            FROM dbo.DailyConsumption
+            WHERE ConsumptionDate >= @ShiftDate
+              AND ConsumptionDate < @NextDate
+              AND WorkingShift = @WorkingShift
+              AND IsActive = 1;", connection);
+
+                nightCommand.Parameters.Add("@ShiftDate", SqlDbType.Date).Value = nightShiftDate;
+                nightCommand.Parameters.Add("@NextDate", SqlDbType.Date).Value = today;
+                nightCommand.Parameters.Add("@WorkingShift", SqlDbType.NVarChar, 100).Value = nightShift;
+
+                int nightCount = Convert.ToInt32(await nightCommand.ExecuteScalarAsync());
+
+                if (nightCount == 0)
+                {
+                    alerts.Add(
+                        $"NIGHT SHIFT DATA NOT ENTERED: Daily Consumption data for " +
+                        $"the night shift starting {nightShiftDate:dd MMM yyyy} " +
+                        $"and ending {today:dd MMM yyyy} has not been entered.");
+                }
+            }
 
             return alerts;
         }
