@@ -1055,3 +1055,27 @@ body.purchase-history-open {
             font-size: 18px;
         }
 }
+
+.master-layout.employee-layout {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+    .master-layout.employee-layout .connector-report-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+    }
+
+    .master-layout.employee-layout .report-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: auto;
+    }
+
+    .master-layout.employee-layout .connector-table {
+        width: 100% !important;
+        min-width: 900px;
+    }

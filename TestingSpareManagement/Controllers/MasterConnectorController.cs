@@ -167,6 +167,8 @@ namespace TestingSpareManagement.Controllers
 
             await LoadConnectorReport(model);
             await LoadProjects(model);
+            await LoadTestingStations();
+
             return View("Index", model);
         }
 
@@ -184,6 +186,9 @@ namespace TestingSpareManagement.Controllers
             if (!ModelState.IsValid)
             {
                 await LoadConnectorReport(model);
+                await LoadProjects(model);
+                await LoadTestingStations();
+
                 return View("Index", model);
             }
 
@@ -196,6 +201,9 @@ namespace TestingSpareManagement.Controllers
                 if (!ModelState.IsValid)
                 {
                     await LoadConnectorReport(model);
+                    await LoadProjects(model);
+                    await LoadTestingStations();
+
                     return View("Index", model);
                 }
             }

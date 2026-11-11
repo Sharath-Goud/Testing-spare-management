@@ -604,6 +604,24 @@
 
                     </button>
                                 }
+
+                <button class="sidebar-item
+        @(ViewContext.RouteData.Values["controller"]?.ToString() == "Account"
+                                  && ViewContext.RouteData.Values["action"]?.ToString() == "ForgotPassword"
+                                        ? "active"
+                                        : "")"
+                        type="button"
+                        onclick="window.location.href='@Url.Action("ForgotPassword", "Account")'">
+
+                    <span class="sidebar-icon sidebar-purple">
+                        <i class="fa-solid fa-lock"></i>
+                    </span>
+
+                    <span class="sidebar-text">
+                        Forgot Password
+                    </span>
+
+                </button>
             </div>
 
 

@@ -19,6 +19,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddMemoryCache();
 builder.Services.AddHostedService<LowStockEmailBackgroundService>();
+builder.Services.AddHttpClient<ExchangeRateService>();
 
 // Add Session
 builder.Services.AddSession(options =>
@@ -36,13 +37,8 @@ var fontPath = Path.Combine(AppContext.BaseDirectory, "wwwroot", "fonts", "Robot
 if (File.Exists(fontPath))
 {
     FontManager.RegisterFont(File.OpenRead(fontPath));
-    Console.WriteLine($"✅ Font registered: {fontPath}");
 }
-else
-{
-    Console.WriteLine($"⚠️ Font NOT found at: {fontPath}");
-    // Fallback: QuestPDF still has built-in Lato as default
-}
+
 
 var app = builder.Build();
 

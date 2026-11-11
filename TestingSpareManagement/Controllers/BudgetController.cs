@@ -24,9 +24,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // GET: Budget/Index
-        // =====================================================
         [HttpGet]
         public async Task<IActionResult> Index(int? year)
         {
@@ -45,9 +42,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // GET: Budget/ExportExcel
-        // =====================================================
         [HttpGet]
         public async Task<IActionResult> ExportExcel(int? year)
         {
@@ -168,9 +162,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // GET: Budget/ExportPdf
-        // =====================================================
         [HttpGet]
         public async Task<IActionResult> ExportPdf(int? year)
         {
@@ -312,16 +303,23 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // POST: Budget/UpdateExpense
-        // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateExpense(int year, int monthNumber, decimal actualExpensesINR)
+        public async Task<IActionResult> UpdateExpense(
+    int year,
+    int monthNumber,
+    decimal allocatedBudgetINR,
+    decimal actualExpensesINR)
         {
             if (year <= 0 || monthNumber < 1 || monthNumber > 12)
             {
                 TempData["ErrorMessage"] = "Invalid month or year.";
+                return RedirectToAction(nameof(Index), new { year });
+            }
+
+            if (allocatedBudgetINR < 0)
+            {
+                TempData["ErrorMessage"] = "Allocated budget cannot be negative.";
                 return RedirectToAction(nameof(Index), new { year });
             }
 
@@ -334,41 +332,65 @@ namespace TestingSpareManagement.Controllers
             try
             {
                 string conn = GetConnectionString();
+
                 using SqlConnection connection = new SqlConnection(conn);
-                using SqlCommand command = new SqlCommand("dbo.UpdateBudgetExpense", connection);
+
+                using SqlCommand command =
+                    new SqlCommand("dbo.UpdateBudgetExpense", connection);
+
                 command.CommandType = CommandType.StoredProcedure;
 
+                // Year
                 command.Parameters.Add("@Year", SqlDbType.Int).Value = year;
+
+                // Month
                 command.Parameters.Add("@MonthNumber", SqlDbType.Int).Value = monthNumber;
 
-                var inrParam = command.Parameters.Add("@ActualExpensesINR", SqlDbType.Decimal);
-                inrParam.Precision = 18; inrParam.Scale = 2;
-                inrParam.Value = actualExpensesINR;
+                // Allocated Budget
+                var budgetParam =
+                    command.Parameters.Add("@AllocatedBudgetINR", SqlDbType.Decimal);
 
-                var rateParam = command.Parameters.Add("@ExchangeRate", SqlDbType.Decimal);
-                rateParam.Precision = 10; rateParam.Scale = 4;
+                budgetParam.Precision = 18;
+                budgetParam.Scale = 2;
+                budgetParam.Value = allocatedBudgetINR;
+
+                // Actual Expense
+                var expenseParam =
+                    command.Parameters.Add("@ActualExpensesINR", SqlDbType.Decimal);
+
+                expenseParam.Precision = 18;
+                expenseParam.Scale = 2;
+                expenseParam.Value = actualExpensesINR;
+
+                // Exchange Rate
+                var rateParam =
+                    command.Parameters.Add("@ExchangeRate", SqlDbType.Decimal);
+
+                rateParam.Precision = 10;
+                rateParam.Scale = 4;
                 rateParam.Value = 11.66m;
 
+                // Modified By
                 command.Parameters.Add("@ModifiedBy", SqlDbType.NVarChar, 100).Value =
                     HttpContext.Session.GetString("EmployeeName") ?? "System";
 
                 await connection.OpenAsync();
+
                 await command.ExecuteNonQueryAsync();
 
-                TempData["SuccessMessage"] = $"Expense updated to ₹{actualExpensesINR:N0} successfully.";
+                TempData["SuccessMessage"] =
+                    $"Budget updated to ₹{allocatedBudgetINR:N2} and expense updated to ₹{actualExpensesINR:N2} successfully.";
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Failed to update expense: {ex.Message}";
+                TempData["ErrorMessage"] =
+                    $"Failed to update budget and expense: {ex.Message}";
             }
 
             return RedirectToAction(nameof(Index), new { year });
         }
 
 
-        // =====================================================
-        // POST: Budget/UpdateYearlyBudget
-        // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateYearlyBudget(int year, decimal monthlyBudgetINR)
@@ -415,9 +437,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // PRIVATE: GET BUDGET LEDGER
-        // =====================================================
         private async Task<List<MonthlyLedgerItem>> GetBudgetLedger(int year)
         {
             var list = new List<MonthlyLedgerItem>();
@@ -453,9 +472,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // PRIVATE: FALLBACK LEDGER
-        // =====================================================
         private List<MonthlyLedgerItem> BuildFallbackLedger(int year)
         {
             var months = new[]
@@ -489,9 +505,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // PRIVATE: BUILD CHART DATA
-        // =====================================================
         private void BuildChartData(BudgetExpenditureViewModel model)
         {
             if (model.MonthlyLedger == null || !model.MonthlyLedger.Any()) return;
@@ -504,9 +517,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // PRIVATE: BUILD SUMMARY CARDS
-        // =====================================================
         private void BuildSummaryCards(BudgetExpenditureViewModel model)
         {
             if (model.MonthlyLedger == null || !model.MonthlyLedger.Any()) return;
@@ -539,9 +549,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // PRIVATE: MAP SQL READER
-        // =====================================================
         private MonthlyLedgerItem MapLedgerItem(SqlDataReader reader)
         {
             return new MonthlyLedgerItem
@@ -562,9 +569,6 @@ namespace TestingSpareManagement.Controllers
         }
 
 
-        // =====================================================
-        // PRIVATE: CONNECTION STRING
-        // =====================================================
         private string GetConnectionString()
         {
             string? cs = _configuration.GetConnectionString("DefaultConnection");

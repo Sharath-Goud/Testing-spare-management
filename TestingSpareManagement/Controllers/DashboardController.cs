@@ -63,11 +63,18 @@ namespace TestingSpareManagement.Controllers
             // Active Projects
             model.ActiveProjects = await GetActiveProjectsStatus();
 
-            // Equipment Consumables (for Stock-Out Alerts)
+            // Equipment Consumables
             model.EquipmentConsumables = await GetEquipmentConsumables();
 
-            model.LowStockAlerts = model.EquipmentConsumables
+            int equipmentLowStockCount = model.EquipmentConsumables
                 .Count(e => e.AvailableQty <= e.MinLimit);
+
+            // Master Connector
+            int masterConnectorLowStockCount = await GetMasterConnectorLowStockCount();
+
+            // Combined Low Stock Count
+            model.LowStockAlerts =
+                equipmentLowStockCount + masterConnectorLowStockCount;
 
             // Material Requests (for Pending Requisitions)
             model.MaterialRequests = await GetMaterialRequests();
@@ -241,45 +248,7 @@ namespace TestingSpareManagement.Controllers
                 });
         }
 
-        //private async Task<List<string>> GetMissingConsumptionShiftAlerts()
-        //{
-        //    var alerts = new List<string>();
-
-        //    DateTime today = DateTime.Today;
-
-        //    string connectionString = GetConnectionString();
-
-        //    using SqlConnection connection =
-        //        new SqlConnection(connectionString);
-
-        //    await connection.OpenAsync();
-
-        //    using SqlCommand command = new SqlCommand(@"
-        //        SELECT COUNT(1)
-        //        FROM dbo.DailyConsumption
-        //        WHERE ConsumptionDate >= @Today
-        //          AND ConsumptionDate < @Tomorrow
-        //          AND IsActive = 1;", connection);
-
-        //    command.Parameters.Add("@Today", SqlDbType.Date).Value = today;
-        //    command.Parameters.Add("@Tomorrow", SqlDbType.Date).Value = today.AddDays(1);
-
-        //    int recordCount = Convert.ToInt32(
-        //        await command.ExecuteScalarAsync());
-
-        //    if (recordCount > 0)
-        //    {
-        //        return alerts;
-        //    }
-
-        //    alerts.Add(
-        //        $"Daily consumption record is missing for today " +
-        //        $"({today:dd MMM yyyy}). Please update Daily Consumption."
-        //    );
-
-        //    return alerts;
-        //}
-
+        
         private async Task<List<string>> GetMissingConsumptionShiftAlerts()
         {
             var alerts = new List<string>();
@@ -468,54 +437,28 @@ namespace TestingSpareManagement.Controllers
             return list;
         }
 
-        //private async Task<List<EquipmentConsumableModel>> GetEquipmentConsumables()
-        //{
-        //    var list = new List<EquipmentConsumableModel>();
-        //    string conn = GetConnectionString();
+        private async Task<int> GetMasterConnectorLowStockCount()
+        {
+            string conn = GetConnectionString();
 
-        //    using SqlConnection connection = new SqlConnection(conn);
+            using SqlConnection connection = new SqlConnection(conn);
 
-        //    string query = @"
-        //        SELECT 
-        //            ec.[Id],
-        //            ec.[ProjectCode],
-        //            ec.[TestItem],
-        //            ec.[AssignedEquipment],
-        //            ec.[StorageLocation],
-        //            ec.[AvailableQty],
-        //            ec.[MinLimit],
-        //            ec.[UnitPriceINR],
-        //            ec.[SpecCycles],
-        //            ec.[ImageUrl]
-        //        FROM [dbo].[EquipmentConsumables] ec
-        //        WHERE ec.[IsActive] = 1
-        //        ORDER BY ec.[ProjectCode], ec.[TestItem]";
+            const string query = @"
+        SELECT COUNT(1)
+        FROM dbo.MasterConnector
+        WHERE IsActive = 1
+          AND BaseStock <= AlertThreshold;";
 
-        //    using SqlCommand command = new SqlCommand(query, connection);
+            using SqlCommand command = new SqlCommand(query, connection);
 
-        //    await connection.OpenAsync();
-        //    using SqlDataReader reader = await command.ExecuteReaderAsync();
+            await connection.OpenAsync();
 
-        //    while (await reader.ReadAsync())
-        //    {
-        //        list.Add(new EquipmentConsumableModel
-        //        {
-        //            Id = Convert.ToInt32(reader["Id"]),
-        //            ProjectCode = reader["ProjectCode"]?.ToString() ?? "",
-        //            TestItem = reader["TestItem"]?.ToString() ?? "",
-        //            AssignedEquipment = reader["AssignedEquipment"]?.ToString() ?? "",
-        //            StorageLocation = reader["StorageLocation"]?.ToString() ?? "",
-        //            AvailableQty = reader["AvailableQty"] == DBNull.Value ? 0 : Convert.ToInt32(reader["AvailableQty"]),
-        //            MinLimit = reader["MinLimit"] == DBNull.Value ? 0 : Convert.ToInt32(reader["MinLimit"]),
-        //            UnitPriceINR = reader["UnitPriceINR"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["UnitPriceINR"]),
-        //            SpecCycles = reader["SpecCycles"]?.ToString() ?? "",
-        //            ImageUrl = reader["ImageUrl"]?.ToString() ?? ""
-        //        });
-        //    }
+            object? result = await command.ExecuteScalarAsync();
 
-        //    return list;
-        //}
-
+            return result == null || result == DBNull.Value
+                ? 0
+                : Convert.ToInt32(result);
+        }
 
         private async Task<List<EquipmentConsumableModel>> GetEquipmentConsumables()
         {

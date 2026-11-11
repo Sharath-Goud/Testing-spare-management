@@ -1,28 +1,30 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using TestingSpareManagement.Models;
-
-// Excel & PDF export packages
+﻿// Excel & PDF export packages
 using ClosedXML.Excel;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-
-// Aliases to avoid SqlDbType conflict
-using SqlDbType = System.Data.SqlDbType;
+using TestingSpareManagement.Models;
+using TestingSpareManagement.Services;
 using CommandType = System.Data.CommandType;
 using ParameterDirection = System.Data.ParameterDirection;
+// Aliases to avoid SqlDbType conflict
+using SqlDbType = System.Data.SqlDbType;
 
 namespace TestingSpareManagement.Controllers
 {
     public class ConsumptionController : Controller
     {
         private readonly IConfiguration _configuration;
-        private const decimal INR_TO_RMB = 0.0858m;
+        private readonly ExchangeRateService _exchangeRateService;
 
-        public ConsumptionController(IConfiguration configuration)
+        public ConsumptionController(
+         IConfiguration configuration,
+         ExchangeRateService exchangeRateService)
         {
             _configuration = configuration;
+            _exchangeRateService = exchangeRateService;
         }
 
         [HttpGet]
@@ -65,7 +67,7 @@ namespace TestingSpareManagement.Controllers
             model.ProjectCodes = await GetProjectCodes();
             model.EquipmentStations = await GetEquipmentStations();
             ViewBag.AssetTargets = await GetMasterConnectorDescriptions();
-            //model.DriEngineers = await GetDriEngineers();
+            model.DriEngineers = await GetDriEngineers();
             model.LineTargets = await GetLineTargets();
 
             return View(model);
@@ -136,7 +138,28 @@ namespace TestingSpareManagement.Controllers
             string connectionString = GetConnectionString();
             using SqlConnection connection = new SqlConnection(connectionString);
 
-            decimal? unitCostINR = await GetUnitCostFromMaster(model.SpareDetails, connectionString);
+            decimal? unitCostINR =
+    await GetUnitCostFromMaster(
+        model.SpareDetails,
+        connectionString);
+
+            decimal exchangeRate = 0m;
+            decimal? unitCostCNY = null;
+
+            if (unitCostINR.HasValue)
+            {
+                var exchangeResult =
+                    await _exchangeRateService.GetInrToCnyRateAsync(
+                        model.SelectedDate);
+
+                exchangeRate = exchangeResult.Rate;
+
+                unitCostCNY =
+                    Math.Round(
+                        unitCostINR.Value * exchangeRate,
+                        4,
+                        MidpointRounding.AwayFromZero);
+            }
 
             using SqlCommand command = new SqlCommand("dbo.InsertDailyConsumption", connection);
             command.CommandType = CommandType.StoredProcedure;
@@ -146,6 +169,15 @@ namespace TestingSpareManagement.Controllers
             command.Parameters.Add("@ProjectCode", SqlDbType.NVarChar, 50).Value = model.ProjectCode;
             command.Parameters.Add("@SpareDetails", SqlDbType.NVarChar, 100).Value = model.SpareDetails;
             command.Parameters.Add("@EquipmentStation", SqlDbType.NVarChar, 50).Value = model.EquipmentStation;
+            command.Parameters.Add("@Brand", SqlDbType.NVarChar, 100).Value =
+                string.IsNullOrWhiteSpace(model.Brand)
+                ? DBNull.Value
+                : model.Brand.Trim();
+
+            command.Parameters.Add("@PartNumber", SqlDbType.NVarChar, 100).Value =
+                string.IsNullOrWhiteSpace(model.PartNumber)
+                    ? DBNull.Value
+                    : model.PartNumber.Trim();
             command.Parameters.Add("@QuantityUsed", SqlDbType.Int).Value = model.QuantityUsed;
             command.Parameters.Add("@LineTarget", SqlDbType.NVarChar, 50).Value = model.LineTarget;
             command.Parameters.Add("@DriEngineer", SqlDbType.NVarChar, 100).Value = model.DriEngineer;
@@ -153,7 +185,9 @@ namespace TestingSpareManagement.Controllers
             command.Parameters.Add("@UnitCostINR", SqlDbType.Decimal).Value =
                 unitCostINR.HasValue ? unitCostINR.Value : DBNull.Value;
             command.Parameters.Add("@UnitCostCNY", SqlDbType.Decimal).Value =
-                unitCostINR.HasValue ? unitCostINR.Value * INR_TO_RMB : DBNull.Value;
+    unitCostCNY.HasValue
+        ? unitCostCNY.Value
+        : DBNull.Value;
 
             command.Parameters.Add("@CreatedBy", SqlDbType.NVarChar, 100).Value =
                 HttpContext.Session.GetString("EmployeeName") ?? "System";
@@ -168,46 +202,127 @@ namespace TestingSpareManagement.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(int id, DailyConsumptionViewModel model)
+        public async Task<IActionResult> Update(
+     int id,
+     DailyConsumptionViewModel model)
         {
-            // ✅ Safety net — default shift if empty
+            // Safety net — default shift if empty
             if (string.IsNullOrWhiteSpace(model.WorkingShift))
                 model.WorkingShift = "Shift-A (Day Shift)";
 
             if (id <= 0 || !ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "❌ Invalid data. Please check your inputs.";
+                TempData["ErrorMessage"] =
+                    "❌ Invalid data. Please check your inputs.";
+
                 return RedirectToAction(nameof(DailyConsumption));
             }
 
-            string connectionString = GetConnectionString();
-            decimal? unitCostINR = await GetUnitCostFromMaster(model.SpareDetails, connectionString);
+            try
+            {
+                string connectionString = GetConnectionString();
 
-            using SqlConnection connection = new SqlConnection(connectionString);
-            using SqlCommand command = new SqlCommand("dbo.UpdateDailyConsumption", connection);
-            command.CommandType = CommandType.StoredProcedure;
+                decimal? unitCostINR =
+                    await GetUnitCostFromMaster(
+                        model.SpareDetails,
+                        connectionString);
 
-            command.Parameters.Add("@Id", SqlDbType.Int).Value = id;
-            command.Parameters.Add("@ConsumptionDate", SqlDbType.Date).Value = model.SelectedDate;
-            command.Parameters.Add("@WorkingShift", SqlDbType.NVarChar, 50).Value = model.WorkingShift;
-            command.Parameters.Add("@ProjectCode", SqlDbType.NVarChar, 50).Value = model.ProjectCode;
-            command.Parameters.Add("@SpareDetails", SqlDbType.NVarChar, 100).Value = model.SpareDetails;
-            command.Parameters.Add("@EquipmentStation", SqlDbType.NVarChar, 50).Value = model.EquipmentStation;
-            command.Parameters.Add("@QuantityUsed", SqlDbType.Int).Value = model.QuantityUsed;
-            command.Parameters.Add("@LineTarget", SqlDbType.NVarChar, 50).Value = model.LineTarget;
-            command.Parameters.Add("@DriEngineer", SqlDbType.NVarChar, 100).Value = model.DriEngineer;
-            command.Parameters.Add("@UnitCostINR", SqlDbType.Decimal).Value =
-                unitCostINR.HasValue ? unitCostINR.Value : DBNull.Value;
-            command.Parameters.Add("@UnitCostCNY", SqlDbType.Decimal).Value =
-                unitCostINR.HasValue ? unitCostINR.Value * INR_TO_RMB : DBNull.Value;
-            command.Parameters.Add("@ModifiedBy", SqlDbType.NVarChar, 100).Value =
-                HttpContext.Session.GetString("EmployeeName") ?? "System";
+                decimal? unitCostCNY = null;
 
-            await connection.OpenAsync();
-            await command.ExecuteNonQueryAsync();
+                if (unitCostINR.HasValue)
+                {
+                    var exchangeResult =
+                        await _exchangeRateService.GetInrToCnyRateAsync(
+                            model.SelectedDate);
 
-            TempData["SuccessMessage"] = "✅ Usage entry updated successfully!";
-            return RedirectToAction(nameof(DailyConsumption));
+                    decimal exchangeRate = exchangeResult.Rate;
+
+                    unitCostCNY =
+                        Math.Round(
+                            unitCostINR.Value * exchangeRate,
+                            4,
+                            MidpointRounding.AwayFromZero);
+                }
+
+                using SqlConnection connection =
+                    new SqlConnection(connectionString);
+
+                using SqlCommand command =
+                    new SqlCommand(
+                        "dbo.UpdateDailyConsumption",
+                        connection);
+
+                command.CommandType =
+                    CommandType.StoredProcedure;
+
+                command.Parameters.Add("@Id", SqlDbType.Int)
+                    .Value = id;
+
+                command.Parameters.Add("@ConsumptionDate", SqlDbType.Date)
+                    .Value = model.SelectedDate;
+
+                command.Parameters.Add("@WorkingShift", SqlDbType.NVarChar, 50)
+                    .Value = model.WorkingShift;
+
+                command.Parameters.Add("@ProjectCode", SqlDbType.NVarChar, 50)
+                    .Value = model.ProjectCode;
+
+                command.Parameters.Add("@SpareDetails", SqlDbType.NVarChar, 100)
+                    .Value = model.SpareDetails;
+
+                command.Parameters.Add("@EquipmentStation", SqlDbType.NVarChar, 50)
+                    .Value = model.EquipmentStation;
+
+                command.Parameters.Add("@Brand", SqlDbType.NVarChar, 100)
+    .Value = string.IsNullOrWhiteSpace(model.Brand)
+        ? DBNull.Value
+        : model.Brand.Trim();
+
+                command.Parameters.Add("@PartNumber", SqlDbType.NVarChar, 100)
+                    .Value = string.IsNullOrWhiteSpace(model.PartNumber)
+                        ? DBNull.Value
+                        : model.PartNumber.Trim();
+
+                command.Parameters.Add("@QuantityUsed", SqlDbType.Int)
+                    .Value = model.QuantityUsed;
+
+                command.Parameters.Add("@LineTarget", SqlDbType.NVarChar, 50)
+                    .Value = model.LineTarget;
+
+                command.Parameters.Add("@DriEngineer", SqlDbType.NVarChar, 100)
+                    .Value = model.DriEngineer;
+
+                command.Parameters.Add("@UnitCostINR", SqlDbType.Decimal)
+                    .Value = unitCostINR.HasValue
+                        ? unitCostINR.Value
+                        : DBNull.Value;
+
+                command.Parameters.Add("@UnitCostCNY", SqlDbType.Decimal)
+                    .Value = unitCostCNY.HasValue
+                        ? unitCostCNY.Value
+                        : DBNull.Value;
+
+                command.Parameters.Add("@ModifiedBy", SqlDbType.NVarChar, 100)
+                    .Value =
+                        HttpContext.Session.GetString("EmployeeName")
+                        ?? "System";
+
+                await connection.OpenAsync();
+
+                await command.ExecuteNonQueryAsync();
+
+                TempData["SuccessMessage"] =
+                    "✅ Usage entry updated successfully!";
+
+                return RedirectToAction(nameof(DailyConsumption));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] =
+                    $"❌ Unable to update usage entry: {ex.Message}";
+
+                return RedirectToAction(nameof(DailyConsumption));
+            }
         }
 
 
@@ -311,7 +426,7 @@ namespace TestingSpareManagement.Controllers
                 inrCell.Style.Font.FontColor = XLColor.FromHtml("#DC2626");
 
                 var rmbCell = ws.Cell(row, 10);
-                rmbCell.Value = (item.TotalCostINR ?? 0) * INR_TO_RMB;
+                rmbCell.Value = item.TotalCostCNY ?? 0;
                 rmbCell.Style.NumberFormat.Format = "¥#,##0.00";
                 rmbCell.Style.Font.FontColor = XLColor.FromHtml("#D97706");
 
@@ -459,8 +574,9 @@ namespace TestingSpareManagement.Controllers
                             DataCell(item.DriEngineer ?? "-");
                             DataCell(item.TotalCostINR.HasValue
                                 ? $"₹{item.TotalCostINR.Value:N2}" : "-");
-                            DataCell(item.TotalCostINR.HasValue
-                                ? $"¥{(item.TotalCostINR.Value * INR_TO_RMB):N2}" : "-");
+                            DataCell(item.TotalCostCNY.HasValue
+                            ? $"¥{item.TotalCostCNY.Value:N2}"
+                            : "-");
                         }
                     });
 
@@ -604,15 +720,34 @@ namespace TestingSpareManagement.Controllers
         private async Task<List<UserDropdownItem>> GetDriEngineers()
         {
             var list = new List<UserDropdownItem>();
+
             string connectionString = GetConnectionString();
+
             try
             {
-                using SqlConnection connection = new SqlConnection(connectionString);
-                using SqlCommand command = new SqlCommand("dbo.GetSystemUsers", connection);
-                command.CommandType = CommandType.StoredProcedure;
+                using SqlConnection connection =
+                    new SqlConnection(connectionString);
+
+                const string query = @"
+            SELECT
+                EmployeeId,
+                FullName,
+                AssignedRole
+            FROM dbo.SystemUsers
+            WHERE IsActive = 1
+              AND EmployeeId IS NOT NULL
+              AND FullName IS NOT NULL
+              AND EmployeeId NOT IN ('123456', '2063870', '2063905')
+            ORDER BY FullName;";
+
+                using SqlCommand command =
+                    new SqlCommand(query, connection);
 
                 await connection.OpenAsync();
-                using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+                using SqlDataReader reader =
+                    await command.ExecuteReaderAsync();
+
                 while (await reader.ReadAsync())
                 {
                     list.Add(new UserDropdownItem
@@ -625,8 +760,10 @@ namespace TestingSpareManagement.Controllers
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("GetDriEngineers error: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine(
+                    "GetDriEngineers error: " + ex.Message);
             }
+
             return list;
         }
 
@@ -730,17 +867,26 @@ namespace TestingSpareManagement.Controllers
                 WorkingShift = reader["WorkingShift"]?.ToString() ?? "",
                 ProjectCode = reader["ProjectCode"]?.ToString() ?? "",
                 SpareDetails = reader["SpareDetails"]?.ToString() ?? "",
+                Brand = reader["Brand"] == DBNull.Value
+    ? null
+    : reader["Brand"]?.ToString(),
+
+                PartNumber = reader["PartNumber"] == DBNull.Value
+    ? null
+    : reader["PartNumber"]?.ToString(),
                 EquipmentStation = reader["EquipmentStation"]?.ToString() ?? "",
                 QuantityUsed = Convert.ToInt32(reader["QuantityUsed"]),
                 LineTarget = reader["LineTarget"]?.ToString() ?? "",
                 DriEngineer = reader["DriEngineer"]?.ToString() ?? "",
                 UnitCostINR = unitCostINR,
                 UnitCostCNY = reader["UnitCostCNY"] == DBNull.Value
-                    ? (unitCostINR.HasValue ? unitCostINR.Value * INR_TO_RMB : null)
-                    : Convert.ToDecimal(reader["UnitCostCNY"]),
+                ? null
+                : Convert.ToDecimal(reader["UnitCostCNY"]),
+
                 TotalCostINR = totalCostINR,
+
                 TotalCostCNY = reader["TotalCostCNY"] == DBNull.Value
-                    ? (totalCostINR.HasValue ? totalCostINR.Value * INR_TO_RMB : null)
+                    ? null
                     : Convert.ToDecimal(reader["TotalCostCNY"]),
                 IsActive = reader["IsActive"] == DBNull.Value
                     ? true

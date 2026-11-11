@@ -103,6 +103,42 @@
                       class="text-danger small"></span>
             </div>
 
+            <!-- Brand -->
+            <div class="form-group">
+                <label for="Brand">
+                    <i class="fa-solid fa-tag"></i>
+                    Brand
+                </label>
+
+                <input asp-for="Brand"
+                       id="Brand"
+                       type="text"
+                       class="form-control-custom"
+                       placeholder="Enter Brand"
+                       maxlength="100" />
+
+                <span asp-validation-for="Brand"
+                      class="text-danger small"></span>
+            </div>
+
+            <!-- Part Number -->
+            <div class="form-group">
+                <label for="PartNumber">
+                    <i class="fa-solid fa-barcode"></i>
+                    Part Number
+                </label>
+
+                <input asp-for="PartNumber"
+                       id="PartNumber"
+                       type="text"
+                       class="form-control-custom"
+                       placeholder="Enter Part Number"
+                       maxlength="100" />
+
+                <span asp-validation-for="PartNumber"
+                      class="text-danger small"></span>
+            </div>
+
             <!-- Equipment Station from TestingStation table -->
             <div class="form-group">
                 <label for="EquipmentStation">Testing Station</label>
@@ -151,35 +187,31 @@
                         class="form-control-custom dri-engineer-select"
                         id="driSelect">
 
-                    <option value="">-- Select Registered User / DRI Engineer --</option>
-
-                    <option value="M.SaiBalaji [ID: 2062927] - General / Line Lead">
-                        M.SaiBalaji [ID: 2062927] - General / Line Lead
+                    <option value="">
+                        -- Select DRI Engineer --
                     </option>
 
-                    <option value="DRI Operator [ID: 2062978] - Operator / DRI">
-                        DRI Operator [ID: 2062978] - Operator / DRI
-                    </option>
-
-                    <option value="Master Admin [ID: admin] - Master Administrator / ORT Lead">
-                        Master Admin [ID: admin] - Master Administrator / ORT Lead
-                    </option>
-
-                    <option value="Ramesh Kumar [ID: user1] - Shift-B / Line-01 Technician">
-                        Ramesh Kumar [ID: user1] - Shift-B / Line-01 Technician
-                    </option>
-
-                    <option value="Wei Zhang [ID: user2] - General / QA Engineer">
-                        Wei Zhang [ID: user2] - General / QA Engineer
-                    </option>
+                    @if (Model.DriEngineers != null && Model.DriEngineers.Any())
+                    {
+                        foreach (var dri in Model.DriEngineers)
+                        {
+                            <option value="@dri.EmployeeId - @dri.FullName">
+                                @dri.EmployeeId - @dri.FullName
+                            </option>
+                        }
+                    }
+                    else
+                    {
+                        <option value="" disabled>
+                            No active DRI engineers found
+                        </option>
+                    }
 
                 </select>
 
                 <span asp-validation-for="DriEngineer"
                       class="text-danger small"></span>
             </div>
-
-
 
 
             <!-- Buttons -->
@@ -232,6 +264,8 @@
                     <tr>
                         <th>DATE</th>
                         <th>SPARE ITEM</th>
+                        <th>BRAND</th>
+                        <th>PART NUMBER</th>
                         <th>SHIFT</th>
                         <th>PROJECT</th>
                         <th>STATION</th>
@@ -251,6 +285,13 @@
                                 <td>@item.ConsumptionDate.ToString("yyyy-MM-dd")</td>
                                 <td class="asset-key-cell">
                                     @item.SpareDetails
+                                </td>
+                                <td>
+                                    @item.Brand
+                                </td>
+
+                                <td>
+                                    @item.PartNumber
                                 </td>
                                 <td><span class="badge badge-shift">@item.WorkingShift</span></td>
                                 <td style="color:#7e22ce; font-weight:bold;">@item.ProjectCode</td>
@@ -397,6 +438,8 @@
                     document.querySelector('[name="WorkingShift"]').value = data.workingShift;
                     document.querySelector('[name="ProjectCode"]').value = data.projectCode;
                     document.querySelector('[name="SpareDetails"]').value = data.spareDetails;
+                            document.querySelector('[name="Brand"]').value = data.brand || '';
+        document.querySelector('[name="PartNumber"]').value = data.partNumber || '';
                     document.querySelector('[name="EquipmentStation"]').value = data.equipmentStation;
                     document.querySelector('[name="QuantityUsed"]').value = data.quantityUsed;
                     document.querySelector('[name="LineTarget"]').value = data.lineTarget;

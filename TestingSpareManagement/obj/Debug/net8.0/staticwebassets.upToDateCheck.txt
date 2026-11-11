@@ -1,4 +1,3 @@
-wwwroot\css\daily-consumption.css
 wwwroot\css\dashboard.css
 wwwroot\css\equipment-consumables.css
 wwwroot\css\master-connector.css
@@ -89,3 +88,4 @@ wwwroot\uploads\equipment\c58f3b066a034835b3ea57c8ae9b708c.png
 wwwroot\uploads\equipment\da73913f70924664b85de83cd41d3574.png
 wwwroot\uploads\equipment\e90c280cb25445349a1550940994f4c2.png
 wwwroot\uploads\equipment\ff84e52b38454c4aa3827adaeae470b2.png
+wwwroot\css\daily-consumption.css

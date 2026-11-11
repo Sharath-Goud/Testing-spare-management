@@ -25,6 +25,14 @@ namespace TestingSpareManagement.Models
         [StringLength(100)]
         public string SpareDetails { get; set; } = string.Empty;
 
+        [Display(Name = "Brand")]
+        [StringLength(100)]
+        public string? Brand { get; set; }
+
+        [Display(Name = "Part Number")]
+        [StringLength(100)]
+        public string? PartNumber { get; set; }
+
         [Required]
         [Display(Name = "Equipment Station")]
         public string EquipmentStation { get; set; } = "OS";
@@ -79,6 +87,8 @@ namespace TestingSpareManagement.Models
         public string WorkingShift { get; set; } = string.Empty;
         public string ProjectCode { get; set; } = string.Empty;
         public string SpareDetails { get; set; } = string.Empty;
+        public string? Brand { get; set; }
+        public string? PartNumber { get; set; }
         public string EquipmentStation { get; set; } = string.Empty;
         public int QuantityUsed { get; set; }
         public string LineTarget { get; set; } = string.Empty;

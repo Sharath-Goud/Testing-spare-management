@@ -3,13 +3,23 @@
 @{
     ViewData["Title"] = "Equipment Consumables";
 }
+@{
+    var userRole = Context.Session.GetString("Role") ?? "";
+
+    var isEmployee = string.Equals(
+        userRole,
+        "Employee",
+        StringComparison.OrdinalIgnoreCase);
+}
 
 <link rel="stylesheet"
       href="~/css/equipment-consumables.css"
       asp-append-version="true" />
 
-<div class="equipment-page-wrapper">
+<div class="equipment-page-wrapper @(isEmployee ? "employee-equipment-layout" : "")">
 
+    @if (!isEmployee)
+{
     <div class="equipment-form-panel">
         <h5><i class="fa-solid fa-plus-circle"></i> Link Spare / Add Requirement</h5>
 
@@ -171,6 +181,7 @@
             </button>
         </form>
     </div>
+    }
 
     <div class="equipment-matrix-panel">
 
@@ -211,7 +222,10 @@
                         <th>UNIT PRICE (INR / RMB)</th>
                         <th>SPEC. CYCLES</th>
                         <th>STATUS</th>
-                        <th>ACTIONS</th>
+                        @if (!isEmployee)
+                        {
+                            <th>ACTIONS</th>
+                        }
                     </tr>
                 </thead>
                 <tbody>
@@ -284,16 +298,19 @@
                                         <span class="status-pill-safe">✓ SAFE</span>
                                     }
                                 </td>
-                                <td>
-                                    <div class="matrix-actions">
-                                        <button type="button" class="btn-matrix-edit" onclick="openEditModal(@item.Id)">
-                                            <i class="fa-solid fa-pen"></i> Edit
-                                        </button>
-                                        <button type="button" class="btn-matrix-del" onclick="deleteEquipment(@item.Id)">
-                                            <i class="fa-solid fa-trash"></i> Del
-                                        </button>
-                                    </div>
-                                </td>
+                                @if (!isEmployee)
+                                {
+                                    <td>
+                                        <div class="matrix-actions">
+                                            <button type="button" class="btn-matrix-edit" onclick="openEditModal(@item.Id)">
+                                                <i class="fa-solid fa-pen"></i> Edit
+                                            </button>
+                                            <button type="button" class="btn-matrix-del" onclick="deleteEquipment(@item.Id)">
+                                                <i class="fa-solid fa-trash"></i> Del
+                                            </button>
+                                        </div>
+                                    </td>
+                                }
                             </tr>
                         }
                     }

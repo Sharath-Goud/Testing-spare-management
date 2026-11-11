@@ -198,6 +198,125 @@ namespace TestingSpareManagement.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            string employeeId = model.EmployeeId.Trim();
+
+            var connection = _context.Database.GetDbConnection();
+
+            bool closeConnection =
+                connection.State != System.Data.ConnectionState.Open;
+
+            try
+            {
+                if (closeConnection)
+                {
+                    await connection.OpenAsync();
+                }
+
+                // Check whether Employee ID exists
+                await using var checkCommand = connection.CreateCommand();
+
+                checkCommand.CommandText = @"
+            SELECT COUNT(1)
+            FROM dbo.SystemUsers
+            WHERE EmployeeId = @EmployeeId
+              AND IsActive = 1;";
+
+                var employeeParameter = checkCommand.CreateParameter();
+                employeeParameter.ParameterName = "@EmployeeId";
+                employeeParameter.Value = employeeId;
+                employeeParameter.DbType = System.Data.DbType.String;
+                employeeParameter.Size = 50;
+
+                checkCommand.Parameters.Add(employeeParameter);
+
+                int employeeExists =
+                    Convert.ToInt32(await checkCommand.ExecuteScalarAsync());
+
+                if (employeeExists == 0)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.EmployeeId),
+                        "Employee ID does not exist.");
+
+                    return View(model);
+                }
+
+                // Update password
+                await using var updateCommand = connection.CreateCommand();
+
+                updateCommand.CommandText = @"
+            UPDATE dbo.SystemUsers
+            SET PasswordHash = @PasswordHash,
+                ModifiedDate = GETDATE()
+            WHERE EmployeeId = @EmployeeId
+              AND IsActive = 1;";
+
+                var passwordParameter = updateCommand.CreateParameter();
+                passwordParameter.ParameterName = "@PasswordHash";
+                passwordParameter.Value = model.NewPassword;
+                passwordParameter.DbType = System.Data.DbType.String;
+                passwordParameter.Size = 255;
+
+                updateCommand.Parameters.Add(passwordParameter);
+
+                var updateEmployeeParameter = updateCommand.CreateParameter();
+                updateEmployeeParameter.ParameterName = "@EmployeeId";
+                updateEmployeeParameter.Value = employeeId;
+                updateEmployeeParameter.DbType = System.Data.DbType.String;
+                updateEmployeeParameter.Size = 50;
+
+                updateCommand.Parameters.Add(updateEmployeeParameter);
+
+                int rowsAffected =
+                    await updateCommand.ExecuteNonQueryAsync();
+
+                if (rowsAffected > 0)
+                {
+                    TempData["SuccessMessage"] =
+                        "Password changed successfully. Please login with your new password.";
+
+                    return RedirectToAction(nameof(Login));
+                }
+
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Unable to change the password. Please try again.");
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Unable to process your request right now. Please try again.");
+
+                return View(model);
+            }
+            finally
+            {
+                if (closeConnection &&
+                    connection.State == System.Data.ConnectionState.Open)
+                {
+                    await connection.CloseAsync();
+                }
+            }
+        }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

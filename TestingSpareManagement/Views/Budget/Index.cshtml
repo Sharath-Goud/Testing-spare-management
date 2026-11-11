@@ -176,8 +176,23 @@
 
             <div style="padding: 24px 28px;">
                 <div style="margin-bottom: 20px;">
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 8px;">Allocated Budget Cap (INR ₹)</label>
-                    <input type="number" id="modalBudget" step="0.01" min="0" readonly style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; background: #f8fafc; box-sizing: border-box;" />
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 8px;">
+                        Allocated Budget Cap (INR ₹)
+                    </label>
+
+                    <input type="number"
+                           id="modalBudget"
+                           name="allocatedBudgetINR"
+                           step="0.01"
+                           min="0"
+                           required
+                           style="width: 100%;
+                          padding: 10px 14px;
+                          border: 1px solid #cbd5e1;
+                          border-radius: 6px;
+                          font-size: 13px;
+                          background: #ffffff;
+                          box-sizing: border-box;" />
                 </div>
                 <div>
                     <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 8px;">Override Actual Expense (INR ₹)</label>
@@ -277,14 +292,49 @@
                 if (e.key === 'Escape') { closeModifyModal(); closeYearlyBudgetModal(); }
             });
 
-            // =====================================================
-            // CHART — Y-axis FIXED: 0 → 2,00,000
-            // =====================================================
             var canvasEl = document.getElementById('budgetChart');
             if (canvasEl && typeof Chart !== 'undefined') {
                 var ctx = canvasEl.getContext('2d');
 
+    var allChartValues = chartBudget.concat(chartExpenses)
+        .map(function (value) {
+            return Number(value) || 0;
+        });
 
+    var maxChartValue = allChartValues.length > 0
+        ? Math.max.apply(null, allChartValues)
+        : 0;
+
+    // Add 20% space above the highest value
+    var chartMax = maxChartValue > 0
+        ? maxChartValue * 1.20
+        : 100000;
+
+    // Create a clean step size
+    var chartStep = chartMax / 5;
+
+    var magnitude = Math.pow(
+        10,
+        Math.floor(Math.log10(chartStep))
+    );
+
+    var normalized = chartStep / magnitude;
+
+    if (normalized <= 1) {
+        chartStep = 1 * magnitude;
+    }
+    else if (normalized <= 2) {
+        chartStep = 2 * magnitude;
+    }
+    else if (normalized <= 5) {
+        chartStep = 5 * magnitude;
+    }
+    else {
+        chartStep = 10 * magnitude;
+    }
+
+    var chartYMax =
+        Math.ceil(chartMax / chartStep) * chartStep;
 
     new Chart(ctx, {
         type: 'line',
@@ -422,17 +472,17 @@
             },
 
             scales: {
-                y: {
+                   y: {
                     beginAtZero: true,
                     min: 0,
-                    max: 200000,
+                    max: chartYMax,
 
                     border: {
                         display: false
                     },
 
                     ticks: {
-                        stepSize: 50000,
+                        stepSize: chartStep,
                         padding: 10,
                         color: '#687386',
 
@@ -442,7 +492,39 @@
                         },
 
                         callback: function (value) {
-                            return '₹' + Number(value).toLocaleString('en-IN');
+
+                            var amount = Number(value);
+
+                            // Crores
+                            if (amount >= 10000000) {
+                                return '₹' +
+                                    (amount / 10000000).toLocaleString('en-IN', {
+                                        maximumFractionDigits: 2
+                                    }) +
+                                    ' Cr';
+                            }
+
+                            // Lakhs
+                            if (amount >= 100000) {
+                                return '₹' +
+                                    (amount / 100000).toLocaleString('en-IN', {
+                                        maximumFractionDigits: 2
+                                    }) +
+                                    ' L';
+                            }
+
+                            // Thousands
+                            if (amount >= 1000) {
+                                return '₹' +
+                                    (amount / 1000).toLocaleString('en-IN', {
+                                        maximumFractionDigits: 1
+                                    }) +
+                                    ' K';
+                            }
+
+                            // Below ₹1,000
+                            return '₹' +
+                                amount.toLocaleString('en-IN');
                         }
                     },
 
