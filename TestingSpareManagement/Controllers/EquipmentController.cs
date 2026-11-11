@@ -158,7 +158,7 @@ namespace TestingSpareManagement.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(EquipmentConsumableViewModel model, IFormFile? Photo)
+        public async Task<IActionResult> Update(EquipmentConsumableViewModel model, IFormFile? PhotoFile)
         {
             string? photoPath = null;
 
@@ -174,9 +174,9 @@ namespace TestingSpareManagement.Controllers
                 }
 
                 // Save a new photo only when the user uploads one
-                if (Photo != null && Photo.Length > 0)
+                if (PhotoFile != null && PhotoFile.Length > 0)
                 {
-                    photoPath = await SavePhotoAsync(Photo);
+                    photoPath = await SavePhotoAsync(PhotoFile);
 
                     if (photoPath == null)
                     {

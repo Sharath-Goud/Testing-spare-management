@@ -195,7 +195,7 @@ namespace TestingSpareManagement.Controllers
             await connection.OpenAsync();
             await command.ExecuteNonQueryAsync();
 
-            TempData["SuccessMessage"] = "✅ Usage entry logged successfully!";
+            TempData["SuccessMessage"] = "Usage entry logged successfully!";
             return RedirectToAction(nameof(DailyConsumption));
         }
 
@@ -312,14 +312,14 @@ namespace TestingSpareManagement.Controllers
                 await command.ExecuteNonQueryAsync();
 
                 TempData["SuccessMessage"] =
-                    "✅ Usage entry updated successfully!";
+                    "Usage entry updated successfully!";
 
                 return RedirectToAction(nameof(DailyConsumption));
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] =
-                    $"❌ Unable to update usage entry: {ex.Message}";
+                    $"Unable to update usage entry: {ex.Message}";
 
                 return RedirectToAction(nameof(DailyConsumption));
             }
