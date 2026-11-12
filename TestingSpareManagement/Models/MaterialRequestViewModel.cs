@@ -61,6 +61,7 @@ namespace TestingSpareManagement.Models
 
         public List<SelectListItem> ProjectCodes { get; set; } = new List<SelectListItem>();
         public List<string> TestingStations { get; set; } = new List<string>();
+
     }
 
 

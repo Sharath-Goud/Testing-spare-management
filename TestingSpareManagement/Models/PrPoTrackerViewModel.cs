@@ -28,6 +28,9 @@ namespace TestingSpareManagement.Models
         [Required(ErrorMessage = "Buyer is required")]
         public string? BuyerName { get; set; }
 
+        [Required(ErrorMessage = "Vendor is required")]
+        public string? VendorName { get; set; }
+
         [Required(ErrorMessage = "Asset Target is required")]
         public string? AssetTarget { get; set; }
 
@@ -111,6 +114,7 @@ namespace TestingSpareManagement.Models
         public string PoStatus { get; set; } = "";
         public string PurchaseOriginRegion { get; set; } = "";
         public string BuyerName { get; set; } = "";
+        public string VendorName { get; set; } = "";
         public string AssetTarget { get; set; } = "";
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }

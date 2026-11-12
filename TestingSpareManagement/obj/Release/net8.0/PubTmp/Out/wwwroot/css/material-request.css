@@ -346,10 +346,6 @@
             color: #ffffff;
         }
 
-    /* =========================================================
-   EMPTY STATE
-   ========================================================= */
-
     .material-request-page-wrapper .empty-state {
         padding: 35px 15px;
         color: #94a3b8;
@@ -363,10 +359,6 @@
             color: #a78bfa;
             font-size: 24px;
         }
-
-/* =========================================================
-   RESPONSIVE LAYOUT
-   ========================================================= */
 
 @media (min-width: 1600px) {
     .material-request-page-wrapper {
@@ -403,8 +395,6 @@
 }
 
 
-/* FIX: Show the complete Material Request form and submit button */
-
 .material-request-page-wrapper {
     height: auto !important;
     min-height: 0 !important;
@@ -439,7 +429,6 @@
         z-index: 1;
     }
 
-/* Allow the page to scroll vertically */
 html,
 body {
     min-height: 100%;
@@ -452,10 +441,6 @@ main,
     overflow-y: visible;
 }
 
-
-/* ==========================================
-   MATERIAL REQUEST CALENDAR
-   ========================================== */
 
 .material-request-page-wrapper .calendar-widget {
     width: 100%;
@@ -718,8 +703,85 @@ main,
     font-size: 12px;
 }
 
-/* Ensure the table scrolls fully to the last column */
 .material-request-page-wrapper .queue-table th:last-child,
 .material-request-page-wrapper .queue-table td:last-child {
     position: relative;
+}
+
+.request-action-cell {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.request-action-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+}
+
+.request-delete-form {
+    margin: 0;
+    padding: 0;
+}
+
+.btn-request-edit,
+.btn-request-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    min-width: 64px;
+    padding: 0 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+    background: #ffffff;
+    transition: all 0.15s ease;
+}
+
+.btn-request-edit {
+    color: #315eff;
+    border: 1px solid #315eff;
+}
+
+    .btn-request-edit:hover {
+        color: #ffffff;
+        background: #315eff;
+        border-color: #315eff;
+        text-decoration: none;
+    }
+
+.btn-request-delete {
+    color: #ef3333;
+    border: 1px solid #ef3333;
+}
+
+    .btn-request-delete:hover {
+        color: #ffffff;
+        background: #ef3333;
+        border-color: #ef3333;
+    }
+
+    .btn-request-edit i,
+    .btn-request-delete i {
+        font-size: 11px;
+        margin-right: 5px;
+    }
+
+@media (max-width: 700px) {
+
+    .request-action-buttons {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .btn-request-edit,
+    .btn-request-delete {
+        min-width: 64px;
+    }
 }

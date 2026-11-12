@@ -50,6 +50,7 @@ namespace TestingSpareManagement.Controllers
             model.PoStatus = (model.PoStatus ?? "").Trim();
             model.PurchaseOriginRegion = (model.PurchaseOriginRegion ?? "").Trim();
             model.BuyerName = (model.BuyerName ?? "").Trim();
+            model.VendorName = (model.VendorName ?? "").Trim();
             model.AssetTarget = (model.AssetTarget ?? "").Trim();
             model.ShipmentTrackingNo = model.ShipmentTrackingNo?.Trim();
             model.ShipmentStatus = model.ShipmentStatus?.Trim();
@@ -95,6 +96,7 @@ namespace TestingSpareManagement.Controllers
                 command.Parameters.Add("@PoStatus", SqlDbType.NVarChar, 50).Value = model.PoStatus ?? "";
                 command.Parameters.Add("@PurchaseOriginRegion", SqlDbType.NVarChar, 50).Value = model.PurchaseOriginRegion ?? "";
                 command.Parameters.Add("@BuyerName", SqlDbType.NVarChar, 100).Value = model.BuyerName ?? "";
+                command.Parameters.Add("@VendorName", SqlDbType.NVarChar, 150).Value = model.VendorName ?? "";
                 command.Parameters.Add("@AssetTarget", SqlDbType.NVarChar, 100).Value = model.AssetTarget ?? "";
                 command.Parameters.Add("@Quantity", SqlDbType.Int).Value = model.Quantity;
 
@@ -165,6 +167,7 @@ namespace TestingSpareManagement.Controllers
                 PoStatus,
                 PurchaseOriginRegion,
                 BuyerName,
+                VendorName,
                 AssetTarget,
                 Quantity,
                 UnitPrice,
@@ -206,6 +209,7 @@ namespace TestingSpareManagement.Controllers
                         purchaseOriginRegion =
                             reader["PurchaseOriginRegion"]?.ToString() ?? "",
                         buyerName = reader["BuyerName"]?.ToString() ?? "",
+                        vendorName = reader["VendorName"]?.ToString() ?? "",
                         assetTarget = reader["AssetTarget"]?.ToString() ?? "",
                         quantity = Convert.ToInt32(reader["Quantity"]),
                         unitPrice = Convert.ToDecimal(reader["UnitPrice"]),
@@ -258,6 +262,7 @@ namespace TestingSpareManagement.Controllers
                 string.IsNullOrWhiteSpace(model.PoStatus) ||
                 string.IsNullOrWhiteSpace(model.PurchaseOriginRegion) ||
                 string.IsNullOrWhiteSpace(model.BuyerName) ||
+                string.IsNullOrWhiteSpace(model.VendorName) ||
                 string.IsNullOrWhiteSpace(model.AssetTarget))
             {
                 TempData["ErrorMessage"] =
@@ -317,6 +322,7 @@ namespace TestingSpareManagement.Controllers
                     PoStatus = @PoStatus,
                     PurchaseOriginRegion = @PurchaseOriginRegion,
                     BuyerName = @BuyerName,
+                    VendorName = @VendorName,
                     AssetTarget = @AssetTarget,
                     Quantity = @Quantity,
                     UnitPrice = @UnitPrice,
@@ -348,6 +354,8 @@ namespace TestingSpareManagement.Controllers
                             .Value = model.PurchaseOriginRegion.Trim();
                         command.Parameters.Add("@BuyerName", SqlDbType.NVarChar, 100)
                             .Value = model.BuyerName.Trim();
+                        command.Parameters.Add("@VendorName", SqlDbType.NVarChar, 150)
+                            .Value = model.VendorName.Trim();
                         command.Parameters.Add("@AssetTarget", SqlDbType.NVarChar, 250)
                             .Value = model.AssetTarget.Trim();
                         command.Parameters.Add("@Quantity", SqlDbType.Int)
@@ -632,7 +640,7 @@ namespace TestingSpareManagement.Controllers
             var sb = new StringBuilder();
 
             // CSV Header
-            sb.AppendLine("DATE,PR NUMBER,PO STATUS,PROJECT,ORIGIN,BUYER,ASSET TARGET,QTY,UNIT PRICE,SUBTOTAL,TAX %,TAX AMOUNT,TOTAL COST,SHIPMENT STATUS,SHIPMENT NO,DELIVERY DATE,REMARKS");
+            sb.AppendLine("DATE,PR NUMBER,PO STATUS,PROJECT,ORIGIN,BUYER,VENDOR,ASSET TARGET,QTY,UNIT PRICE,SUBTOTAL,TAX %,TAX AMOUNT,TOTAL COST,SHIPMENT STATUS,SHIPMENT NO,DELIVERY DATE,REMARKS");
 
             // CSV Rows
             foreach (var item in records)
@@ -643,6 +651,7 @@ namespace TestingSpareManagement.Controllers
                 sb.Append(Escape(item.ProjectCode)).Append(',');
                 sb.Append(Escape(item.PurchaseOriginRegion)).Append(',');
                 sb.Append(Escape(item.BuyerName)).Append(',');
+                sb.Append(Escape(item.VendorName)).Append(',');
                 sb.Append(Escape(item.AssetTarget)).Append(',');
                 sb.Append(item.Quantity).Append(',');
                 sb.Append(item.UnitPrice.ToString("F2")).Append(',');
@@ -698,6 +707,7 @@ namespace TestingSpareManagement.Controllers
             sb.AppendLine("<th>PROJECT</th>");
             sb.AppendLine("<th>ORIGIN</th>");
             sb.AppendLine("<th>BUYER</th>");
+            sb.AppendLine("<th>VENDOR</th>");
             sb.AppendLine("<th>ASSET</th>");
             sb.AppendLine("<th>QTY</th>");
             sb.AppendLine("<th>UNIT PRICE</th>");
@@ -717,6 +727,7 @@ namespace TestingSpareManagement.Controllers
                 sb.AppendLine($"<td>{System.Net.WebUtility.HtmlEncode(item.ProjectCode)}</td>");
                 sb.AppendLine($"<td>{System.Net.WebUtility.HtmlEncode(item.PurchaseOriginRegion)}</td>");
                 sb.AppendLine($"<td>{System.Net.WebUtility.HtmlEncode(item.BuyerName)}</td>");
+                sb.AppendLine($"<td>{System.Net.WebUtility.HtmlEncode(item.VendorName)}</td>");
                 sb.AppendLine($"<td>{System.Net.WebUtility.HtmlEncode(item.AssetTarget)}</td>");
                 sb.AppendLine($"<td>{item.Quantity}</td>");
                 sb.AppendLine($"<td>${item.UnitPrice:F2}</td>");
@@ -1009,6 +1020,7 @@ namespace TestingSpareManagement.Controllers
                 PoStatus = reader["PoStatus"]?.ToString() ?? "",
                 PurchaseOriginRegion = reader["PurchaseOriginRegion"]?.ToString() ?? "",
                 BuyerName = reader["BuyerName"]?.ToString() ?? "",
+                VendorName = reader["VendorName"]?.ToString() ?? "",
                 AssetTarget = reader["AssetTarget"]?.ToString() ?? "",
                 Quantity = Convert.ToInt32(reader["Quantity"]),
                 UnitPrice = Convert.ToDecimal(reader["UnitPrice"]),

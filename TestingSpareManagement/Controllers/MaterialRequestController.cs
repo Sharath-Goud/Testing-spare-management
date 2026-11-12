@@ -200,6 +200,339 @@ namespace TestingSpareManagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            if (id <= 0)
+                return BadRequest();
+
+            MaterialRequestViewModel model = new MaterialRequestViewModel();
+
+            using SqlConnection connection =
+                new SqlConnection(GetConnectionString());
+
+            const string query = @"
+        SELECT
+            Id,
+            RequestDate,
+            ProjectCode,
+            SpareDescription,
+            PartNumber,
+            Brand,
+            TargetMachine,
+            RequestedQuantity,
+            PriorityLevel,
+            Justification
+        FROM dbo.MaterialRequest
+        WHERE Id = @Id
+          AND IsActive = 1;";
+
+            using SqlCommand command =
+                new SqlCommand(query, connection);
+
+            command.Parameters.Add("@Id", SqlDbType.Int).Value = id;
+
+            await connection.OpenAsync();
+
+            using SqlDataReader reader =
+                await command.ExecuteReaderAsync();
+
+            if (!await reader.ReadAsync())
+            {
+                TempData["ErrorMessage"] =
+                    "Material request not found.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            model.Id = Convert.ToInt32(reader["Id"]);
+
+            model.RequestDate =
+                Convert.ToDateTime(reader["RequestDate"]);
+
+            model.ProjectCode =
+                reader["ProjectCode"]?.ToString() ?? "";
+
+            model.SpareDescription =
+                reader["SpareDescription"]?.ToString() ?? "";
+
+            model.PartNumber =
+                reader["PartNumber"] == DBNull.Value
+                    ? ""
+                    : reader["PartNumber"]?.ToString() ?? "";
+
+            model.Brand =
+                reader["Brand"] == DBNull.Value
+                    ? ""
+                    : reader["Brand"]?.ToString() ?? "";
+
+            model.TargetMachine =
+                reader["TargetMachine"]?.ToString() ?? "";
+
+            model.RequestedQuantity =
+                Convert.ToInt32(reader["RequestedQuantity"]);
+
+            model.PriorityLevel =
+                reader["PriorityLevel"]?.ToString() ?? "";
+
+            model.Justification =
+                reader["Justification"] == DBNull.Value
+                    ? ""
+                    : reader["Justification"]?.ToString() ?? "";
+
+            model.ProjectCodes =
+                await GetActiveProjectCodes();
+
+            var spareDescriptions = await GetMasterConnectorDescriptions();
+
+            if (!string.IsNullOrWhiteSpace(model.SpareDescription) &&
+                !spareDescriptions.Any(x =>
+                    string.Equals(
+                        x?.Trim(),
+                        model.SpareDescription.Trim(),
+                        StringComparison.OrdinalIgnoreCase)))
+            {
+                spareDescriptions.Insert(0, model.SpareDescription.Trim());
+            }
+
+            ViewBag.SpareDescriptions = spareDescriptions;
+
+            model.TestingStations =
+                await GetTestingStations();
+
+            var (records, totalRecords) =
+                await GetMaterialRequests(1, 25);
+
+            model.Requests = records;
+            model.TotalRecords = totalRecords;
+            model.CurrentPage = 1;
+            model.PageSize = 25;
+
+            return View("Index", model);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(MaterialRequestItem model)
+        {
+            if (model.Id <= 0)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.ProjectCodes =
+                    await GetActiveProjectCodes();
+
+                ViewBag.SpareDescriptions =
+                    await GetMasterConnectorDescriptions();
+
+                ViewBag.TestingStations =
+                    await GetTestingStations();
+
+                return View(model);
+            }
+
+            using SqlConnection connection =
+                new SqlConnection(GetConnectionString());
+
+            const string query = @"
+        UPDATE dbo.MaterialRequest
+        SET
+            RequestDate = @RequestDate,
+            ProjectCode = @ProjectCode,
+            SpareDescription = @SpareDescription,
+            PartNumber = @PartNumber,
+            Brand = @Brand,
+            TargetMachine = @TargetMachine,
+            RequestedQuantity = @RequestedQuantity,
+            PriorityLevel = @PriorityLevel,
+            Justification = @Justification,
+            ModifiedBy = @ModifiedBy,
+            ModifiedDate = GETDATE()
+        WHERE Id = @Id
+          AND IsActive = 1;";
+
+            using SqlCommand command =
+                new SqlCommand(query, connection);
+
+            command.Parameters.Add("@Id", SqlDbType.Int)
+                .Value = model.Id;
+
+            command.Parameters.Add("@RequestDate", SqlDbType.Date)
+                .Value = model.RequestDate;
+
+            command.Parameters.Add("@ProjectCode", SqlDbType.NVarChar, 50)
+                .Value = model.ProjectCode;
+
+            command.Parameters.Add("@SpareDescription", SqlDbType.NVarChar, 250)
+                .Value = model.SpareDescription;
+
+            command.Parameters.Add("@PartNumber", SqlDbType.NVarChar, 100)
+                .Value = string.IsNullOrWhiteSpace(model.PartNumber)
+                    ? DBNull.Value
+                    : model.PartNumber;
+
+            command.Parameters.Add("@Brand", SqlDbType.NVarChar, 100)
+                .Value = string.IsNullOrWhiteSpace(model.Brand)
+                    ? DBNull.Value
+                    : model.Brand;
+
+            command.Parameters.Add("@TargetMachine", SqlDbType.NVarChar, 50)
+                .Value = model.TargetMachine;
+
+            command.Parameters.Add("@RequestedQuantity", SqlDbType.Int)
+                .Value = model.RequestedQuantity;
+
+            command.Parameters.Add("@PriorityLevel", SqlDbType.NVarChar, 50)
+                .Value = model.PriorityLevel;
+
+            command.Parameters.Add("@Justification", SqlDbType.NVarChar, 500)
+                .Value = string.IsNullOrWhiteSpace(model.Justification)
+                    ? DBNull.Value
+                    : model.Justification;
+
+            string modifiedBy =
+                HttpContext.Session.GetString("EmployeeName")
+                ?? HttpContext.Session.GetString("EmployeeId")
+                ?? "System";
+
+            command.Parameters.Add("@ModifiedBy", SqlDbType.NVarChar, 100)
+                .Value = modifiedBy;
+
+            await connection.OpenAsync();
+
+            int rows =
+                await command.ExecuteNonQueryAsync();
+
+            if (rows == 0)
+            {
+                TempData["ErrorMessage"] =
+                    "Material request could not be updated.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            TempData["SuccessMessage"] =
+                "Material request updated successfully.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(MaterialRequestViewModel model)
+        {
+            if (model.Id <= 0)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+            {
+                model.ProjectCodes =
+                    await GetActiveProjectCodes();
+
+                ViewBag.SpareDescriptions =
+                    await GetMasterConnectorDescriptions();
+
+                model.TestingStations =
+                    await GetTestingStations();
+
+                var (records, totalRecords) =
+                    await GetMaterialRequests(1, 25);
+
+                model.Requests = records;
+                model.TotalRecords = totalRecords;
+                model.CurrentPage = 1;
+                model.PageSize = 25;
+
+                return View("Index", model);
+            }
+
+            using SqlConnection connection =
+                new SqlConnection(GetConnectionString());
+
+            const string query = @"
+        UPDATE dbo.MaterialRequest
+        SET
+            RequestDate = @RequestDate,
+            ProjectCode = @ProjectCode,
+            SpareDescription = @SpareDescription,
+            PartNumber = @PartNumber,
+            Brand = @Brand,
+            TargetMachine = @TargetMachine,
+            RequestedQuantity = @RequestedQuantity,
+            PriorityLevel = @PriorityLevel,
+            Justification = @Justification,
+            ModifiedBy = @ModifiedBy,
+            ModifiedDate = GETDATE()
+        WHERE Id = @Id
+          AND IsActive = 1;";
+
+            using SqlCommand command =
+                new SqlCommand(query, connection);
+
+            command.Parameters.Add("@Id", SqlDbType.Int)
+                .Value = model.Id;
+
+            command.Parameters.Add("@RequestDate", SqlDbType.Date)
+                .Value = model.RequestDate;
+
+            command.Parameters.Add("@ProjectCode", SqlDbType.NVarChar, 50)
+                .Value = model.ProjectCode;
+
+            command.Parameters.Add("@SpareDescription", SqlDbType.NVarChar, 250)
+                .Value = model.SpareDescription;
+
+            command.Parameters.Add("@PartNumber", SqlDbType.NVarChar, 100)
+                .Value = string.IsNullOrWhiteSpace(model.PartNumber)
+                    ? DBNull.Value
+                    : model.PartNumber;
+
+            command.Parameters.Add("@Brand", SqlDbType.NVarChar, 100)
+                .Value = string.IsNullOrWhiteSpace(model.Brand)
+                    ? DBNull.Value
+                    : model.Brand;
+
+            command.Parameters.Add("@TargetMachine", SqlDbType.NVarChar, 50)
+                .Value = model.TargetMachine;
+
+            command.Parameters.Add("@RequestedQuantity", SqlDbType.Int)
+                .Value = model.RequestedQuantity;
+
+            command.Parameters.Add("@PriorityLevel", SqlDbType.NVarChar, 50)
+                .Value = model.PriorityLevel;
+
+            command.Parameters.Add("@Justification", SqlDbType.NVarChar, 500)
+                .Value = string.IsNullOrWhiteSpace(model.Justification)
+                    ? DBNull.Value
+                    : model.Justification;
+
+            string modifiedBy =
+                HttpContext.Session.GetString("EmployeeName")
+                ?? HttpContext.Session.GetString("EmployeeId")
+                ?? "System";
+
+            command.Parameters.Add("@ModifiedBy", SqlDbType.NVarChar, 100)
+                .Value = modifiedBy;
+
+            await connection.OpenAsync();
+
+            int rowsUpdated =
+                await command.ExecuteNonQueryAsync();
+
+            if (rowsUpdated == 0)
+            {
+                TempData["ErrorMessage"] =
+                    "Material request could not be updated.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            TempData["SuccessMessage"] =
+                "Material request updated successfully.";
+
+            return RedirectToAction(nameof(Index));
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -1121,10 +1454,10 @@ namespace TestingSpareManagement.Controllers
                 new SqlConnection(GetConnectionString());
 
             const string query = @"
-        SELECT StationCode
-        FROM dbo.TestingStation
-        WHERE IsActive = 1
-        ORDER BY StationCode;";
+                SELECT StationCode
+                FROM dbo.TestingStation
+                WHERE IsActive = 1
+                ORDER BY StationCode;";
 
             using SqlCommand command = new SqlCommand(query, connection);
 

@@ -36,8 +36,14 @@
         }
 
 
-        <form asp-controller="MaterialRequest" asp-action="Submit" method="post">
+        <form asp-controller="MaterialRequest"
+              asp-action="@(Model.Id > 0 ? "Update" : "Submit")"
+              method="post">
+
             @Html.AntiForgeryToken()
+
+            <input type="hidden"
+                   asp-for="Id" />
 
 
             <!-- Interactive Calendar - Material Request -->
@@ -158,7 +164,7 @@
             <!-- Requested Quantity -->
             <div class="form-group">
                 <label>Requested Quantity (Pcs/Sets)</label>
-                <input asp-for="RequestedQuantity" type="number" class="form-control-custom" placeholder="e.g. 2" value=""/>
+                <input asp-for="RequestedQuantity" type="number" class="form-control-custom" placeholder="e.g. 2"/>
                 <span asp-validation-for="RequestedQuantity" class="text-danger small"></span>
             </div>
 
@@ -212,6 +218,7 @@
                         <th>PRIORITY</th>
                         <th>STATUS</th>
                         <th>ADMIN ACTIONS</th>
+                        <th>ACTION</th>
                     </tr>
                 </thead>
 
@@ -315,7 +322,41 @@
                                         <span class="admin-action-completed">Processed</span>
                                     }
                                 </td>
+                                <td class="request-action-cell">
+                                    <div class="request-action-buttons">
 
+                                        <!-- EDIT -->
+                                        <a asp-controller="MaterialRequest"
+                                           asp-action="Edit"
+                                           asp-route-id="@item.Id"
+                                           class="btn-request-edit">
+                                            <i class="fa-solid fa-pen"></i>
+                                            Edit
+                                        </a>
+
+                                        <!-- DELETE -->
+                                        <form asp-controller="MaterialRequest"
+                                              asp-action="Delete"
+                                              method="post"
+                                              class="request-delete-form"
+                                              onsubmit="return confirm('Are you sure you want to delete this material request?');">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@item.Id" />
+
+                                            <button type="submit"
+                                                    class="btn-request-delete">
+                                                <i class="fa-solid fa-trash"></i>
+                                                Del
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+                                </td>
                             </tr>
                         }
                     }
